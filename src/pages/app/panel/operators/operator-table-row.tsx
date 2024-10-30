@@ -11,7 +11,16 @@ import {
 } from '@/components/ui/select'
 import { TableCell, TableRow } from '@/components/ui/table'
 
-export function OperatorTableRow() {
+export interface OperatorTableRowProps {
+  operator: {
+    id: string
+    name: string
+    email: string
+    role: string
+  }
+}
+
+export function OperatorTableRow({ operator }: OperatorTableRowProps) {
   return (
     <TableRow>
       <TableCell>
@@ -26,16 +35,14 @@ export function OperatorTableRow() {
         </Dialog>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        Francisco silva Machado de Sousa
+        {operator.name}
       </TableCell>
-      <TableCell className="text-muted-foreground">
-        Francisc34@gmail.com
-      </TableCell>
+      <TableCell className="text-muted-foreground">{operator.email}</TableCell>
       <TableCell>UBS - módulo 32</TableCell>
       <TableCell className="font-medium">
-        <Select defaultValue="COMMON">
+        <Select defaultValue={operator.role}>
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Theme" />
+            <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="AMDIN">Administrador</SelectItem>

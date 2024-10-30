@@ -1,5 +1,21 @@
+import { useQuery } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
+import { useSearchParams } from 'react-router-dom'
+import { z } from 'zod'
 
+import { getOperators } from '@/api/get-operators'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
@@ -8,18 +24,41 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { useAuth } from '@/contexts/authContext'
 
+import { NewOperatorDialog } from './new-operator-dialog'
 import { OperatorTableFilters } from './operator-table-filters'
 import { OperatorTableRow } from './operator-table-row'
 
 export function Operators() {
+  const { token } = useAuth()
+
+  const [searchParams, setSearchParams] = useSearchParams()
+  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const { data: operators } = useQuery({
+    queryKey: ['operators'],
+    queryFn: () => getOperators({ page }, token ?? ''),
+  })
+
+  console.log()
+
   return (
     <>
       <Helmet title="Operadores" />
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Operadores</h1>
         <div className="space-y-2.5">
-          <OperatorTableFilters />
+          <div className="flex items-center justify-between">
+            <OperatorTableFilters />
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button className="" variant={'default'}>
+                  Novo Operador
+                </Button>
+              </DialogTrigger>
+              <NewOperatorDialog />
+            </Dialog>
+          </div>
           <div className="rounded-md border">
             <Table>
               <TableHeader>
@@ -36,9 +75,10 @@ export function Operators() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {Array.from({ length: 10 }).map((_, i) => {
-                  return <OperatorTableRow key={i} />
-                })}
+                {operators &&
+                  operators.map((item) => {
+                    return <OperatorTableRow operator={item} key={item.email} />
+                  })}
               </TableBody>
             </Table>
           </div>

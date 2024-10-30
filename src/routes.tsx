@@ -16,14 +16,25 @@ export const router = createBrowserRouter([
 
   {
     path: '/',
-    element: (
-      <PrivateRoute>
-        <PanelLayout />
-      </PrivateRoute>
-    ),
+    element: <PanelLayout />,
     children: [
-      { path: '/panel', element: <LoginForm /> },
-      { path: '/operators', element: <Operators /> },
+      {
+        path: '/panel',
+        element: (
+          <PrivateRoute>
+            {' '}
+            <LoginForm />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: '/operators',
+        element: (
+          <PrivateRoute>
+            <Operators />
+          </PrivateRoute>
+        ),
+      },
     ],
   },
 ])
