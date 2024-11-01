@@ -26,6 +26,7 @@ import { useAuth } from '@/contexts/authContext'
 
 import { InstitutionTableFilters } from './institution-table-filters'
 import { InstitutionTableRow } from './institution-table-row'
+import { NewInstitutionDialog } from './new-institution-dialog'
 // import { NewInstitutionDialog } from './new-institution-dialog'
 
 export function Institutions() {
@@ -54,7 +55,7 @@ export function Institutions() {
                   Nova Instituição
                 </Button>
               </DialogTrigger>
-              {/* <NewInstitutionDialog /> */}
+              <NewInstitutionDialog />
             </Dialog>
           </div>
           <div className="rounded-md border">

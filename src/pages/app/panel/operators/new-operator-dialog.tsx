@@ -25,7 +25,7 @@ const newOperatorSchema = z.object({
   name: z.string().min(3),
   email: z.string().email(),
   password: z.string(),
-  role: z.enum(['ADMIN', 'COMMOM']),
+  role: z.enum(['ADMIN', 'COMMON']),
 })
 type NewOperatorSchema = z.infer<typeof newOperatorSchema>
 

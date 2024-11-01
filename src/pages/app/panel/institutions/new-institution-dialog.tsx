@@ -19,13 +19,13 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/authContext'
 
 const newInstitutionSchema = z.object({
   name: z.string().min(3),
-  email: z.string().email(),
-  password: z.string(),
-  role: z.enum(['ADMIN', 'COMMOM']),
+  cnpj: z.string(),
+  description: z.string(),
 })
 type NewInstitutionSchema = z.infer<typeof newInstitutionSchema>
 
@@ -46,25 +46,26 @@ export function NewInstitutionDialog() {
 
   async function handleRegisterInstitution(data: NewInstitutionSchema) {
     try {
+      // console.log(token)
       await registerInstitutionFn({
         name: data.name,
-        email: data.email,
-        password: data.password,
-        role: data.role,
+        cnpj: data.cnpj,
+        description: data.description,
       })
 
-      toast.success(`Operador ${data.name} registrado com sucesso!`)
-    } catch {
-      toast.error('Não foi possível registrar o operador. Tente Novamente!')
+      toast.success(`Instituição ${data.name} registrada com sucesso!`)
+    } catch (error) {
+      console.log(error)
+      toast.error('Não foi possível registrar a Institutição. Tente Novamente!')
     }
   }
 
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
-        <DialogTitle>Novo Operador</DialogTitle>
+        <DialogTitle>Nova Institutição</DialogTitle>
         <DialogDescription>
-          Preencha todas as informações para registrar um novo usuário
+          Preencha todas as informações para registrar uma nova instituição.
         </DialogDescription>
       </DialogHeader>
 
@@ -77,30 +78,20 @@ export function NewInstitutionDialog() {
             <Input id="name" className="col-span-3" {...register('name')} />
           </div>
           <div className="flex-col">
-            <Label htmlFor="email" className="text-right">
-              Email
+            <Label htmlFor="cnpj" className="text-right">
+              CNPJ
             </Label>
-            <Input id="email" className="col-span-3" {...register('email')} />
+            <Input id="cnpj" className="col-span-3" {...register('cnpj')} />
           </div>
           <div className="flex-col">
-            <Label htmlFor="password" className="text-right">
-              Senha
+            <Label htmlFor="description" className="text-right">
+              Descrição
             </Label>
-            <Input
-              id="password"
-              className="col-span-3"
-              {...register('password')}
-            />
-          </div>
-          <div className="flex-col">
-            <Label htmlFor="role" className="text-right">
-              role
-            </Label>
-            <Input
-              id="role"
-              value="ADMIN"
-              className="col-span-3"
-              {...register('role')}
+            <Textarea
+              id="description"
+              className="col-span-3 min-h-[120px]"
+              placeholder="Sobre a instituição..."
+              {...register('description')}
             />
           </div>
         </div>
