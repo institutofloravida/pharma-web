@@ -11,6 +11,7 @@ import {
   Frame,
   GalleryVerticalEnd,
   LogOut,
+  MonitorCog,
   MoreHorizontal,
   Pill,
   Plus,
@@ -102,22 +103,22 @@ const data = {
   ],
   navMainWithManyItems: [
     {
-      title: 'Playground',
+      title: 'Cadastros Gerais',
       url: '#',
-      icon: SquareTerminal,
+      icon: MonitorCog,
       isActive: true,
       items: [
         {
-          title: 'History',
-          url: '#',
+          title: 'Instituições',
+          url: '/institutions',
         },
         {
-          title: 'Starred',
-          url: '#',
+          title: 'Laboratórios',
+          url: '/manufactures',
         },
         {
-          title: 'Settings',
-          url: '#',
+          title: 'Estoques',
+          url: '/stocks',
         },
       ],
     },
@@ -388,20 +389,14 @@ export default function PanelLayout() {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                {breadCrumpItems.map((item, index) => {
-                  return (
-                    <>
-                      <BreadcrumbItem key={item}>
-                        <BreadcrumbPage>{item}</BreadcrumbPage>
-                      </BreadcrumbItem>
-                      {index === breadCrumpItems.length - 1 ? (
-                        <></>
-                      ) : (
-                        <BreadcrumbSeparator className="hidden md:block" />
-                      )}
-                    </>
-                  )
-                })}
+                {breadCrumpItems.map((item, index) => (
+                  <BreadcrumbItem key={`breadcrumb-${index}`}>
+                    <BreadcrumbPage>{item}</BreadcrumbPage>
+                    {index < breadCrumpItems.length - 1 && (
+                      <BreadcrumbSeparator className="hidden md:block" />
+                    )}
+                  </BreadcrumbItem>
+                ))}
               </BreadcrumbList>
             </Breadcrumb>
           </div>

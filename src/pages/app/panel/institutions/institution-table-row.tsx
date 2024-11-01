@@ -1,4 +1,4 @@
-import { Search, UserMinus, UserPen } from 'lucide-react'
+import { PenLine, Search, Trash, UserMinus, UserPen } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
@@ -11,16 +11,15 @@ import {
 } from '@/components/ui/select'
 import { TableCell, TableRow } from '@/components/ui/table'
 
-export interface OperatorTableRowProps {
-  operator: {
-    id: string
+export interface InstitutionTableRowProps {
+  institution: {
     name: string
-    email: string
-    role: string
+    cnpj: string
+    description: string
   }
 }
 
-export function OperatorTableRow({ operator }: OperatorTableRowProps) {
+export function InstitutionTableRow({ institution }: InstitutionTableRowProps) {
   return (
     <TableRow>
       <TableCell>
@@ -35,29 +34,21 @@ export function OperatorTableRow({ operator }: OperatorTableRowProps) {
         </Dialog>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        {operator.name}
+        {institution.name}
       </TableCell>
-      <TableCell className="text-muted-foreground">{operator.email}</TableCell>
-      <TableCell>UBS - módulo 32</TableCell>
-      <TableCell className="font-medium">
-        <Select defaultValue={operator.role}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ADMIN">Administrador</SelectItem>
-            <SelectItem value="COMMON">Comum</SelectItem>
-          </SelectContent>
-        </Select>
+      <TableCell className="text-muted-foreground">
+        {institution.cnpj}
       </TableCell>
+      <TableCell>{institution.description}</TableCell>
+
       <TableCell>
         <Button variant={'outline'} size={'xs'}>
-          <UserPen className="h-3 w-3" />
+          <PenLine className="h-3 w-3" />
         </Button>
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>
-          <UserMinus className="h-3 w-3" />
+          <Trash className="h-3 w-3" />
         </Button>
       </TableCell>
     </TableRow>

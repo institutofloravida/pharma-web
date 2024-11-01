@@ -5,6 +5,7 @@ import { AuthLayout } from './pages/_layouts/auth'
 import PanelLayout from './pages/_layouts/panel'
 import { PrivateRoute } from './pages/_private/private-route'
 import { SignIn } from './pages/app/auth/sign-in'
+import { Institutions } from './pages/app/panel/institutions/institutions'
 import { Operators } from './pages/app/panel/operators/operators'
 
 export const router = createBrowserRouter([
@@ -22,7 +23,6 @@ export const router = createBrowserRouter([
         path: '/panel',
         element: (
           <PrivateRoute>
-            {' '}
             <LoginForm />
           </PrivateRoute>
         ),
@@ -32,6 +32,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Operators />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: '/institutions',
+        element: (
+          <PrivateRoute>
+            <Institutions />
           </PrivateRoute>
         ),
       },

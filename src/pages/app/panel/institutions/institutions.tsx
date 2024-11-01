@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { getOperators } from '@/api/get-operators'
+import { fetchInstitutions } from '@/api/fetch-institutions'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -14,8 +14,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
@@ -26,37 +24,37 @@ import {
 } from '@/components/ui/table'
 import { useAuth } from '@/contexts/authContext'
 
-import { NewOperatorDialog } from './new-operator-dialog'
-import { OperatorTableFilters } from './operator-table-filters'
-import { OperatorTableRow } from './operator-table-row'
+import { InstitutionTableFilters } from './institution-table-filters'
+import { InstitutionTableRow } from './institution-table-row'
+// import { NewInstitutionDialog } from './new-institution-dialog'
 
-export function Operators() {
+export function Institutions() {
   const { token } = useAuth()
 
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: operators } = useQuery({
-    queryKey: ['operators'],
-    queryFn: () => getOperators({ page }, token ?? ''),
+  const { data: institutions } = useQuery({
+    queryKey: ['institutions'],
+    queryFn: () => fetchInstitutions({ page }, token ?? ''),
   })
 
   console.log()
 
   return (
     <>
-      <Helmet title="Operadores" />
+      <Helmet title="Instituições" />
       <div className="flex flex-col gap-4">
-        <h1 className="text-3xl font-bold tracking-tight">Operadores</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Instituições</h1>
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <OperatorTableFilters />
+            <InstitutionTableFilters />
             <Dialog>
               <DialogTrigger asChild>
                 <Button className="" variant={'default'}>
-                  Novo Operador
+                  Nova Instituição
                 </Button>
               </DialogTrigger>
-              <NewOperatorDialog />
+              {/* <NewInstitutionDialog /> */}
             </Dialog>
           </div>
           <div className="rounded-md border">
@@ -65,19 +63,18 @@ export function Operators() {
                 <TableRow>
                   <TableHead className="w-[64px]"></TableHead>
                   <TableHead>Nome</TableHead>
-                  <TableHead className="w-[180px]">Email</TableHead>
-                  <TableHead className="w-[180px]">
-                    Instituição Associada
-                  </TableHead>
-                  <TableHead className="w-[140px]">Tipo de usuário</TableHead>
+                  <TableHead className="w-[180px]">CNPJ</TableHead>
+                  <TableHead className="w-[550px]">Descrição</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {operators &&
-                  operators.map((item) => {
-                    return <OperatorTableRow operator={item} key={item.id} />
+                {institutions &&
+                  institutions.map((item) => {
+                    return (
+                      <InstitutionTableRow institution={item} key={item.id} />
+                    )
                   })}
               </TableBody>
             </Table>
