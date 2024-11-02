@@ -3,13 +3,15 @@ export interface GetOperatorsQuery {
   page?: number | null
 }
 
+export interface Operator {
+  id: string
+  name: string
+  email: string
+  role: string
+}
+
 interface GetOperatorsResponse {
-  operators: {
-    id: string
-    name: string
-    email: string
-    role: string
-  }[]
+  operators: Operator[]
 }
 
 export async function getOperators({ page }: GetOperatorsQuery, token: string) {

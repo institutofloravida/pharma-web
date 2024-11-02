@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -9,6 +9,7 @@ import {
   registerOperator,
   type RegisterOperatorBody,
 } from '@/api/register-operator'
+import { SelectRole } from '@/components/select-role'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,
@@ -30,10 +31,13 @@ const newOperatorSchema = z.object({
 type NewOperatorSchema = z.infer<typeof newOperatorSchema>
 
 export function NewOperatorDialog() {
+  const queryClient = useQueryClient()
   const { token } = useAuth()
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { isSubmitting },
   } = useForm<NewOperatorSchema>({
     resolver: zodResolver(newOperatorSchema),
@@ -42,6 +46,17 @@ export function NewOperatorDialog() {
   const { mutateAsync: registerOperatorFn } = useMutation({
     mutationFn: (data: RegisterOperatorBody) =>
       registerOperator(data, token ?? ''),
+    onSuccess(_, { name, email, role }) {
+      const cached =
+        queryClient.getQueryData<NewOperatorSchema[]>(['operators']) || []
+
+      if (cached) {
+        queryClient.setQueryData(
+          ['operators'],
+          [...cached, { name, email, role }],
+        )
+      }
+    },
   })
 
   async function handleRegisterOperator(data: NewOperatorSchema) {
@@ -93,14 +108,9 @@ export function NewOperatorDialog() {
             />
           </div>
           <div className="flex-col">
-            <Label htmlFor="role" className="text-right">
-              role
-            </Label>
-            <Input
-              id="role"
-              value="ADMIN"
-              className="col-span-3"
-              {...register('role')}
+            <SelectRole
+              value={watch('role')}
+              onChange={(value) => setValue('role', value)}
             />
           </div>
         </div>
