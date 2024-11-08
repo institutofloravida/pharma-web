@@ -114,12 +114,12 @@ const data = {
           url: '/institutions',
         },
         {
-          title: 'Laboratórios',
-          url: '/manufactures',
-        },
-        {
           title: 'Estoques',
           url: '/stocks',
+        },
+        {
+          title: 'Laboratórios',
+          url: '/manufactures',
         },
       ],
     },

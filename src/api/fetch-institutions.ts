@@ -3,13 +3,15 @@ export interface FetchInstitutionsQuery {
   page?: number | null
 }
 
+export interface Institution {
+  id: string
+  name: string
+  cnpj: string
+  description: string
+}
+
 interface FetchInstitutionsResponse {
-  institutions: {
-    id: string
-    name: string
-    cnpj: string
-    description: string
-  }[]
+  institutions: Institution[]
 }
 
 export async function fetchInstitutions(

@@ -7,6 +7,7 @@ import { PrivateRoute } from './pages/_private/private-route'
 import { SignIn } from './pages/app/auth/sign-in'
 import { Institutions } from './pages/app/panel/institutions/institutions'
 import { Operators } from './pages/app/panel/operators/operators'
+import { Stocks } from './pages/app/panel/stocks/stocks'
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +41,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Institutions />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: '/stocks',
+        element: (
+          <PrivateRoute>
+            <Stocks />
           </PrivateRoute>
         ),
       },
