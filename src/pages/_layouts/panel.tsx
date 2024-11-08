@@ -118,8 +118,8 @@ const data = {
           url: '/stocks',
         },
         {
-          title: 'Laboratórios',
-          url: '/manufactures',
+          title: 'Classes Terapêuticas',
+          url: '/therapeutic-class',
         },
       ],
     },
