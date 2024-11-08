@@ -5,9 +5,9 @@ import { AuthLayout } from './pages/_layouts/auth'
 import PanelLayout from './pages/_layouts/panel'
 import { PrivateRoute } from './pages/_private/private-route'
 import { SignIn } from './pages/app/auth/sign-in'
-import { Institutions } from './pages/app/panel/institutions/institutions'
+import { Institutions } from './pages/app/panel/auxiliary-records/institutions/institutions'
+import { Stocks } from './pages/app/panel/auxiliary-records/stocks/stocks'
 import { Operators } from './pages/app/panel/operators/operators'
-import { Stocks } from './pages/app/panel/stocks/stocks'
 
 export const router = createBrowserRouter([
   {
