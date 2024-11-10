@@ -45,7 +45,8 @@ export function OperatorTableRow({ operator }: OperatorTableRowProps) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ADMIN">Administrador</SelectItem>
+            <SelectItem value="SUPER_ADMIN">Super Administrador</SelectItem>
+            <SelectItem value="MANAGER">Adminitrador</SelectItem>
             <SelectItem value="COMMON">Comum</SelectItem>
           </SelectContent>
         </Select>
