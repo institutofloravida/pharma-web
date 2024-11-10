@@ -1,21 +1,14 @@
-import { PenLine, Search, Trash, UserMinus, UserPen } from 'lucide-react'
+import { PenLine, Search, Trash } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { TableCell, TableRow } from '@/components/ui/table'
 
 export interface StockTableRowProps {
   stock: {
     name: string
     status: boolean
-    institutionId: string
+    institutionName: string
   }
 }
 
@@ -51,7 +44,7 @@ export function StockTableRow({ stock }: StockTableRowProps) {
           )}
         </div>
       </TableCell>
-      <TableCell>{stock.institutionId}</TableCell>
+      <TableCell>{stock.institutionName}</TableCell>
 
       <TableCell>
         <Button variant={'outline'} size={'xs'}>

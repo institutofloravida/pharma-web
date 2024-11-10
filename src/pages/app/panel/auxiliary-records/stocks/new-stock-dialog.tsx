@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchInstitutions } from '@/api/fetch-institutions'
@@ -9,6 +9,7 @@ import { registerStock, type RegisterStockBody } from '@/api/register-stock'
 import { SelectInstitutions } from '@/components/select-institutions'
 import { Button } from '@/components/ui/button'
 import {
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -46,6 +47,7 @@ export function NewStockDialog() {
   const { token } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+
   const { data: institutions } = useQuery({
     queryKey: ['institutions', page],
     queryFn: () => fetchInstitutions({ page }, token ?? ''),
@@ -56,8 +58,8 @@ export function NewStockDialog() {
     onSuccess(_, { name, institutionId, status }) {
       const cached =
         queryClient.getQueryData<NewStockSchema[]>(['stocks']) || []
-      console.log('cached>>>>>>', cached)
       if (cached) {
+        console.log(cached)
         queryClient.setQueryData(
           ['stocks'],
           [{ name, institutionId, status }, ...cached],
@@ -68,6 +70,7 @@ export function NewStockDialog() {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+
     defaultValues: {
       status: true,
     },
@@ -164,6 +167,9 @@ export function NewStockDialog() {
               </FormItem>
             )}
           />
+          <DialogClose asChild>
+            <Button variant={'outline'}>Cancelar</Button>
+          </DialogClose>
           <Button type="submit">Submit</Button>
         </form>
       </Form>

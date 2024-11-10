@@ -8,7 +8,7 @@ interface FetchStocksResponse {
     id: string
     name: string
     status: boolean
-    institutionId: string
+    institutionName: string
   }[]
 }
 
