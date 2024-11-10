@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import {
   createContext,
   ReactNode,
@@ -6,14 +7,20 @@ import {
   useState,
 } from 'react'
 
+import {
+  getOperatorDetails,
+  GetOperatorDetailsResponse,
+} from '@/api/operators/get-operator-details'
+import type { Operator } from '@/api/operators/get-operators'
 import { api } from '@/lib/axios'
 
 interface AuthContextType {
   token: string | null
-  login: (newToken: string) => void
-  logout: () => void
   isAuthenticated: boolean
   loading: boolean
+  me: Operator | undefined
+  login: (newToken: string) => void
+  logout: () => void
 }
 
 interface AuthProviderProps {
@@ -28,6 +35,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   )
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  const { data: me } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => getOperatorDetails(token ?? ''),
+  })
 
   useEffect(() => {
     const validateToken = async () => {
@@ -65,7 +77,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return (
     <AuthContext.Provider
-      value={{ token, login, logout, isAuthenticated, loading }}
+      value={{
+        token,
+        login,
+        logout,
+        isAuthenticated,
+        loading,
+        me: me?.operator,
+      }}
     >
       {children}
     </AuthContext.Provider>

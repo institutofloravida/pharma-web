@@ -15,9 +15,7 @@ export function App() {
         <Helmet titleTemplate="%s | pharma.web" />
         {/* <Toaster richColors closeButton position="top-right" /> */}
         <Toaster />
-        <QueryClientProvider client={queryClient}>
-          <RouterProvider router={router} />
-        </QueryClientProvider>
+        <RouterProvider router={router} />
       </ThemeProvider>
     </HelmetProvider>
   )

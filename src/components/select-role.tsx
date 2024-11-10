@@ -1,3 +1,4 @@
+import type { OperatorRole } from '@/api/operators/register-operator'
 import {
   Select,
   SelectContent,
@@ -7,8 +8,8 @@ import {
 } from '@/components/ui/select'
 
 interface SelectRoleProps {
-  value: 'ADMIN' | 'COMMON'
-  onChange: (value: 'ADMIN' | 'COMMON') => void
+  value: OperatorRole
+  onChange: (value: OperatorRole) => void
 }
 
 export function SelectRole({ value, onChange }: SelectRoleProps) {
@@ -18,7 +19,8 @@ export function SelectRole({ value, onChange }: SelectRoleProps) {
         <SelectValue placeholder="Selecione o tipo de usuário" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="ADMIN">Administrador</SelectItem>
+        <SelectItem value="SUPER_ADMIN">Super Administrador</SelectItem>
+        <SelectItem value="MANAGER">Administrador</SelectItem>
         <SelectItem value="COMMON">Comum</SelectItem>
       </SelectContent>
     </Select>

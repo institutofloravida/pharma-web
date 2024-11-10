@@ -3,19 +3,9 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { getOperators } from '@/api/get-operators'
+import { getOperators } from '@/api/operators/get-operators'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
@@ -39,8 +29,6 @@ export function Operators() {
     queryKey: ['operators'],
     queryFn: () => getOperators({ page }, token ?? ''),
   })
-
-  console.log()
 
   return (
     <>

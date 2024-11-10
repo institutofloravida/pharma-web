@@ -1,12 +1,12 @@
 import { api } from '@/lib/axios'
 
-export type RoleOperator = 'ADMIN' | 'COMMON'
+export type OperatorRole = 'SUPER_ADMIN' | 'MANAGER' | 'COMMON'
 
 export interface RegisterOperatorBody {
   name: string
   email: string
   password: string
-  role: RoleOperator
+  role: OperatorRole
 }
 
 export async function registerOperator(

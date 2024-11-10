@@ -8,7 +8,7 @@ import { z } from 'zod'
 import {
   registerOperator,
   type RegisterOperatorBody,
-} from '@/api/register-operator'
+} from '@/api/operators/register-operator'
 import { SelectRole } from '@/components/select-role'
 import { Button } from '@/components/ui/button'
 import {
@@ -26,7 +26,7 @@ const newOperatorSchema = z.object({
   name: z.string().min(3),
   email: z.string().email(),
   password: z.string(),
-  role: z.enum(['ADMIN', 'COMMON']),
+  role: z.enum(['SUPER_ADMIN', 'MANAGER', 'COMMON']),
 })
 type NewOperatorSchema = z.infer<typeof newOperatorSchema>
 
