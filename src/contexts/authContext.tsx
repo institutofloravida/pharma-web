@@ -7,10 +7,7 @@ import {
   useState,
 } from 'react'
 
-import {
-  getOperatorDetails,
-  GetOperatorDetailsResponse,
-} from '@/api/operators/get-operator-details'
+import { getOperatorDetails } from '@/api/operators/get-operator-details'
 import type { Operator } from '@/api/operators/get-operators'
 import { api } from '@/lib/axios'
 

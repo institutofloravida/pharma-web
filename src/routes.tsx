@@ -6,6 +6,7 @@ import PanelLayout from './pages/_layouts/panel'
 import { PrivateRoute } from './pages/_private/private-route'
 import { SignIn } from './pages/app/auth/sign-in'
 import { Institutions } from './pages/app/panel/auxiliary-records/institutions/institutions'
+import { PharmaceuticalForms } from './pages/app/panel/auxiliary-records/pharmaceutical-form/pharmaceutical-forms'
 import { Stocks } from './pages/app/panel/auxiliary-records/stocks/stocks'
 import { TherapeuticClass } from './pages/app/panel/auxiliary-records/therapeutic-class/therapeutic-class'
 import { Operators } from './pages/app/panel/operators/operators'
@@ -58,6 +59,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <TherapeuticClass />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: '/pharmaceutical-form',
+        element: (
+          <PrivateRoute>
+            <PharmaceuticalForms />
           </PrivateRoute>
         ),
       },

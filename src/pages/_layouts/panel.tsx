@@ -122,6 +122,10 @@ const data = {
           title: 'Classes Terapêuticas',
           url: '/therapeutic-class',
         },
+        {
+          title: 'Formas Farmacêuticas',
+          url: '/pharmaceutical-form',
+        },
       ],
     },
   ],
@@ -138,7 +142,7 @@ export default function PanelLayout() {
   const [activeTeam, setActiveTeam] = useState(data.teams[0])
   const { pathname } = useLocation()
   const breadCrumpItems = pathname.split('/').filter((item) => item.length > 0)
-  const { me } = useAuth()
+  const { me, logout } = useAuth()
 
   return (
     <SidebarProvider>
@@ -342,27 +346,17 @@ export default function PanelLayout() {
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
-                      <Sparkles />
-                      Upgrade to Pro
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem>
                       <BadgeCheck />
-                      Account
+                      Minha conta
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <CreditCard />
-                      Billing
-                    </DropdownMenuItem>
+
                     <DropdownMenuItem>
                       <Bell />
                       Notifications
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout}>
                     <LogOut />
                     Log out
                   </DropdownMenuItem>
