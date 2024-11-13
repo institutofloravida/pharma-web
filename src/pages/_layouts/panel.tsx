@@ -126,6 +126,10 @@ const data = {
           title: 'Formas Farmacêuticas',
           url: '/pharmaceutical-form',
         },
+        {
+          title: 'Fabricantes',
+          url: '/manufacturer',
+        },
       ],
     },
   ],
