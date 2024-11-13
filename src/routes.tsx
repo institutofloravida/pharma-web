@@ -10,6 +10,7 @@ import { Manufacturers } from './pages/app/panel/auxiliary-records/manufacturers
 import { PharmaceuticalForms } from './pages/app/panel/auxiliary-records/pharmaceutical-form/pharmaceutical-forms'
 import { Stocks } from './pages/app/panel/auxiliary-records/stocks/stocks'
 import { TherapeuticClass } from './pages/app/panel/auxiliary-records/therapeutic-class/therapeutic-class'
+import { UnitMeasure } from './pages/app/panel/auxiliary-records/unit-measure/units-measure'
 import { Operators } from './pages/app/panel/operators/operators'
 
 export const router = createBrowserRouter([
@@ -76,6 +77,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Manufacturers />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: '/unit-measure',
+        element: (
+          <PrivateRoute>
+            <UnitMeasure />
           </PrivateRoute>
         ),
       },

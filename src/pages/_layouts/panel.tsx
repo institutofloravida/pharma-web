@@ -130,6 +130,10 @@ const data = {
           title: 'Fabricantes',
           url: '/manufacturer',
         },
+        {
+          title: 'Unidades de medida',
+          url: '/unit-measure',
+        },
       ],
     },
   ],

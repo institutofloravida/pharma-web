@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchManufacturers } from '@/api/auxiliary-records/manufactories/fetch-manufacturer'
+import { fetchManufacturers } from '@/api/auxiliary-records/manufacturer/fetch-manufacturer'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { Pagination } from '@/components/ui/pagination'

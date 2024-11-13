@@ -1,22 +1,16 @@
-import { useQuery } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchInstitutions } from '@/api/fetch-institutions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/contexts/authContext'
 
-export function StockTableFilters() {
+export function UnitMeasureTableFilters() {
   const { token } = useAuth()
 
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: institutions } = useQuery({
-    queryKey: ['institutions'],
-    queryFn: () => fetchInstitutions({ page }, token ?? ''),
-  })
 
   return (
     <form className="flex items-center gap-2">
