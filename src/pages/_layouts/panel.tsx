@@ -134,6 +134,10 @@ const data = {
           title: 'Unidades de medida',
           url: '/unit-measure',
         },
+        {
+          title: 'Patologias',
+          url: '/pathologies',
+        },
       ],
     },
   ],
