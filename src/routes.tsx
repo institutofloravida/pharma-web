@@ -12,13 +12,17 @@ import { PharmaceuticalForms } from './pages/app/panel/auxiliary-records/pharmac
 import { Stocks } from './pages/app/panel/auxiliary-records/stocks/stocks'
 import { TherapeuticClass } from './pages/app/panel/auxiliary-records/therapeutic-class/therapeutic-class'
 import { UnitMeasure } from './pages/app/panel/auxiliary-records/unit-measure/units-measure'
+import { Medicines } from './pages/app/panel/medicines/medicines'
 import { Operators } from './pages/app/panel/operators/operators'
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <AuthLayout />,
-    children: [{ path: '/sign-in', element: <SignIn /> }],
+    children: [
+      { path: '/sign-in', element: <SignIn /> },
+      { path: '/', element: <SignIn /> },
+    ],
   },
 
   {
@@ -94,6 +98,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Pathologies />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: '/medicines',
+        element: (
+          <PrivateRoute>
+            <Medicines />
           </PrivateRoute>
         ),
       },

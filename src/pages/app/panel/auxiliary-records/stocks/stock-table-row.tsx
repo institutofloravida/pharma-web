@@ -39,7 +39,7 @@ export function StockTableRow({ stock }: StockTableRowProps) {
           ) : (
             <>
               <span className="h-2 w-2 rounded-full bg-rose-500" />
-              <span className="font-medium text-muted-foreground">Inativo</span>
+              <span className="font-medium text-muted-foreground">INATIVO</span>
             </>
           )}
         </div>

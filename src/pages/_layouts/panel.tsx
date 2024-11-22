@@ -5,7 +5,6 @@ import {
   ChevronRight,
   ChevronsUpDown,
   Command,
-  CreditCard,
   Folder,
   Forward,
   Frame,
@@ -14,9 +13,7 @@ import {
   MonitorCog,
   MoreHorizontal,
   Pill,
-  Plus,
-  Sparkles,
-  SquareTerminal,
+  Settings,
   Trash2,
   Users,
 } from 'lucide-react'
@@ -76,19 +73,19 @@ const data = {
   },
   teams: [
     {
-      name: 'Acme Inc',
+      name: 'Instituto Flora Vida',
       logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
+      plan: 'ONG',
     },
     {
-      name: 'Acme Corp.',
+      name: 'UBS - módulo 22',
       logo: AudioWaveform,
-      plan: 'Startup',
+      plan: 'Pública',
     },
     {
-      name: 'Evil Corp.',
+      name: 'UBS - módulo 30',
       logo: Command,
-      plan: 'Free',
+      plan: 'Pública',
     },
   ],
   navMainWithSingleItem: [
@@ -143,9 +140,14 @@ const data = {
   ],
   projects: [
     {
-      name: 'Design Engineering',
+      name: 'Configurações',
       url: '#',
-      icon: Frame,
+      icon: Settings,
+    },
+    {
+      name: 'Notificações',
+      url: '#',
+      icon: Bell,
     },
   ],
 }
@@ -189,7 +191,7 @@ export default function PanelLayout() {
                   sideOffset={4}
                 >
                   <DropdownMenuLabel className="text-xs text-muted-foreground">
-                    Teams
+                    Instituições
                   </DropdownMenuLabel>
                   {data.teams.map((team, index) => (
                     <DropdownMenuItem
@@ -205,14 +207,14 @@ export default function PanelLayout() {
                     </DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem className="gap-2 p-2">
+                  {/* <DropdownMenuItem className="gap-2 p-2">
                     <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                       <Plus className="size-4" />
                     </div>
                     <div className="font-medium text-muted-foreground">
-                      Add team
+                      
                     </div>
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                 </DropdownMenuContent>
               </DropdownMenu>
             </SidebarMenuItem>
@@ -265,7 +267,7 @@ export default function PanelLayout() {
             </SidebarMenu>
           </SidebarGroup>
           <SidebarGroup className="">
-            <SidebarGroupLabel>Projects</SidebarGroupLabel>
+            <SidebarGroupLabel>Mais</SidebarGroupLabel>
             <SidebarMenu>
               {data.projects.map((item) => (
                 <SidebarMenuItem key={item.name}>

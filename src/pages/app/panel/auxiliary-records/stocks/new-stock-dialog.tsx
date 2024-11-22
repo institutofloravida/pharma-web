@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 import { fetchInstitutions } from '@/api/fetch-institutions'
 import { registerStock, type RegisterStockBody } from '@/api/register-stock'
-import { SelectInstitutions } from '@/components/select-institutions'
+import { SelectInstitutions } from '@/components/selects/select-institutions'
 import { Button } from '@/components/ui/button'
 import {
   DialogClose,
@@ -45,7 +45,7 @@ type NewStockSchema = z.infer<typeof FormSchema>
 
 export function NewStockDialog() {
   const { token } = useAuth()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, _] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
 
   const { data: institutions } = useQuery({
@@ -105,8 +105,8 @@ export function NewStockDialog() {
   }
 
   return (
-    <DialogContent>
-      <DialogHeader>
+    <DialogContent className="flex flex-col items-center">
+      <DialogHeader className="items-center">
         <DialogTitle>Novo Estoque</DialogTitle>
         <DialogDescription>Cadastre seu novo estoque.</DialogDescription>
       </DialogHeader>
@@ -128,27 +128,6 @@ export function NewStockDialog() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                <div className="space-y-0.5">
-                  <FormLabel>Status</FormLabel>
-                  <FormDescription>
-                    Defina o status do seu estoque.
-                  </FormDescription>
-                </div>
-                <FormControl>
-                  <Switch
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    aria-readonly
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
 
           <FormField
             control={form.control}
@@ -167,10 +146,34 @@ export function NewStockDialog() {
               </FormItem>
             )}
           />
-          <DialogClose asChild>
-            <Button variant={'outline'}>Cancelar</Button>
-          </DialogClose>
-          <Button type="submit">Submit</Button>
+
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-2 shadow-sm">
+                <div className="space-y-0.5">
+                  <FormLabel>Status</FormLabel>
+                  <FormDescription>
+                    Defina o status do seu estoque.
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    aria-readonly
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <div className="flex items-center gap-3">
+            <DialogClose asChild>
+              <Button variant={'outline'}>Cancelar</Button>
+            </DialogClose>
+            <Button type="submit">Submit</Button>
+          </div>
         </form>
       </Form>
     </DialogContent>

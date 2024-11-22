@@ -4,7 +4,6 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchInstitutions } from '@/api/fetch-institutions'
 import { fetchStocks } from '@/api/fetch-stocks'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/pagination'
@@ -23,7 +22,7 @@ import { StockTableRow } from './stock-table-row'
 
 export function Stocks() {
   const { token } = useAuth()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, _] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: stocks } = useQuery({
     queryKey: ['stocks'],
@@ -52,7 +51,7 @@ export function Stocks() {
                   <TableHead className="w-[64px]"></TableHead>
                   <TableHead>Nome</TableHead>
                   <TableHead className="w-[180px]">Status</TableHead>
-                  <TableHead className="w-[550px]">Descrição</TableHead>
+                  <TableHead className="w-[550px]">Instituição</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>

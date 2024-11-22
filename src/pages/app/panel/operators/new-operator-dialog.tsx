@@ -9,7 +9,7 @@ import {
   registerOperator,
   type RegisterOperatorBody,
 } from '@/api/operators/register-operator'
-import { SelectRole } from '@/components/select-role'
+import { SelectRole } from '@/components/selects/select-role'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,
