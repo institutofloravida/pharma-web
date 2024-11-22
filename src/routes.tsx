@@ -14,6 +14,7 @@ import { TherapeuticClass } from './pages/app/panel/auxiliary-records/therapeuti
 import { UnitMeasure } from './pages/app/panel/auxiliary-records/unit-measure/units-measure'
 import { Medicines } from './pages/app/panel/medicines/medicines'
 import { Operators } from './pages/app/panel/operators/operators'
+import { Test } from './pages/app/test'
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +30,14 @@ export const router = createBrowserRouter([
     path: '/',
     element: <PanelLayout />,
     children: [
+      {
+        path: '/test',
+        element: (
+          <PrivateRoute>
+            <Test />
+          </PrivateRoute>
+        ),
+      },
       {
         path: '/panel',
         element: (

@@ -11,7 +11,7 @@ export async function registerMedicine(
   token: string,
 ) {
   await api.post(
-    '/medicines',
+    '/medicine',
     { name, description, therapeuticClassesIds },
     {
       headers: {

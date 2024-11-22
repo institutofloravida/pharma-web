@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
+import { fetchTherapeuticClasses } from '@/api/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
 import { fetchMedicines } from '@/api/medicines/fetch-medicines'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
@@ -18,6 +19,7 @@ import { useAuth } from '@/contexts/authContext'
 
 import { MedicineTableFilters } from './medicine-table-filters'
 import { MedicineTableRow } from './medicine-table-row'
+import { NewMedicineDialog } from './new-medicine-dialog'
 
 export function Medicines() {
   const { token } = useAuth()
@@ -27,6 +29,11 @@ export function Medicines() {
   const { data: medicines } = useQuery({
     queryKey: ['medicines'],
     queryFn: () => fetchMedicines({ page }, token ?? ''),
+  })
+
+  const { data: therapeuticClasses } = useQuery({
+    queryKey: ['therapeutic-classes'],
+    queryFn: () => fetchTherapeuticClasses({ page }, token ?? ''),
   })
 
   console.log()
@@ -45,7 +52,9 @@ export function Medicines() {
                   Novo Medicamento
                 </Button>
               </DialogTrigger>
-              {/* <NewMedicineDialog /> */}
+              <NewMedicineDialog
+                therapeuticClasses={therapeuticClasses ?? []}
+              />
             </Dialog>
           </div>
           <div className="rounded-md border">
