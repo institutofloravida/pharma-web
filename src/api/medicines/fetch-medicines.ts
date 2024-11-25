@@ -1,6 +1,7 @@
 import { api } from '@/lib/axios'
 export interface FetchMedicinesQuery {
   page?: number | null
+  query?: string | null
 }
 
 export interface Medicine {
@@ -11,10 +12,14 @@ export interface Medicine {
 
 interface FetchMedicinesResponse {
   medicines: Medicine[]
+  meta: {
+    page: number
+    totalCount: number
+  }
 }
 
 export async function fetchMedicines(
-  { page }: FetchMedicinesQuery,
+  { page, query }: FetchMedicinesQuery,
   token: string,
 ) {
   const response = await api.get<FetchMedicinesResponse>('/medicines', {
@@ -23,8 +28,9 @@ export async function fetchMedicines(
     },
     params: {
       page,
+      query,
     },
   })
 
-  return response.data.medicines
+  return response.data
 }

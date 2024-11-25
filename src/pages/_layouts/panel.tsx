@@ -137,6 +137,22 @@ const data = {
         },
       ],
     },
+    {
+      title: 'Medicamentos',
+      url: '#',
+      icon: Pill,
+      isActive: true,
+      items: [
+        {
+          title: 'Medicamentos',
+          url: '/medicines',
+        },
+        {
+          title: 'Variantes',
+          url: '/medicines/variants',
+        },
+      ],
+    },
   ],
   projects: [
     {

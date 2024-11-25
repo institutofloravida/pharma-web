@@ -12,6 +12,7 @@ import { PharmaceuticalForms } from './pages/app/panel/auxiliary-records/pharmac
 import { Stocks } from './pages/app/panel/auxiliary-records/stocks/stocks'
 import { TherapeuticClass } from './pages/app/panel/auxiliary-records/therapeutic-class/therapeutic-class'
 import { UnitMeasure } from './pages/app/panel/auxiliary-records/unit-measure/units-measure'
+import { MedicinesVariants } from './pages/app/panel/medicine-variant/medicines-variants'
 import { Medicines } from './pages/app/panel/medicines/medicines'
 import { Operators } from './pages/app/panel/operators/operators'
 import { Test } from './pages/app/test'
@@ -20,18 +21,14 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <AuthLayout />,
-    children: [
-      { path: '/sign-in', element: <SignIn /> },
-      { path: '/', element: <SignIn /> },
-    ],
+    children: [{ path: 'sign-in', element: <SignIn /> }],
   },
-
   {
     path: '/',
     element: <PanelLayout />,
     children: [
       {
-        path: '/test',
+        path: 'test',
         element: (
           <PrivateRoute>
             <Test />
@@ -39,7 +36,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/panel',
+        path: 'panel',
         element: (
           <PrivateRoute>
             <LoginForm />
@@ -47,7 +44,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/operators',
+        path: 'operators',
         element: (
           <PrivateRoute>
             <Operators />
@@ -55,7 +52,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/institutions',
+        path: 'institutions',
         element: (
           <PrivateRoute>
             <Institutions />
@@ -63,7 +60,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/stocks',
+        path: 'stocks',
         element: (
           <PrivateRoute>
             <Stocks />
@@ -71,7 +68,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/therapeutic-class',
+        path: 'therapeutic-class',
         element: (
           <PrivateRoute>
             <TherapeuticClass />
@@ -79,7 +76,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/pharmaceutical-form',
+        path: 'pharmaceutical-form',
         element: (
           <PrivateRoute>
             <PharmaceuticalForms />
@@ -87,7 +84,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/manufacturer',
+        path: 'manufacturer',
         element: (
           <PrivateRoute>
             <Manufacturers />
@@ -95,7 +92,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/unit-measure',
+        path: 'unit-measure',
         element: (
           <PrivateRoute>
             <UnitMeasure />
@@ -103,18 +100,32 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/pathologies',
+        path: 'pathologies',
         element: (
           <PrivateRoute>
             <Pathologies />
           </PrivateRoute>
         ),
       },
+    ],
+  },
+  {
+    path: '/medicines',
+    element: <PanelLayout />,
+    children: [
       {
-        path: '/medicines',
+        path: '',
         element: (
           <PrivateRoute>
             <Medicines />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'variants',
+        element: (
+          <PrivateRoute>
+            <MedicinesVariants />
           </PrivateRoute>
         ),
       },

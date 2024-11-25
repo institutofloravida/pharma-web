@@ -5,9 +5,9 @@ import { z } from 'zod'
 
 import { fetchTherapeuticClasses } from '@/api/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
 import { fetchMedicines } from '@/api/medicines/fetch-medicines'
+import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
   TableBody,
@@ -24,20 +24,27 @@ import { NewMedicineDialog } from './new-medicine-dialog'
 export function Medicines() {
   const { token } = useAuth()
 
-  const [searchParams, _] = useSearchParams()
-  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: medicines } = useQuery({
-    queryKey: ['medicines'],
-    queryFn: () => fetchMedicines({ page }, token ?? ''),
+  const [searchParams, setSearchParams] = useSearchParams()
+  const pageIndex = z.coerce
+    .number()
+    // .transform((page) => page - 1)
+    .parse(searchParams.get('page') ?? '1')
+  const { data: medicinesResult } = useQuery({
+    queryKey: ['medicines', pageIndex],
+    queryFn: () => fetchMedicines({ page: pageIndex }, token ?? ''),
   })
 
   const { data: therapeuticClasses } = useQuery({
     queryKey: ['therapeutic-classes'],
-    queryFn: () => fetchTherapeuticClasses({ page }, token ?? ''),
+    queryFn: () => fetchTherapeuticClasses({ page: 1 }, token ?? ''),
   })
 
-  console.log()
-
+  function handlePagination(pageIndex: number) {
+    setSearchParams((state) => {
+      state.set('page', pageIndex.toString())
+      return state
+    })
+  }
   return (
     <>
       <Helmet title="Medicamentos" />
@@ -69,15 +76,21 @@ export function Medicines() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {medicines &&
-                  medicines.map((item) => {
+                {medicinesResult &&
+                  medicinesResult.medicines.map((item) => {
                     return <MedicineTableRow medicine={item} key={item.id} />
                   })}
               </TableBody>
             </Table>
           </div>
-
-          <Pagination />
+          {medicinesResult && (
+            <Pagination
+              pageIndex={medicinesResult.meta.page}
+              totalCount={medicinesResult.meta.totalCount}
+              perPage={20}
+              onPageChange={handlePagination}
+            />
+          )}
         </div>
       </div>
     </>
