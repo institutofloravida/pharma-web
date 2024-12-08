@@ -1,22 +1,30 @@
 import { api } from '@/lib/axios'
 export interface FetchMedicinesVariantsQuery {
   page?: number | null
+  query?: string | null
 }
 
 export interface MedicineVariant {
   id: string
   medicine: string
+  medicineId: string
   dosage: string
   unitMeasure: string
+  unitMeasureId: string
   pharmaceuticalForm: string
+  pharmaceuticalFormId: string
 }
 
-interface FetchMedicinesVariantsResponse {
+export interface FetchMedicinesVariantsResponse {
   medicines_variants: MedicineVariant[]
+  meta: {
+    page: number
+    totalCount: number
+  }
 }
 
 export async function fetchMedicinesVariants(
-  { page }: FetchMedicinesVariantsQuery,
+  { page, query }: FetchMedicinesVariantsQuery,
   token: string,
 ) {
   const response = await api.get<FetchMedicinesVariantsResponse>(
@@ -27,9 +35,10 @@ export async function fetchMedicinesVariants(
       },
       params: {
         page,
+        query,
       },
     },
   )
 
-  return response.data.medicines_variants
+  return response.data
 }

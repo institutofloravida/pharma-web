@@ -3,11 +3,10 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchTherapeuticClasses } from '@/api/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
 import { fetchMedicinesVariants } from '@/api/medicines-variants/fetch-medicines-variants'
+import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
   TableBody,
@@ -24,12 +23,19 @@ import { NewMedicineVariantDialog } from './new-medicine-variant-dialog'
 export function MedicinesVariants() {
   const { token } = useAuth()
 
-  const [searchParams, _] = useSearchParams()
-  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: medicinesVariants } = useQuery({
-    queryKey: ['medicines-variants'],
-    queryFn: () => fetchMedicinesVariants({ page }, token ?? ''),
+    queryKey: ['medicines-variants', pageIndex],
+    queryFn: () => fetchMedicinesVariants({ page: pageIndex }, token ?? ''),
   })
+
+  function handlePagination(pageIndex: number) {
+    setSearchParams((state) => {
+      state.set('page', pageIndex.toString())
+      return state
+    })
+  }
 
   // const { data: therapeuticClasses } = useQuery({
   //   queryKey: ['therapeutic-classes'],
@@ -54,9 +60,7 @@ export function MedicinesVariants() {
                   Nova Variante
                 </Button>
               </DialogTrigger>
-              {/* <NewMedicineVariantDialog
-                therapeuticClasses={therapeuticClasses ?? []}
-              /> */}
+              <NewMedicineVariantDialog />
             </Dialog>
           </div>
           <div className="rounded-md border">
@@ -73,7 +77,7 @@ export function MedicinesVariants() {
               </TableHeader>
               <TableBody>
                 {medicinesVariants &&
-                  medicinesVariants.map((item) => {
+                  medicinesVariants.medicines_variants.map((item) => {
                     return (
                       <MedicineVariantTableRow
                         medicineVariant={item}
@@ -85,7 +89,14 @@ export function MedicinesVariants() {
             </Table>
           </div>
 
-          <Pagination />
+          {medicinesVariants && (
+            <Pagination
+              pageIndex={medicinesVariants.meta.page}
+              totalCount={medicinesVariants.meta.totalCount}
+              perPage={20}
+              onPageChange={handlePagination}
+            />
+          )}
         </div>
       </div>
     </>

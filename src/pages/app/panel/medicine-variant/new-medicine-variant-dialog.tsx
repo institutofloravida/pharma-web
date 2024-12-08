@@ -1,17 +1,22 @@
-'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import type { TherapeuticClass } from '@/api/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
+import { fetchPharmaceuticalForms } from '@/api/auxiliary-records/pharmaceutical-form/fetch-pharmaceutical-form'
+import { fetchUnitsMeasure } from '@/api/auxiliary-records/unit-measure/fetch-units-measure'
+import { fetchMedicines } from '@/api/medicines/fetch-medicines'
+import type {
+  FetchMedicinesVariantsResponse,
+  MedicineVariant,
+} from '@/api/medicines-variants/fetch-medicines-variants'
 import {
-  registerMedicine,
-  type RegisterMedicineBody,
-} from '@/api/medicines/resgister-medicine'
+  registerMedicineVariant,
+  type RegisterMedicineVariantBody,
+} from '@/api/medicines-variants/register-medicine-variant'
+import { Combobox } from '@/components/comboboxes/pharmaceutical-form-combobox'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   DialogContent,
   DialogDescription,
@@ -21,66 +26,128 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
-import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
 
 const FormSchema = z.object({
-  therapeuticClassesIds: z
-    .array(z.string())
-    .min(1, 'selecione pelo menos uma opção'),
-  name: z.string().min(1, 'campo obrigatório'),
-  description: z.string().optional(),
+  medicineId: z.string({
+    required_error: 'Selecione um medicamento.',
+  }),
+  pharmaceuticalFormId: z.string({
+    required_error: 'Selecione uma forma farmaceutica.',
+  }),
+  dosage: z.string({
+    required_error: 'Digite uma dosagem.',
+  }),
+  unitMeasureId: z.string({
+    required_error: 'Selecione uma unidade de medida',
+  }),
 })
 
-type NewMedicineSchema = z.infer<typeof FormSchema>
-interface NewMedicineDialogProps {
-  therapeuticClasses: TherapeuticClass[]
-}
+// type NewMedicineVariantSchema = z.infer<typeof FormSchema>
+// interface NewMedicineVariantDialogProps {
+//   medicinesVariants: MedicineVariant[]
+// }
 
-export function NewMedicineVariantDialog({
-  therapeuticClasses,
-}: NewMedicineDialogProps) {
+export function NewMedicineVariantDialog() {
+  const [queryMedicine, setQueryMedicine] = useState('')
+  const [queryPharmaceuticalForm, setQueryPharmaceuticalForm] = useState('')
+  const [queryUnitMeasure, setQueryUnitMeasure] = useState('')
   const { token } = useAuth()
-  const { mutateAsync: registerMedicineFn } = useMutation({
-    mutationFn: (data: RegisterMedicineBody) =>
-      registerMedicine(data, token ?? ''),
-    onSuccess(_, { name, description, therapeuticClassesIds }) {
-      const cached =
-        queryClient.getQueryData<NewMedicineSchema[]>(['medicines']) || []
 
-      if (cached) {
-        queryClient.setQueryData(
-          ['medicines'],
-          [...cached, { name, description, therapeuticClassesIds }],
-        )
+  const { mutateAsync: registerMedicineVariantFn } = useMutation({
+    mutationFn: (data: RegisterMedicineVariantBody) =>
+      registerMedicineVariant(data, token ?? ''),
+    onSuccess(_, { medicineId, pharmaceuticalFormId, dosage, unitMeasureId }) {
+      const cached = queryClient.getQueryData<FetchMedicinesVariantsResponse>([
+        'medicines-variants',
+        1,
+      ]) || { medicines_variants: [], meta: { page: 1, totalCount: 0 } }
+
+      console.log(cached)
+
+      const medicineName = queryMedicine
+      const unitMeasureAcronym = queryUnitMeasure
+      const pharmaceuticalFormName = queryPharmaceuticalForm
+
+      if (cached.medicines_variants) {
+        const updatedData = {
+          ...cached,
+          medicines_variants: [
+            {
+              medicineId,
+              medicine: medicineName,
+              dosage,
+              pharmaceuticalFormId,
+              unitMeasureId,
+              unitMeasure: unitMeasureAcronym,
+              pharmaceuticalForm: pharmaceuticalFormName,
+            },
+            ...cached.medicines_variants,
+          ],
+          meta: {
+            ...cached.meta,
+            totalCount: cached.meta.totalCount + 1,
+          },
+        }
+
+        queryClient.setQueryData(['medicines-variants', 1], updatedData)
       }
     },
   })
 
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      therapeuticClassesIds: [],
-    },
+  const { data: medicinesResult, isFetching: isFetchingMedicines } = useQuery({
+    queryKey: ['medicines', queryMedicine],
+    queryFn: () =>
+      fetchMedicines({ page: 1, query: queryMedicine }, token ?? ''),
+    enabled: queryMedicine !== null,
+    staleTime: 1000,
+    refetchOnMount: true,
   })
 
-  async function handleRegisterMedicine(data: z.infer<typeof FormSchema>) {
+  const {
+    data: pharmaceuticalFormResult,
+    isFetching: isFetchingPharmaceuticalForm,
+  } = useQuery({
+    queryKey: ['pharmaceutical-forms', queryPharmaceuticalForm],
+    queryFn: () =>
+      fetchPharmaceuticalForms(
+        { page: 1, query: queryPharmaceuticalForm },
+        token ?? '',
+      ),
+    enabled: queryPharmaceuticalForm !== null,
+    staleTime: 1000,
+    refetchOnMount: true,
+  })
+
+  const { data: unitsMeasureResult, isFetching: isFetchingUnitsMeasure } =
+    useQuery({
+      queryKey: ['units-measure', queryUnitMeasure],
+      queryFn: () =>
+        fetchUnitsMeasure({ page: 1, query: queryUnitMeasure }, token ?? ''),
+      enabled: queryUnitMeasure !== null,
+      staleTime: 1000,
+      refetchOnMount: true,
+    })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+  })
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      await registerMedicineFn({
-        name: data.name,
-        description: data.description,
-        therapeuticClassesIds: data.therapeuticClassesIds,
+      await registerMedicineVariantFn({
+        medicineId: data.medicineId,
+        pharmaceuticalFormId: data.pharmaceuticalFormId,
+        unitMeasureId: data.unitMeasureId,
+        dosage: data.dosage,
       })
 
       toast({
@@ -93,37 +160,82 @@ export function NewMedicineVariantDialog({
       })
     } catch (error) {
       toast({
-        title: 'Error ao cadastrar o estoque',
+        title: 'You submitted the following values:',
         description: (
           <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(error, null, 2)}</code>
+            {error.message}
           </pre>
         ),
       })
     }
   }
+
   return (
     <DialogContent className="flex flex-col items-center">
       <DialogHeader className="items-center">
-        <DialogTitle>Novo Medicamento</DialogTitle>
+        <DialogTitle>Nova Variante</DialogTitle>
         <DialogDescription>
-          Preencha os dados para cadastrar um novo medicamento.
+          Preencha os dados para cadastrar uma nova variante de medicamento.
         </DialogDescription>
       </DialogHeader>
-
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleRegisterMedicine)}
-          className="space-y-8"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <FormField
             control={form.control}
-            name="name"
+            name="medicineId"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Medicamento</FormLabel>
+                <Combobox
+                  items={medicinesResult?.medicines || []}
+                  field={field}
+                  query={queryMedicine}
+                  placeholder="Selecione o medicamento "
+                  isFetching={isFetchingMedicines}
+                  onQueryChange={setQueryMedicine}
+                  onSelect={(id, name) => {
+                    form.setValue('medicineId', id)
+                    setQueryMedicine(name)
+                  }}
+                  itemKey="id"
+                  itemValue="name"
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="pharmaceuticalFormId"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Forma Farmacêutica</FormLabel>
+                <Combobox
+                  items={pharmaceuticalFormResult?.pharmaceutical_forms || []}
+                  field={field}
+                  query={queryPharmaceuticalForm}
+                  placeholder="Selecione a forma farmacêutica"
+                  isFetching={isFetchingPharmaceuticalForm}
+                  onQueryChange={setQueryPharmaceuticalForm}
+                  onSelect={(id, name) => {
+                    form.setValue('pharmaceuticalFormId', id)
+                    setQueryPharmaceuticalForm(name)
+                  }}
+                  itemKey="id"
+                  itemValue="name"
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="dosage"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nome</FormLabel>
+                <FormLabel>Dosagem</FormLabel>
                 <FormControl>
-                  <Input placeholder="Nome do Medicamento..." {...field} />
+                  <Input placeholder="Dosagem..." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -131,79 +243,28 @@ export function NewMedicineVariantDialog({
           />
           <FormField
             control={form.control}
-            name="description"
+            name="unitMeasureId"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Descrição</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Descreva o medicamento..."
-                    {...field}
-                  />
-                </FormControl>
+              <FormItem className="flex flex-col">
+                <Combobox
+                  items={unitsMeasureResult?.units_measure || []}
+                  field={field}
+                  query={queryUnitMeasure}
+                  placeholder="Selecione a unidade de medida"
+                  isFetching={isFetchingUnitsMeasure}
+                  onQueryChange={setQueryUnitMeasure}
+                  onSelect={(id, acronym) => {
+                    form.setValue('unitMeasureId', id)
+                    setQueryUnitMeasure(acronym)
+                  }}
+                  itemKey="id"
+                  itemValue="acronym"
+                />
                 <FormMessage />
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="therapeuticClassesIds"
-            render={() => (
-              <FormItem>
-                <div className="mb-4">
-                  <FormLabel className="text-base">
-                    Classes Terapêuticas
-                  </FormLabel>
-                  <FormDescription>
-                    Selecione as classes terapẽuticas que o medicamento possui.
-                  </FormDescription>
-                </div>
-                <ScrollArea
-                  className="m-10 h-48 rounded-md"
-                  aria-label="Selectable items"
-                >
-                  <div className="p-2">
-                    {therapeuticClasses.map((item) => (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="therapeuticClassesIds"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(item.id)}
-                                  onCheckedChange={(checked) =>
-                                    checked
-                                      ? field.onChange([
-                                          ...field.value,
-                                          item.id,
-                                        ])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== item.id,
-                                          ),
-                                        )
-                                  }
-                                />
-                              </FormControl>
-                              <FormLabel className="text-sm font-normal">
-                                {item.name}
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                        <Separator className="my-2" />
-                      </>
-                    ))}
-                  </div>
-                </ScrollArea>
-                <FormMessage>
-                  {form.formState.errors.therapeuticClassesIds?.message}
-                </FormMessage>
-              </FormItem>
-            )}
-          />
+
           <Button type="submit">Submit</Button>
         </form>
       </Form>

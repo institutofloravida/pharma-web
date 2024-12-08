@@ -1,6 +1,7 @@
 import { api } from '@/lib/axios'
 export interface FetchUnitMeasuresQuery {
   page?: number | null
+  query?: string | null
 }
 
 export interface UnitMeasure {
@@ -11,10 +12,14 @@ export interface UnitMeasure {
 
 interface FetchUnitMeasuresResponse {
   units_measure: UnitMeasure[]
+  meta: {
+    page: number
+    totalCount: number
+  }
 }
 
 export async function fetchUnitsMeasure(
-  { page }: FetchUnitMeasuresQuery,
+  { page, query }: FetchUnitMeasuresQuery,
   token: string,
 ) {
   const response = await api.get<FetchUnitMeasuresResponse>('/unit-measure', {
@@ -23,8 +28,9 @@ export async function fetchUnitsMeasure(
     },
     params: {
       page,
+      query,
     },
   })
 
-  return response.data.units_measure
+  return response.data
 }

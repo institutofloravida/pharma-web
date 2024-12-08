@@ -1,6 +1,7 @@
 import { api } from '@/lib/axios'
 export interface FetchPharmaceuticalFormsQuery {
   page?: number | null
+  query?: string | null
 }
 
 export interface PharmaceuticalForm {
@@ -10,10 +11,14 @@ export interface PharmaceuticalForm {
 
 interface FetchPharmaceuticalFormsResponse {
   pharmaceutical_forms: PharmaceuticalForm[]
+  meta: {
+    page: number
+    totalCount: number
+  }
 }
 
 export async function fetchPharmaceuticalForms(
-  { page }: FetchPharmaceuticalFormsQuery,
+  { page, query }: FetchPharmaceuticalFormsQuery,
   token: string,
 ) {
   const response = await api.get<FetchPharmaceuticalFormsResponse>(
@@ -24,9 +29,10 @@ export async function fetchPharmaceuticalForms(
       },
       params: {
         page,
+        query,
       },
     },
   )
 
-  return response.data.pharmaceutical_forms
+  return response.data
 }

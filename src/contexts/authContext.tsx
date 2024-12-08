@@ -10,12 +10,13 @@ import {
 import { getOperatorDetails } from '@/api/operators/get-operator-details'
 import type { Operator } from '@/api/operators/get-operators'
 import { api } from '@/lib/axios'
+import { queryClient } from '@/lib/react-query'
 
 interface AuthContextType {
   token: string | null
   isAuthenticated: boolean
   loading: boolean
-  me: Operator | undefined
+  me: Operator | null
   login: (newToken: string) => void
   logout: () => void
 }
@@ -33,31 +34,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  const { data: me } = useQuery({
-    queryKey: ['me'],
-    queryFn: () => getOperatorDetails(token ?? ''),
+  const clearAuth = () => {
+    setToken(null)
+    setIsAuthenticated(false)
+    queryClient.invalidateQueries({ queryKey: ['me'] })
+    localStorage.removeItem('token')
+  }
+
+  const { data: me, isLoading } = useQuery({
+    queryKey: ['me', token],
+    queryFn: async () => {
+      try {
+        const response = await api.get('/validate-token', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        if (!response.data.isValid) throw new Error('Token inválido')
+        return getOperatorDetails(token ?? '')
+      } catch (error) {
+        clearAuth()
+        throw error
+      }
+    },
+    enabled: Boolean(token),
   })
 
   useEffect(() => {
-    const validateToken = async () => {
-      if (token) {
-        try {
-          const response = await api.get('/validate-token', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          setIsAuthenticated(response.data.isValid)
-        } catch (error) {
-          logout()
-        }
-      } else {
-        setIsAuthenticated(false)
-      }
-      setLoading(false) // Atualiza o estado de carregamento ao final
-    }
-
-    validateToken()
+    if (!token) setLoading(false)
   }, [token])
 
   const login = (newToken: string) => {
@@ -67,9 +71,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   const logout = () => {
-    setToken(null)
-    setIsAuthenticated(false)
-    localStorage.removeItem('token')
+    clearAuth()
   }
 
   return (
@@ -79,8 +81,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         login,
         logout,
         isAuthenticated,
-        loading,
-        me: me?.operator,
+        loading: loading || isLoading,
+        me: me?.operator ?? null,
       }}
     >
       {children}

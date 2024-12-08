@@ -154,6 +154,45 @@ const data = {
       ],
     },
   ],
+
+  operatorAreaSingleItem: [
+    {
+      name: 'Ações',
+      url: '/operators',
+      icon: Users,
+    },
+  ],
+  operatorAreaManyItems: [
+    {
+      title: 'Movimentações',
+      url: '#',
+      icon: MonitorCog,
+      isActive: true,
+      items: [
+        {
+          title: 'Entradas',
+          url: '/medicine/entries',
+        },
+      ],
+    },
+    {
+      title: 'Medicamentos',
+      url: '#',
+      icon: Pill,
+      isActive: true,
+      items: [
+        {
+          title: 'Medicamentos',
+          url: '/medicines',
+        },
+        {
+          title: 'Variantes',
+          url: '/medicines/variants',
+        },
+      ],
+    },
+  ],
+
   projects: [
     {
       name: 'Configurações',
@@ -251,6 +290,51 @@ export default function PanelLayout() {
             })}
             <SidebarMenu>
               {data.navMainWithManyItems.map((item) => (
+                <Collapsible
+                  key={item.title}
+                  asChild
+                  className="group/collapsible"
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton tooltip={item.title}>
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item.items?.map((subItem) => (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton asChild>
+                              <Link to={subItem.url}>
+                                <span>{subItem.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+          <SidebarGroup>
+            <SidebarGroupLabel>Área do Operador</SidebarGroupLabel>
+            {data.operatorAreaSingleItem.map((item) => {
+              return (
+                <SidebarMenuButton tooltip={item.name} asChild key={item.name}>
+                  <Link to={item.url}>
+                    <item.icon />
+                    <span>{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              )
+            })}
+            <SidebarMenu>
+              {data.operatorAreaManyItems.map((item) => (
                 <Collapsible
                   key={item.title}
                   asChild
