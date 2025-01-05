@@ -99,11 +99,6 @@ const data = {
       url: '/operators',
       icon: Users,
     },
-    {
-      name: 'Medicamentos',
-      url: '/medicines',
-      icon: Pill,
-    },
   ],
   navMainWithManyItems: [
     {
@@ -281,7 +276,7 @@ export default function PanelLayout() {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Platform</SidebarGroupLabel>
+            <SidebarGroupLabel>Área Geral</SidebarGroupLabel>
             {data.navMainWithSingleItem.map((item) => {
               return (
                 <SidebarMenuButton tooltip={item.name} asChild key={item.name}>
