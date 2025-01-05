@@ -21,7 +21,7 @@ import {
 import { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 
-import { fetchInstitutions } from '@/api/fetch-institutions'
+import { fetchInstitutions } from '@/api/auxiliary-records/institution/fetch-institutions'
 import { LogoutButton } from '@/components/logout-button'
 import { SelectInstitutionGlobal } from '@/components/selects/select-institution-global'
 import { ModeToggle } from '@/components/theme/mode-toggle'

@@ -3,7 +3,7 @@ import { ChevronsUpDown, CircleOff, Command } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-import { fetchInstitutions, type Institution } from '@/api/fetch-institutions'
+import { fetchInstitutions, type Institution } from '@/api/auxiliary-records/institution/fetch-institutions'
 import { useAuth } from '@/contexts/authContext'
 
 import {

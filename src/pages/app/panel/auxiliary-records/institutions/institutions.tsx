@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchInstitutions } from '@/api/fetch-institutions'
+import { fetchInstitutions } from '@/api/auxiliary-records/institution/fetch-institutions'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,

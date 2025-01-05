@@ -4,8 +4,11 @@ import { useForm } from 'react-hook-form'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchInstitutions } from '@/api/fetch-institutions'
-import { registerStock, type RegisterStockBody } from '@/api/auxiliary-records/stock/register-stock'
+import { fetchInstitutions } from '@/api/auxiliary-records/institution/fetch-institutions'
+import {
+  registerStock,
+  type RegisterStockBody,
+} from '@/api/auxiliary-records/stock/register-stock'
 import { SelectInstitutions } from '@/components/selects/select-institutions'
 import { Button } from '@/components/ui/button'
 import {
@@ -59,7 +62,6 @@ export function NewStockDialog() {
       const cached =
         queryClient.getQueryData<NewStockSchema[]>(['stocks']) || []
       if (cached) {
-        
         queryClient.setQueryData(
           ['stocks'],
           [{ name, institutionId, status }, ...cached],

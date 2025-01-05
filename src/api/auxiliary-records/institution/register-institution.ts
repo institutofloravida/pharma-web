@@ -11,7 +11,7 @@ export async function registerInstitution(
   token: string,
 ) {
   await api.post(
-    '/institutions',
+    '/institution',
     { name, cnpj, description },
     {
       headers: {

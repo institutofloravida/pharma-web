@@ -1,4 +1,4 @@
-import type { Institution } from '@/api/fetch-institutions'
+import type { Institution } from '@/api/auxiliary-records/institution/fetch-institutions'
 import {
   Select,
   SelectContent,
