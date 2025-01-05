@@ -58,8 +58,8 @@ export function UnitMeasure() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {unitsMeasure?.length ? (
-                  unitsMeasure.map((item) => (
+                {unitsMeasure?.units_measure ? (
+                  unitsMeasure.units_measure.map((item) => (
                     <UnitMeasureTableRow
                       unitMeasure={item ?? []}
                       key={item.id}
