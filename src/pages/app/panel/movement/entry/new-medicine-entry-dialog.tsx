@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { format, isValid, parse } from 'date-fns'
+import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { CalendarIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -8,7 +8,6 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { fetchManufacturers } from '@/api/auxiliary-records/manufacturer/fetch-manufacturer'
-import { fetchPharmaceuticalForms } from '@/api/auxiliary-records/pharmaceutical-form/fetch-pharmaceutical-form'
 import { fetchStocks } from '@/api/auxiliary-records/stock/fetch-stocks'
 import { fetchUnitsMeasure } from '@/api/auxiliary-records/unit-measure/fetch-units-measure'
 import {
@@ -20,7 +19,6 @@ import {
   type RegisterMedicineEntryBodyAndParams,
 } from '@/api/movement/entry/register-medicine-entry'
 import { ComboboxUp } from '@/components/comboboxes/combobox-up'
-import { Combobox } from '@/components/comboboxes/pharmaceutical-form-combobox'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {
@@ -34,7 +32,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -46,7 +43,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
@@ -60,12 +56,9 @@ const FormSchema = z.object({
     required_error: 'Selecione uma variante de medicamento.',
   }),
   newBatches: z.object({
-    code: z
-      .string({
-        required_error: 'Digite um código',
-      })
-      .optional(),
-
+    code: z.string({
+      required_error: 'Digite um código',
+    }),
     expirationDate: z.date({
       required_error: 'Selecione uma data válida',
     }),
@@ -74,6 +67,9 @@ const FormSchema = z.object({
     }),
     manufacturingDate: z.date().optional(),
     quantityToEntry: z.coerce.number().int(),
+  }),
+  entryDate: z.date({
+    required_error: 'Selecione uma data válida',
   }),
 })
 
@@ -177,12 +173,21 @@ export function NewMedicineEntryDialog() {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      // await registerMedicineEntryFn({
-      //   medicineId: data.medicineVariantId,
-      //   pharmaceuticalFormId: data.pharmaceuticalFormId,
-      //   unitMeasureId: data.unitMeasureId,
-      //   dosage: data.dosage,
-      // })
+      await registerMedicineEntryFn({
+        medicineVariantId: data.medicineVariantId,
+        stockId: data.stockId,
+        entryDate: data.entryDate,
+        newBatches: [
+          {
+            code: data.newBatches.code,
+            expirationDate: data.newBatches.expirationDate,
+            manufacturerId: data.newBatches.manufacturerId,
+            manufacturingDate: data.newBatches.manufacturingDate,
+            quantityToEntry: data.newBatches.quantityToEntry,
+          },
+        ],
+        movementTypeId: '033353fa-6a5a-42d7-889f-f1bb3687202e',
+      })
 
       toast({
         title: 'You submitted the following values:',
@@ -402,6 +407,48 @@ export function NewMedicineEntryDialog() {
                     {...field}
                   />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="entryDate"
+            defaultValue={new Date()}
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Data de Entrada</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={'outline'}
+                        className={cn(
+                          'w-[240px] pl-3 text-left font-normal',
+                          !field.value && 'text-muted-foreground',
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, 'PPP', { locale: ptBR })
+                        ) : (
+                          <span>Selecione uma data</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) => date > new Date()}
+                      lang="pt-BR"
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+
                 <FormMessage />
               </FormItem>
             )}

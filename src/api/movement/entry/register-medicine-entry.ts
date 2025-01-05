@@ -10,7 +10,7 @@ export interface RegisterMedicineEntryBodyAndParams {
     code: string
     expirationDate: Date
     manufacturerId: string
-    manufacturingDate: Date
+    manufacturingDate?: Date | null
     quantityToEntry: number
   }[]
   entryDate: Date
