@@ -11,7 +11,7 @@ export async function registerStock(
   token: string,
 ) {
   await api.post(
-    '/stocks',
+    '/stock',
     { name, institutionId, status },
     {
       headers: {
