@@ -14,6 +14,7 @@ import { TherapeuticClass } from './pages/app/panel/auxiliary-records/therapeuti
 import { UnitMeasure } from './pages/app/panel/auxiliary-records/unit-measure/units-measure'
 import { MedicinesVariants } from './pages/app/panel/medicine-variant/medicines-variants'
 import { Medicines } from './pages/app/panel/medicines/medicines'
+import { MedicinesEntries } from './pages/app/panel/movement/entry/medicines-entries'
 import { Operators } from './pages/app/panel/operators/operators'
 
 export const router = createBrowserRouter([
@@ -117,6 +118,20 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <MedicinesVariants />
+          </PrivateRoute>
+        ),
+      },
+    ],
+  },
+  {
+    path: '/movement',
+    element: <PanelLayout />,
+    children: [
+      {
+        path: 'entries',
+        element: (
+          <PrivateRoute>
+            <MedicinesEntries />
           </PrivateRoute>
         ),
       },

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import {
   AudioWaveform,
   BadgeCheck,
@@ -7,12 +8,12 @@ import {
   Command,
   Folder,
   Forward,
-  Frame,
   GalleryVerticalEnd,
   LogOut,
   MonitorCog,
   MoreHorizontal,
   Pill,
+  Plus,
   Settings,
   Trash2,
   Users,
@@ -20,6 +21,9 @@ import {
 import { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 
+import { fetchInstitutions } from '@/api/fetch-institutions'
+import { LogoutButton } from '@/components/logout-button'
+import { SelectInstitutionGlobal } from '@/components/selects/select-institution-global'
 import { ModeToggle } from '@/components/theme/mode-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -65,6 +69,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar'
 import { useAuth } from '@/contexts/authContext'
+
 const data = {
   user: {
     name: 'shadcn',
@@ -171,7 +176,7 @@ const data = {
       items: [
         {
           title: 'Entradas',
-          url: '/medicine/entries',
+          url: '/movement/entries',
         },
       ],
     },
@@ -219,7 +224,8 @@ export default function PanelLayout() {
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <DropdownMenu>
+              <SelectInstitutionGlobal />
+              {/* <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton
                     size="lg"
@@ -262,16 +268,14 @@ export default function PanelLayout() {
                     </DropdownMenuItem>
                   ))}
                   <DropdownMenuSeparator />
-                  {/* <DropdownMenuItem className="gap-2 p-2">
+                  <DropdownMenuItem className="gap-2 p-2">
                     <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                       <Plus className="size-4" />
                     </div>
-                    <div className="font-medium text-muted-foreground">
-                      
-                    </div>
-                  </DropdownMenuItem> */}
+                    <div className="font-medium text-muted-foreground"></div>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
-              </DropdownMenu>
+              </DropdownMenu> */}
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
@@ -470,6 +474,7 @@ export default function PanelLayout() {
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
+                  {/* <LogoutButton /> */}
                   <DropdownMenuItem onClick={logout}>
                     <LogOut />
                     Log out

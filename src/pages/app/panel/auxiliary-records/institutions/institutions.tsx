@@ -39,7 +39,7 @@ export function Institutions() {
     queryFn: () => fetchInstitutions({ page }, token ?? ''),
   })
 
-  console.log()
+  
 
   return (
     <>

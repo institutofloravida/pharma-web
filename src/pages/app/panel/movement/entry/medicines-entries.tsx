@@ -1,9 +1,10 @@
+import { DialogContent } from '@radix-ui/react-dialog'
 import { useQuery } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchMedicinesVariants } from '@/api/medicines-variants/fetch-medicines-variants'
+import { fetchMedicinesEntries } from '@/api/movement/entry/fetch-medicines-entries'
 import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
@@ -16,18 +17,24 @@ import {
 } from '@/components/ui/table'
 import { useAuth } from '@/contexts/authContext'
 
+import { MedicineEntryTableRow } from './medicine-entry-table-row'
 import { MedicineVariantTableFilters } from './medicine-variant-table-filters'
-import { MedicineVariantTableRow } from './medicine-variant-table-row'
-import { NewMedicineVariantDialog } from './new-medicine-variant-dialog'
+import { NewMedicineEntryDialog } from './new-medicine-entry-dialog'
+import { DatePickerForm } from './teste'
 
-export function MedicinesVariants() {
-  const { token } = useAuth()
+export function MedicinesEntries() {
+  const { token, institutionId } = useAuth()
 
   const [searchParams, setSearchParams] = useSearchParams()
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: medicinesVariants } = useQuery({
-    queryKey: ['medicines-variants', pageIndex],
-    queryFn: () => fetchMedicinesVariants({ page: pageIndex }, token ?? ''),
+  const { data: medicinesEntriesResult } = useQuery({
+    queryKey: ['medicines-entries', 'data-on-institution', pageIndex],
+    queryFn: () =>
+      fetchMedicinesEntries(
+        { page: pageIndex, institutionId: institutionId ?? '' },
+        token ?? '',
+      ),
+    enabled: Boolean(institutionId),
   })
 
   function handlePagination(pageIndex: number) {
@@ -37,17 +44,12 @@ export function MedicinesVariants() {
     })
   }
 
-  // const { data: therapeuticClasses } = useQuery({
-  //   queryKey: ['therapeutic-classes'],
-  //   queryFn: () => fetchTherapeuticClasses({ page }, token ?? ''),
-  // })
-
   return (
     <>
-      <Helmet title="Variantes de Medicamentos" />
+      <Helmet title="Entradas de medicamentos" />
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">
-          Variantes de Medicamentos
+          Entradas de Medicamentos
         </h1>
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
@@ -55,10 +57,10 @@ export function MedicinesVariants() {
             <Dialog>
               <DialogTrigger asChild>
                 <Button className="" variant={'default'}>
-                  Nova Variante
+                  Nova Entrada
                 </Button>
               </DialogTrigger>
-              <NewMedicineVariantDialog />
+              <NewMedicineEntryDialog />
             </Dialog>
           </div>
           <div className="rounded-md border">
@@ -66,20 +68,23 @@ export function MedicinesVariants() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[64px]"></TableHead>
+                  <TableHead className="">Stock</TableHead>
                   <TableHead>Medicamento</TableHead>
-                  <TableHead className="">Dosagem</TableHead>
-                  <TableHead className="">Forma Farmacêutica</TableHead>
+                  <TableHead>Lote</TableHead>
+                  <TableHead className="w-[64px]">Quantidade</TableHead>
+                  <TableHead className="">Operador</TableHead>
+                  <TableHead>Data</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {medicinesVariants &&
-                  medicinesVariants.medicines_variants.map((item) => {
+                {medicinesEntriesResult &&
+                  medicinesEntriesResult.medicines_entries.map((item) => {
                     return (
-                      <MedicineVariantTableRow
-                        medicineVariant={item}
-                        key={item.id}
+                      <MedicineEntryTableRow
+                        medicineEntry={item}
+                        key={item.medicineEntryId}
                       />
                     )
                   })}
@@ -87,10 +92,10 @@ export function MedicinesVariants() {
             </Table>
           </div>
 
-          {medicinesVariants && (
+          {medicinesEntriesResult && (
             <Pagination
-              pageIndex={medicinesVariants.meta.page}
-              totalCount={medicinesVariants.meta.totalCount}
+              pageIndex={medicinesEntriesResult.meta.page}
+              totalCount={medicinesEntriesResult.meta.totalCount}
               perPage={20}
               onPageChange={handlePagination}
             />

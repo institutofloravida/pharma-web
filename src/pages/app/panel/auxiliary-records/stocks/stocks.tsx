@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchStocks } from '@/api/fetch-stocks'
+import { fetchStocks } from '@/api/auxiliary-records/stock/fetch-stocks'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/pagination'
 import {
@@ -117,7 +117,7 @@ export function Stocks() {
 //               <TableBody>
 //                 {stocks &&
 //                   stocks.map((item) => {
-//                     console.log(item)
+//
 //                     return <StockTableRow stock={item} key={item.id} />
 //                   })}
 //               </TableBody>

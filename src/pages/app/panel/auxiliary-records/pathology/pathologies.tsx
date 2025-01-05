@@ -30,7 +30,7 @@ export function Pathologies() {
     queryFn: () => fetchPathologies({ page }, token ?? ''),
   })
 
-  console.log()
+  
 
   return (
     <>

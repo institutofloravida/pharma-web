@@ -30,7 +30,7 @@ export function Manufacturers() {
     queryFn: () => fetchManufacturers({ page }, token ?? ''),
   })
 
-  console.log()
+  
 
   return (
     <>

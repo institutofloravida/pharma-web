@@ -1,6 +1,7 @@
 import { api } from '@/lib/axios'
 export interface FetchStocksQuery {
   page?: number | null
+  query?: string
 }
 
 interface FetchStocksResponse {
@@ -10,17 +11,25 @@ interface FetchStocksResponse {
     status: boolean
     institutionName: string
   }[]
+  meta: {
+    page: number
+    totalCount: number
+  }
 }
 
-export async function fetchStocks({ page }: FetchStocksQuery, token: string) {
+export async function fetchStocks(
+  { page, query }: FetchStocksQuery,
+  token: string,
+) {
   const response = await api.get<FetchStocksResponse>('/stocks', {
     headers: {
       Authorization: `Bearer ${token}`,
     },
     params: {
       page,
+      query,
     },
   })
 
-  return response.data.stocks
+  return response.data
 }

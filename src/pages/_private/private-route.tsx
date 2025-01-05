@@ -8,12 +8,17 @@ interface PrivateRouteProps {
 }
 
 export function PrivateRoute({ children }: PrivateRouteProps) {
-  const { isAuthenticated, loading } = useAuth()
+  const { isAuthenticated, loading, token } = useAuth()
+  if (!token) {
+    return <Navigate to="/sign-in" replace />
+  }
 
   if (loading) {
-    // Pode adicionar uma tela de carregamento ou apenas retornar `null`
     return <div>Carregando...</div>
   }
 
-  return isAuthenticated ? <>{children}</> : <Navigate to="/sign-in" />
+  if (!isAuthenticated) {
+    return <Navigate to="/sign-in" replace />
+  }
+  return <>{children}</>
 }

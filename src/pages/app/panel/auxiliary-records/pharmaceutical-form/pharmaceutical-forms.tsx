@@ -30,7 +30,7 @@ export function PharmaceuticalForms() {
     queryFn: () => fetchPharmaceuticalForms({ page }, token ?? ''),
   })
 
-  console.log()
+  
 
   return (
     <>

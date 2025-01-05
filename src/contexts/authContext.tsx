@@ -1,11 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from 'react'
+import { createContext, ReactNode, useContext, useState } from 'react'
 
 import { getOperatorDetails } from '@/api/operators/get-operator-details'
 import type { Operator } from '@/api/operators/get-operators'
@@ -13,12 +7,14 @@ import { api } from '@/lib/axios'
 import { queryClient } from '@/lib/react-query'
 
 interface AuthContextType {
+  institutionId: string | null
   token: string | null
   isAuthenticated: boolean
   loading: boolean
   me: Operator | null
   login: (newToken: string) => void
   logout: () => void
+  selectInstitution: (institutionId: string | null) => void
 }
 
 interface AuthProviderProps {
@@ -31,14 +27,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [token, setToken] = useState<string | null>(
     localStorage.getItem('token'),
   )
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [institutionId, setInstitutionId] = useState<string | null>(
+    localStorage.getItem('institutionId'),
+  )
 
   const clearAuth = () => {
     setToken(null)
-    setIsAuthenticated(false)
-    queryClient.invalidateQueries({ queryKey: ['me'] })
+    setInstitutionId(null)
     localStorage.removeItem('token')
+    localStorage.removeItem('institutionId')
+    queryClient.invalidateQueries()
   }
 
   const { data: me, isLoading } = useQuery({
@@ -46,9 +44,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     queryFn: async () => {
       try {
         const response = await api.get('/validate-token', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         })
         if (!response.data.isValid) throw new Error('Token inválido')
         return getOperatorDetails(token ?? '')
@@ -60,18 +56,25 @@ export function AuthProvider({ children }: AuthProviderProps) {
     enabled: Boolean(token),
   })
 
-  useEffect(() => {
-    if (!token) setLoading(false)
-  }, [token])
+  const isAuthenticated = Boolean(token) && !isLoading && !!me
+  const isLoadingAuth = isLoading || !token
 
   const login = (newToken: string) => {
     setToken(newToken)
-    setIsAuthenticated(true)
     localStorage.setItem('token', newToken)
   }
 
-  const logout = () => {
-    clearAuth()
+  const selectInstitution = (newInstitutionId: string | null) => {
+    setInstitutionId(newInstitutionId)
+    if (newInstitutionId) {
+      localStorage.setItem('institutionId', newInstitutionId)
+      queryClient.invalidateQueries({
+        queryKey: ['data-on-institution'],
+      })
+    } else {
+      localStorage.removeItem('institutionId')
+    }
+    // Invalida queries dependentes da instituição
   }
 
   return (
@@ -79,10 +82,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       value={{
         token,
         login,
-        logout,
+        logout: clearAuth,
         isAuthenticated,
-        loading: loading || isLoading,
+        loading: isLoadingAuth,
         me: me?.operator ?? null,
+        institutionId,
+        selectInstitution,
       }}
     >
       {children}

@@ -1,6 +1,8 @@
 import { api } from '@/lib/axios'
 export interface FetchManufacturersQuery {
   page?: number | null
+  query?: string
+  cnpj?: string
 }
 
 export interface Manufacturer {
@@ -12,10 +14,14 @@ export interface Manufacturer {
 
 interface FetchManufacturersResponse {
   manufacturers: Manufacturer[]
+  meta: {
+    page: number
+    totalCount: number
+  }
 }
 
 export async function fetchManufacturers(
-  { page }: FetchManufacturersQuery,
+  { page, query, cnpj }: FetchManufacturersQuery,
   token: string,
 ) {
   const response = await api.get<FetchManufacturersResponse>('/manufacturer', {
@@ -24,8 +30,10 @@ export async function fetchManufacturers(
     },
     params: {
       page,
+      query,
+      cnpj,
     },
   })
 
-  return response.data.manufacturers
+  return response.data
 }

@@ -7,10 +7,7 @@ import { z } from 'zod'
 import { fetchPharmaceuticalForms } from '@/api/auxiliary-records/pharmaceutical-form/fetch-pharmaceutical-form'
 import { fetchUnitsMeasure } from '@/api/auxiliary-records/unit-measure/fetch-units-measure'
 import { fetchMedicines } from '@/api/medicines/fetch-medicines'
-import type {
-  FetchMedicinesVariantsResponse,
-  MedicineVariant,
-} from '@/api/medicines-variants/fetch-medicines-variants'
+import type { FetchMedicinesVariantsResponse } from '@/api/medicines-variants/fetch-medicines-variants'
 import {
   registerMedicineVariant,
   type RegisterMedicineVariantBody,
@@ -70,8 +67,6 @@ export function NewMedicineVariantDialog() {
         'medicines-variants',
         1,
       ]) || { medicines_variants: [], meta: { page: 1, totalCount: 0 } }
-
-      console.log(cached)
 
       const medicineName = queryMedicine
       const unitMeasureAcronym = queryUnitMeasure
