@@ -25,12 +25,10 @@ export function Manufacturers() {
 
   const [searchParams, _] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: manufacturers } = useQuery({
+  const { data: manufacturersResult } = useQuery({
     queryKey: ['manufacturers'],
     queryFn: () => fetchManufacturers({ page }, token ?? ''),
   })
-
-  
 
   return (
     <>
@@ -62,8 +60,8 @@ export function Manufacturers() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {manufacturers &&
-                  manufacturers.map((item) => {
+                {manufacturersResult?.manufacturers &&
+                  manufacturersResult?.manufacturers.map((item) => {
                     return (
                       <ManufacturerTableRow manufacturer={item} key={item.id} />
                     )
