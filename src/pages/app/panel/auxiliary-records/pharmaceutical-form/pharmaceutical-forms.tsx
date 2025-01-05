@@ -25,12 +25,10 @@ export function PharmaceuticalForms() {
 
   const [searchParams, _] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: pharmaceuticalforms } = useQuery({
+  const { data: pharmaceuticalformsResult } = useQuery({
     queryKey: ['pharmaceutical-forms'],
     queryFn: () => fetchPharmaceuticalForms({ page }, token ?? ''),
   })
-
-  
 
   return (
     <>
@@ -62,15 +60,17 @@ export function PharmaceuticalForms() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pharmaceuticalforms &&
-                  pharmaceuticalforms.map((item) => {
-                    return (
-                      <PharmaceuticalFormTableRow
-                        pharmaceuticalForm={item}
-                        key={item.id}
-                      />
-                    )
-                  })}
+                {pharmaceuticalformsResult?.pharmaceutical_forms &&
+                  pharmaceuticalformsResult?.pharmaceutical_forms.map(
+                    (item) => {
+                      return (
+                        <PharmaceuticalFormTableRow
+                          pharmaceuticalForm={item}
+                          key={item.id}
+                        />
+                      )
+                    },
+                  )}
               </TableBody>
             </Table>
           </div>
