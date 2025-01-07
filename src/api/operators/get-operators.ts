@@ -12,6 +12,10 @@ export interface Operator {
 
 interface GetOperatorsResponse {
   operators: Operator[]
+  meta: {
+    page: number
+    totalCount: number
+  }
 }
 
 export async function getOperators({ page }: GetOperatorsQuery, token: string) {
@@ -24,5 +28,5 @@ export async function getOperators({ page }: GetOperatorsQuery, token: string) {
     },
   })
 
-  return response.data.operators
+  return response.data
 }

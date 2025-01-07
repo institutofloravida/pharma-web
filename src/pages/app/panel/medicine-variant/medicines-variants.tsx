@@ -37,11 +37,6 @@ export function MedicinesVariants() {
     })
   }
 
-  // const { data: therapeuticClasses } = useQuery({
-  //   queryKey: ['therapeutic-classes'],
-  //   queryFn: () => fetchTherapeuticClasses({ page }, token ?? ''),
-  // })
-
   return (
     <>
       <Helmet title="Variantes de Medicamentos" />

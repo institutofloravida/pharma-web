@@ -4,9 +4,9 @@ import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { getOperators } from '@/api/operators/get-operators'
+import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
   TableBody,
@@ -25,10 +25,17 @@ export function Operators() {
 
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: operators } = useQuery({
+  const { data: operatorsResult } = useQuery({
     queryKey: ['operators'],
     queryFn: () => getOperators({ page }, token ?? ''),
   })
+
+  function handlePagination(pageIndex: number) {
+    setSearchParams((state) => {
+      state.set('page', pageIndex.toString())
+      return state
+    })
+  }
 
   return (
     <>
@@ -63,15 +70,22 @@ export function Operators() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {operators &&
-                  operators.map((item) => {
+                {operatorsResult?.operators &&
+                  operatorsResult.operators.map((item) => {
                     return <OperatorTableRow operator={item} key={item.id} />
                   })}
               </TableBody>
             </Table>
           </div>
 
-          <Pagination />
+          {operatorsResult && (
+            <Pagination
+              pageIndex={operatorsResult.meta.page}
+              totalCount={operatorsResult.meta.totalCount}
+              perPage={20}
+              onPageChange={handlePagination}
+            />
+          )}
         </div>
       </div>
     </>
