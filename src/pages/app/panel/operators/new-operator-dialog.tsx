@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { z } from 'zod'
 
 import {
@@ -18,9 +17,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { useAuth } from '@/contexts/authContext'
+import { toast } from '@/hooks/use-toast'
 
 const newOperatorSchema = z.object({
   name: z.string().min(3),
@@ -33,15 +40,6 @@ type NewOperatorSchema = z.infer<typeof newOperatorSchema>
 export function NewOperatorDialog() {
   const queryClient = useQueryClient()
   const { token } = useAuth()
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { isSubmitting },
-  } = useForm<NewOperatorSchema>({
-    resolver: zodResolver(newOperatorSchema),
-  })
 
   const { mutateAsync: registerOperatorFn } = useMutation({
     mutationFn: (data: RegisterOperatorBody) =>
@@ -59,6 +57,10 @@ export function NewOperatorDialog() {
     },
   })
 
+  const form = useForm<z.infer<typeof newOperatorSchema>>({
+    resolver: zodResolver(newOperatorSchema),
+  })
+
   async function handleRegisterOperator(data: NewOperatorSchema) {
     try {
       await registerOperatorFn({
@@ -67,10 +69,24 @@ export function NewOperatorDialog() {
         password: data.password,
         role: data.role,
       })
-
-      toast.success(`Operador ${data.name} registrado com sucesso!`)
+      console.log('Asdsdasf')
+      toast({
+        title: 'You submitted the following values:',
+        description: (
+          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+          </pre>
+        ),
+      })
     } catch {
-      toast.error('Não foi possível registrar o operador. Tente Novamente!')
+      toast({
+        title: 'Error ao cadastrar o estoque',
+        description: (
+          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+            <code className="text-white">{JSON.stringify(error, null, 2)}</code>
+          </pre>
+        ),
+      })
     }
   }
 
@@ -82,47 +98,67 @@ export function NewOperatorDialog() {
           Preencha todas as informações para registrar um novo usuário
         </DialogDescription>
       </DialogHeader>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleRegisterOperator)}>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nome</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nome do Operador..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nome</FormLabel>
+                <FormControl>
+                  <Input placeholder="Email..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Senha</FormLabel>
+                <FormControl>
+                  <Input placeholder="Senha..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="role"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <SelectRole onChange={field.onChange} value={field.value} />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <form onSubmit={handleSubmit(handleRegisterOperator)}>
-        <div className="grid gap-2">
-          <div className="flex-col gap-2">
-            <Label htmlFor="name" className="text-right">
-              Nome
-            </Label>
-            <Input id="name" className="col-span-3" {...register('name')} />
-          </div>
-          <div className="flex-col">
-            <Label htmlFor="email" className="text-right">
-              Email
-            </Label>
-            <Input id="email" className="col-span-3" {...register('email')} />
-          </div>
-          <div className="flex-col">
-            <Label htmlFor="password" className="text-right">
-              Senha
-            </Label>
-            <Input
-              id="password"
-              className="col-span-3"
-              {...register('password')}
-            />
-          </div>
-          <div className="flex-col">
-            <SelectRole
-              value={watch('role')}
-              onChange={(value) => setValue('role', value)}
-            />
-          </div>
-        </div>
-        <DialogFooter className="mt-2">
-          <DialogClose asChild>
-            <Button variant={'ghost'}>Cancelar</Button>
-          </DialogClose>
-          <Button type="submit" disabled={isSubmitting}>
-            Cadastrar
-          </Button>
-        </DialogFooter>
-      </form>
+          <DialogFooter className="mt-2">
+            <DialogClose asChild>
+              <Button variant={'ghost'}>Cancelar</Button>
+            </DialogClose>
+            <Button type="submit">Cadastrar</Button>
+          </DialogFooter>
+        </form>
+      </Form>
     </DialogContent>
   )
 }
