@@ -12,12 +12,27 @@ import { PharmaceuticalForms } from './pages/app/panel/auxiliary-records/pharmac
 import { Stocks } from './pages/app/panel/auxiliary-records/stocks/stocks'
 import { TherapeuticClass } from './pages/app/panel/auxiliary-records/therapeutic-class/therapeutic-class'
 import { UnitMeasure } from './pages/app/panel/auxiliary-records/unit-measure/units-measure'
+import { Dashboard } from './pages/app/panel/dashboard/dashboard'
 import { MedicinesVariants } from './pages/app/panel/medicine-variant/medicines-variants'
 import { Medicines } from './pages/app/panel/medicines/medicines'
 import { MedicinesEntries } from './pages/app/panel/movement/entry/medicines-entries'
 import { Operators } from './pages/app/panel/operators/operators'
 
 export const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <PanelLayout />,
+    children: [
+      {
+        path: '',
+        element: (
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        ),
+      },
+    ],
+  },
   {
     path: '/',
     element: <AuthLayout />,
@@ -28,10 +43,18 @@ export const router = createBrowserRouter([
     element: <PanelLayout />,
     children: [
       {
+        path: '',
+        element: (
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        ),
+      },
+      {
         path: 'panel',
         element: (
           <PrivateRoute>
-            <LoginForm />
+            <Dashboard />
           </PrivateRoute>
         ),
       },

@@ -67,7 +67,6 @@ export function NewManufacturerDialog() {
 
       toast.success(`Fabricante ${data.name} registrada com sucesso!`)
     } catch (error) {
-      
       toast.error('Não foi possível registra o fabricante. Tente Novamente!')
     }
   }

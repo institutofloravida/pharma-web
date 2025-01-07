@@ -64,7 +64,6 @@ export function NewPharmaceuticalFormDialog() {
 
       toast.success(`Forma farmacêutica ${data.name} registrada com sucesso!`)
     } catch (error) {
-      
       toast.error(
         'Não foi possível registrar a forma farmacêutica. Tente Novamente!',
       )

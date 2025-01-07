@@ -39,8 +39,6 @@ export function Institutions() {
     queryFn: () => fetchInstitutions({ page }, token ?? ''),
   })
 
-  
-
   return (
     <>
       <Helmet title="Instituições" />

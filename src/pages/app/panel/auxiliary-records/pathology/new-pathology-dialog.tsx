@@ -63,7 +63,6 @@ export function NewPathologyDialog() {
 
       toast.success(`Patologia ${data.name} registrada com sucesso!`)
     } catch (error) {
-      
       toast.error('Não foi possível registrar a patologia. Tente Novamente!')
     }
   }

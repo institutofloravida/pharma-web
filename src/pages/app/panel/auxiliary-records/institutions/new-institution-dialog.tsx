@@ -46,7 +46,7 @@ export function NewInstitutionDialog() {
 
   async function handleRegisterInstitution(data: NewInstitutionSchema) {
     try {
-      // 
+      //
       await registerInstitutionFn({
         name: data.name,
         cnpj: data.cnpj,
@@ -55,7 +55,6 @@ export function NewInstitutionDialog() {
 
       toast.success(`Instituição ${data.name} registrada com sucesso!`)
     } catch (error) {
-      
       toast.error('Não foi possível registrar a Institutição. Tente Novamente!')
     }
   }

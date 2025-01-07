@@ -30,8 +30,6 @@ export function Pathologies() {
     queryFn: () => fetchPathologies({ page }, token ?? ''),
   })
 
-  
-
   return (
     <>
       <Helmet title="Patologias" />
