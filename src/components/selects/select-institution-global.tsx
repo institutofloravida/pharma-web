@@ -28,7 +28,6 @@ export function SelectInstitutionGlobal() {
   const { data: institutions, isLoading } = useQuery({
     queryKey: ['institutions'],
     queryFn: () => fetchInstitutions({ page: 1 }, token ?? ''),
-    enabled: !!institutionId,
   })
 
   const [activeInstitution, setActiveInstitution] =
