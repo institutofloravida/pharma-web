@@ -22,6 +22,7 @@ import { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 
 import { fetchInstitutions } from '@/api/auxiliary-records/institution/fetch-institutions'
+import { getOperatorDetails } from '@/api/operators/get-operator-details'
 import { LogoutButton } from '@/components/logout-button'
 import { SelectInstitutionGlobal } from '@/components/selects/select-institution-global'
 import { ModeToggle } from '@/components/theme/mode-toggle'
@@ -68,7 +69,9 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from '@/components/ui/sidebar'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/contexts/authContext'
+import { api } from '@/lib/axios'
 
 const data = {
   user: {
@@ -211,7 +214,12 @@ export default function PanelLayout() {
   const [activeTeam, setActiveTeam] = useState(data.teams[0])
   const { pathname } = useLocation()
   const breadCrumpItems = pathname.split('/').filter((item) => item.length > 0)
-  const { me, logout } = useAuth()
+  const { token, logout } = useAuth()
+
+  const { data: operatorResult, isLoading } = useQuery({
+    queryKey: ['me', token],
+    queryFn: () => getOperatorDetails(token ?? ''),
+  })
 
   return (
     <SidebarProvider>
@@ -424,12 +432,27 @@ export default function PanelLayout() {
                     className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                   >
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src={''} alt={me?.name} />
+                      <AvatarImage
+                        src={''}
+                        alt={operatorResult?.operator?.name}
+                      />
                       <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">{me?.name}</span>
-                      <span className="truncate text-xs">{me?.email}</span>
+                      <span className="truncate font-semibold">
+                        {isLoading ? (
+                          <Skeleton className="mb-2 h-4 w-20" />
+                        ) : (
+                          operatorResult?.operator?.name
+                        )}
+                      </span>
+                      <span className="truncate text-xs">
+                        {isLoading ? (
+                          <Skeleton className="w-50 h-4" />
+                        ) : (
+                          operatorResult?.operator?.email
+                        )}
+                      </span>
                     </div>
                     <ChevronsUpDown className="ml-auto size-4" />
                   </SidebarMenuButton>
@@ -443,16 +466,21 @@ export default function PanelLayout() {
                   <DropdownMenuLabel className="p-0 font-normal">
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                       <Avatar className="h-8 w-8 rounded-lg">
-                        <AvatarImage src={me?.name} alt={me?.name} />
+                        <AvatarImage
+                          src={operatorResult?.operator?.name}
+                          alt={operatorResult?.operator?.name}
+                        />
                         <AvatarFallback className="rounded-lg">
                           CN
                         </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold">
-                          {me?.name}
+                          {operatorResult?.operator?.name}
                         </span>
-                        <span className="truncate text-xs">{me?.email}</span>
+                        <span className="truncate text-xs">
+                          {operatorResult?.operator?.email}
+                        </span>
                       </div>
                     </div>
                   </DropdownMenuLabel>
