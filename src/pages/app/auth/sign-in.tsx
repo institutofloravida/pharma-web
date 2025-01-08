@@ -3,7 +3,6 @@ import { useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
-import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { signIn, SignInBody } from '@/api/auth/sign-in'
@@ -11,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/contexts/authContext'
+import { toast } from '@/hooks/use-toast'
 
 const SignInForm = z.object({
   email: z.string().email(),
@@ -35,15 +35,23 @@ export function SignIn() {
     },
     onSuccess: (data) => {
       login(data.access_token)
-      toast.success(
-        'Aproveite todas as funcionalidades do painel administrativo',
-      )
+      toast({
+        title: 'Aproveite todas as funcionalidades do painel administrativo!',
+      })
+      navigate('/panel')
     },
     onError: (error: any) => {
       if (error.response?.status === 401) {
-        toast.error('Credenciais Inválidas')
+        toast({
+          title: 'Credenciais Inválidas',
+          variant: 'destructive',
+        })
+        // toast.error('Credenciais Inválidas')
       } else {
-        toast.error('Erro no login. Tente novamente.')
+        toast({
+          title: 'Erro no login. Tente novamente.',
+          variant: 'destructive',
+        })
       }
     },
   })
@@ -53,7 +61,6 @@ export function SignIn() {
   }
 
   useEffect(() => {
-    // Redireciona para o painel assim que `isAuthenticated` for verdadeiro após o login
     if (isAuthenticated) {
       navigate('/panel')
     }
