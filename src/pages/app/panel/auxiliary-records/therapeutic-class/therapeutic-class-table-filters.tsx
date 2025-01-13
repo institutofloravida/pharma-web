@@ -11,12 +11,8 @@ import { useAuth } from '@/contexts/authContext'
 export function StockTableFilters() {
   const { token } = useAuth()
 
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, _] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: institutions } = useQuery({
-    queryKey: ['institutions'],
-    queryFn: () => fetchInstitutions({ page }, token ?? ''),
-  })
 
   return (
     <form className="flex items-center gap-2">

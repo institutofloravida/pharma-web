@@ -1,13 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { fetchInstitutions } from '@/api/auxiliary-records/institution/fetch-institutions'
 import {
   registerOperator,
   type RegisterOperatorBody,
 } from '@/api/operators/register-operator'
+import { ComboboxMany } from '@/components/comboboxes/combobox-many'
 import { SelectRole } from '@/components/selects/select-role'
 import { Button } from '@/components/ui/button'
 import {
@@ -30,16 +33,24 @@ import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 
 const newOperatorSchema = z.object({
-  name: z.string().min(3),
+  name: z
+    .string({
+      required_error: 'digite um nome',
+    })
+    .min(3, { message: 'mínimo de 3 caracteres' }),
   email: z.string().email(),
-  password: z.string(),
+  password: z.string().min(8),
   role: z.enum(['SUPER_ADMIN', 'MANAGER', 'COMMON']),
+  institutionsIds: z.array(z.string()).min(1, {
+    message: 'selecione pelo menos uma instituição',
+  }),
 })
 type NewOperatorSchema = z.infer<typeof newOperatorSchema>
 
 export function NewOperatorDialog() {
   const queryClient = useQueryClient()
   const { token } = useAuth()
+  const [queryInstitution, setQueryInstitution] = useState('')
 
   const { mutateAsync: registerOperatorFn } = useMutation({
     mutationFn: (data: RegisterOperatorBody) =>
@@ -57,8 +68,19 @@ export function NewOperatorDialog() {
     },
   })
 
+  const { data: institutionsResult, isFetching: isFetchingInstitutions } =
+    useQuery({
+      queryKey: ['institutions', queryInstitution],
+      queryFn: () =>
+        fetchInstitutions({ page: 1, query: queryInstitution }, token ?? ''),
+      staleTime: 1000,
+      refetchOnMount: true,
+    })
   const form = useForm<z.infer<typeof newOperatorSchema>>({
     resolver: zodResolver(newOperatorSchema),
+    defaultValues: {
+      institutionsIds: [],
+    },
   })
 
   async function handleRegisterOperator(data: NewOperatorSchema) {
@@ -68,8 +90,8 @@ export function NewOperatorDialog() {
         email: data.email,
         password: data.password,
         role: data.role,
+        institutionsIds: data.institutionsIds,
       })
-      console.log('Asdsdasf')
       toast({
         title: 'You submitted the following values:',
         description: (
@@ -95,7 +117,7 @@ export function NewOperatorDialog() {
       <DialogHeader>
         <DialogTitle>Novo Operador</DialogTitle>
         <DialogDescription>
-          Preencha todas as informações para registrar um novo usuário
+          Preencha todas as informações para registrar um novo operador
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
@@ -118,7 +140,7 @@ export function NewOperatorDialog() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nome</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input placeholder="Email..." {...field} />
                 </FormControl>
@@ -133,7 +155,7 @@ export function NewOperatorDialog() {
               <FormItem>
                 <FormLabel>Senha</FormLabel>
                 <FormControl>
-                  <Input placeholder="Senha..." {...field} />
+                  <Input type="password" placeholder="Senha..." {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -144,8 +166,28 @@ export function NewOperatorDialog() {
             name="role"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Tipo de usuário</FormLabel>
                 <SelectRole onChange={field.onChange} value={field.value} />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="institutionsIds"
+            render={({ field }) => (
+              <FormItem className="w-[200px]">
+                <FormLabel>Instituições</FormLabel>
+                <ComboboxMany
+                  field={field}
+                  items={institutionsResult?.institutions ?? []}
+                  itemKey="id"
+                  onChange={(selectedItems) => field.onChange(selectedItems)}
+                  onQueryChange={setQueryInstitution}
+                  query={queryInstitution}
+                  isFetching={isFetchingInstitutions}
+                  formatItem={(item) => `${item.name}`}
+                />
                 <FormMessage />
               </FormItem>
             )}

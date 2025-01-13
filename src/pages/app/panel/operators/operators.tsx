@@ -61,7 +61,7 @@ export function Operators() {
                   <TableHead className="w-[64px]"></TableHead>
                   <TableHead>Nome</TableHead>
                   <TableHead className="w-[180px]">Email</TableHead>
-                  <TableHead className="w-[180px]">
+                  <TableHead className="w-[200px]">
                     Instituição Associada
                   </TableHead>
                   <TableHead className="w-[140px]">Tipo de usuário</TableHead>

@@ -51,7 +51,7 @@ export function NewStockDialog() {
   const [searchParams, _] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
 
-  const { data: institutions } = useQuery({
+  const { data: institutionsResult } = useQuery({
     queryKey: ['institutions', page],
     queryFn: () => fetchInstitutions({ page }, token ?? ''),
   })
@@ -139,7 +139,7 @@ export function NewStockDialog() {
                 <FormLabel>Instituição</FormLabel>
                 <FormControl>
                   <SelectInstitutions
-                    institutions={institutions ?? []}
+                    institutions={institutionsResult?.institutions ?? []}
                     value={field.value}
                     onChange={field.onChange}
                   />

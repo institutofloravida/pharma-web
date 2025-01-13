@@ -20,6 +20,7 @@ export function SelectInstitutions({
   value,
   onChange,
 }: SelectInstitutionsProps) {
+  console.log('institutions: ', institutions)
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger className="w-[280px]">

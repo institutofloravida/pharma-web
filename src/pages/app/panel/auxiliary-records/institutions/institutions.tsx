@@ -34,7 +34,7 @@ export function Institutions() {
 
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: institutions } = useQuery({
+  const { data: institutionsResult } = useQuery({
     queryKey: ['institutions'],
     queryFn: () => fetchInstitutions({ page }, token ?? ''),
   })
@@ -69,8 +69,8 @@ export function Institutions() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {institutions &&
-                  institutions.map((item) => {
+                {institutionsResult &&
+                  institutionsResult.institutions.map((item) => {
                     return (
                       <InstitutionTableRow institution={item} key={item.id} />
                     )

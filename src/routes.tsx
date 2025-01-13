@@ -17,6 +17,7 @@ import { MedicinesVariants } from './pages/app/panel/medicine-variant/medicines-
 import { Medicines } from './pages/app/panel/medicines/medicines'
 import { MedicinesEntries } from './pages/app/panel/movement/entry/medicines-entries'
 import { Operators } from './pages/app/panel/operators/operators'
+import { Test } from './pages/app/panel/test/test'
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +48,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Dashboard />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'test',
+        element: (
+          <PrivateRoute>
+            <Test />
           </PrivateRoute>
         ),
       },

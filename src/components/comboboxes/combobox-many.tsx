@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { Check, ChevronsUpDown, Plus, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -18,107 +18,144 @@ import {
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 
-interface ComboboxMultiSelectProps<T> {
+interface ComboboxProps<T> {
   items: T[]
-  selectedItems: T[]
+  field: {
+    value: string[]
+  }
   query: string
   placeholder?: string
   isFetching: boolean
   onQueryChange: (query: string) => void
-  onSelect: (selectedItems: T[]) => void
+  onChange: (selectedItems: string[]) => void
   itemKey: keyof T
   formatItem: (item: T) => string
 }
 
-export function ComboboxMultiSelect<T extends Record<string, any>>({
+export function ComboboxMany<T extends Record<string, any>>({
   items,
-  selectedItems,
+  field,
   query,
-  placeholder = 'Select items...',
+  placeholder = 'Selecione itens...',
   isFetching,
   onQueryChange,
-  onSelect,
+  onChange,
   itemKey,
   formatItem,
-}: ComboboxMultiSelectProps<T>) {
-  const [open, setOpen] = useState(false)
+}: ComboboxProps<T>) {
+  const [selectedItems, setSelectedItems] = useState<string[]>(
+    field.value || [],
+  )
 
-  const toggleSelection = (item: T) => {
-    const isAlreadySelected = selectedItems.some(
-      (selected) => selected[itemKey] === item[itemKey],
-    )
+  const handleAddItem = (id: string) => {
+    if (!selectedItems.includes(id)) {
+      const newSelectedItems = [...selectedItems, id]
+      setSelectedItems(newSelectedItems)
+      onChange(newSelectedItems)
+    }
+  }
 
-    const updatedSelection = isAlreadySelected
-      ? selectedItems.filter((selected) => selected[itemKey] !== item[itemKey])
-      : [...selectedItems, item]
-
-    onSelect(updatedSelection)
+  const handleRemoveItem = (id: string) => {
+    const newSelectedItems = selectedItems.filter((item) => item !== id)
+    setSelectedItems(newSelectedItems)
+    onChange(newSelectedItems)
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <FormControl>
-          <Button
-            variant="outline"
-            role="combobox"
-            className={cn(
-              'w-[250px] justify-between',
-              !selectedItems.length && 'text-muted-foreground',
-            )}
-          >
-            {selectedItems.length
-              ? selectedItems.map(formatItem).join(', ')
-              : placeholder}
-            <ChevronsUpDown className="opacity-50" />
-          </Button>
-        </FormControl>
-      </PopoverTrigger>
-      <PopoverContent className="w-[250px] p-0">
-        <Command>
-          <CommandInput
-            placeholder="Search..."
-            className="h-9"
-            value={query}
-            onValueChange={onQueryChange}
-          />
-          <CommandList>
-            {isFetching && <CommandEmpty>Loading...</CommandEmpty>}
-            {!isFetching && (
-              <>
-                {items.length ? (
-                  <CommandGroup>
-                    {items.map((item) => {
-                      const formattedValue = formatItem(item)
-                      const isSelected = selectedItems.some(
-                        (selected) => selected[itemKey] === item[itemKey],
-                      )
+    <div>
+      <Popover>
+        <PopoverTrigger asChild>
+          <FormControl>
+            <Button
+              variant="outline"
+              role="combobox"
+              className={cn(
+                'w-[250px] justify-between',
+                !selectedItems.length && 'text-muted-foreground',
+              )}
+            >
+              {selectedItems.length
+                ? `${selectedItems.length} item(s) selected`
+                : placeholder}
+              <ChevronsUpDown className="opacity-50" />
+            </Button>
+          </FormControl>
+        </PopoverTrigger>
+        <PopoverContent className="w-[250px] p-0">
+          <Command>
+            <CommandInput
+              placeholder="Search..."
+              className="h-9"
+              value={query}
+              onValueChange={onQueryChange}
+            />
+            <CommandList>
+              {isFetching && <CommandEmpty>Loading...</CommandEmpty>}
+              {!isFetching && (
+                <>
+                  {items.length ? (
+                    <CommandGroup>
+                      {items.map((item) => {
+                        const formattedValue = formatItem(item)
+                        const itemId = item[itemKey]
+                        const isSelected = selectedItems.includes(itemId) // Verifica se o item já está na lista
+                        return (
+                          <CommandItem
+                            value={formattedValue}
+                            key={itemId}
+                            className={`${isSelected ? 'opacity-50' : ''}`}
+                          >
+                            {formattedValue}
+                            <Button
+                              variant="ghost"
+                              size="xxs"
+                              className="ml-auto"
+                              onClick={() => handleAddItem(itemId)}
+                              disabled={isSelected} // Desativa o botão se já estiver na lista
+                            >
+                              <Plus />
+                            </Button>
+                          </CommandItem>
+                        )
+                      })}
+                    </CommandGroup>
+                  ) : (
+                    <CommandEmpty>No results found.</CommandEmpty>
+                  )}
+                </>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+      {/* Selected Items Section */}
+      {selectedItems.length > 0 && (
+        <div className="mt-4">
+          {/* <h4 className="text-xs">Items Selecionados</h4> */}
+          <ul className="mt-2 space-y-1">
+            {selectedItems.map((id) => {
+              const selectedItem = items.find((item) => item[itemKey] === id)
+              if (!selectedItem) return null
 
-                      return (
-                        <CommandItem
-                          value={formattedValue}
-                          key={item[itemKey]}
-                          onSelect={() => toggleSelection(item)}
-                        >
-                          {formattedValue}
-                          <Check
-                            className={cn(
-                              'ml-auto',
-                              isSelected ? 'opacity-100' : 'opacity-0',
-                            )}
-                          />
-                        </CommandItem>
-                      )
-                    })}
-                  </CommandGroup>
-                ) : (
-                  <CommandEmpty>No results found.</CommandEmpty>
-                )}
-              </>
-            )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+              return (
+                <li
+                  key={id}
+                  className="flex items-center justify-between rounded-md border p-1 text-xs"
+                >
+                  <span className="">{formatItem(selectedItem)}</span>
+                  <Button
+                    variant="link"
+                    size="xxs"
+                    onClick={() => handleRemoveItem(id)}
+                  >
+                    <X />
+                  </Button>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
+    </div>
   )
 }

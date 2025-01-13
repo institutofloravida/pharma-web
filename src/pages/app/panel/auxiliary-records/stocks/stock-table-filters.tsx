@@ -27,7 +27,7 @@ export function StockTableFilters() {
 
   const [searchParams, _] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: institutions } = useQuery({
+  const { data: institutionsResult } = useQuery({
     queryKey: ['institutions'],
     queryFn: () => fetchInstitutions({ page }, token ?? ''),
   })
@@ -63,7 +63,7 @@ export function StockTableFilters() {
             <FormItem>
               <FormControl>
                 <SelectInstitutions
-                  institutions={institutions ?? []}
+                  institutions={institutionsResult?.institutions ?? []}
                   value={field.value}
                   onChange={field.onChange}
                 />

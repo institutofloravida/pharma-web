@@ -1,5 +1,6 @@
 import { Search, UserMinus, UserPen } from 'lucide-react'
 
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import {
@@ -38,7 +39,10 @@ export function OperatorTableRow({ operator }: OperatorTableRowProps) {
         {operator.name}
       </TableCell>
       <TableCell className="text-muted-foreground">{operator.email}</TableCell>
-      <TableCell>UBS - módulo 32</TableCell>
+      <TableCell className="flex-grow flex-col flex-wrap space-x-1 space-y-1">
+        <Badge variant={'outline'}>Ubs - módulo 20</Badge>
+        <Badge variant={'outline'}>...</Badge>
+      </TableCell>
       <TableCell className="font-medium">
         <Select defaultValue={operator.role}>
           <SelectTrigger className="w-[180px]">

@@ -7,10 +7,11 @@ export interface RegisterOperatorBody {
   email: string
   password: string
   role: OperatorRole
+  institutionsIds: string[]
 }
 
 export async function registerOperator(
-  { name, email, password, role }: RegisterOperatorBody,
+  { name, email, password, role, institutionsIds }: RegisterOperatorBody,
   token: string,
 ) {
   await api.post(
@@ -20,6 +21,7 @@ export async function registerOperator(
       email,
       password,
       role,
+      institutionsIds,
     },
     {
       headers: {

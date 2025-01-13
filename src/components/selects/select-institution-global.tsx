@@ -25,7 +25,7 @@ export function SelectInstitutionGlobal() {
   const { pathname } = useLocation()
   const { token, selectInstitution, institutionId } = useAuth()
 
-  const { data: institutions, isLoading } = useQuery({
+  const { data: institutionsResult, isLoading } = useQuery({
     queryKey: ['institutions'],
     queryFn: () => fetchInstitutions({ page: 1 }, token ?? ''),
   })
@@ -34,13 +34,13 @@ export function SelectInstitutionGlobal() {
     useState<Institution | null>(null)
 
   useEffect(() => {
-    if (institutions && institutionId) {
-      const currentInstitution = institutions.find(
+    if (institutionsResult && institutionId) {
+      const currentInstitution = institutionsResult.institutions.find(
         (institution) => institution.id === institutionId,
       )
       setActiveInstitution(currentInstitution ?? null)
     }
-  }, [institutions, institutionId])
+  }, [institutionsResult, institutionId])
 
   return (
     <DropdownMenu>
@@ -76,8 +76,8 @@ export function SelectInstitutionGlobal() {
           <div className="p-4 text-center text-muted-foreground">
             Carregando...
           </div>
-        ) : institutions && institutions.length > 0 ? (
-          institutions.map((institution, index) => (
+        ) : institutionsResult ? (
+          institutionsResult.institutions.map((institution, index) => (
             <DropdownMenuItem
               key={institution.id}
               onClick={() => {

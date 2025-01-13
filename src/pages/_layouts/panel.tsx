@@ -6,6 +6,7 @@ import {
   ChevronRight,
   ChevronsUpDown,
   Command,
+  FlaskConical,
   Folder,
   Forward,
   GalleryVerticalEnd,
@@ -13,7 +14,6 @@ import {
   MonitorCog,
   MoreHorizontal,
   Pill,
-  Plus,
   Settings,
   Trash2,
   Users,
@@ -21,9 +21,7 @@ import {
 import { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 
-import { fetchInstitutions } from '@/api/auxiliary-records/institution/fetch-institutions'
 import { getOperatorDetails } from '@/api/operators/get-operator-details'
-import { LogoutButton } from '@/components/logout-button'
 import { SelectInstitutionGlobal } from '@/components/selects/select-institution-global'
 import { ModeToggle } from '@/components/theme/mode-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -46,7 +44,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Separator } from '@/components/ui/separator'
@@ -71,7 +68,6 @@ import {
 } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/contexts/authContext'
-import { api } from '@/lib/axios'
 
 const data = {
   user: {
@@ -160,9 +156,9 @@ const data = {
 
   operatorAreaSingleItem: [
     {
-      name: 'Ações',
-      url: '/operators',
-      icon: Users,
+      name: 'Teste',
+      url: '/test',
+      icon: FlaskConical,
     },
   ],
   operatorAreaManyItems: [

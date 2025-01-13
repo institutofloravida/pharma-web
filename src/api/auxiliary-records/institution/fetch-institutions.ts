@@ -1,6 +1,7 @@
 import { api } from '@/lib/axios'
 export interface FetchInstitutionsQuery {
   page?: number | null
+  query?: string | null
 }
 
 export interface Institution {
@@ -12,6 +13,10 @@ export interface Institution {
 
 interface FetchInstitutionsResponse {
   institutions: Institution[]
+  meta: {
+    page: number
+    totalPage: number
+  }
 }
 
 export async function fetchInstitutions(
@@ -27,5 +32,5 @@ export async function fetchInstitutions(
     },
   })
 
-  return response.data.institutions
+  return response.data
 }
