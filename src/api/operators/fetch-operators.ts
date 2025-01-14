@@ -8,6 +8,10 @@ export interface Operator {
   name: string
   email: string
   role: string
+  institutions: {
+    id: string
+    name: string
+  }[]
 }
 
 interface GetOperatorsResponse {
@@ -18,7 +22,10 @@ interface GetOperatorsResponse {
   }
 }
 
-export async function getOperators({ page }: GetOperatorsQuery, token: string) {
+export async function fetchOperators(
+  { page }: GetOperatorsQuery,
+  token: string,
+) {
   const response = await api.get<GetOperatorsResponse>('/operators', {
     headers: {
       Authorization: `Bearer ${token}`,

@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -52,19 +53,17 @@ export function NewOperatorDialog() {
   const { token } = useAuth()
   const [queryInstitution, setQueryInstitution] = useState('')
 
-  const { mutateAsync: registerOperatorFn } = useMutation({
+  const {
+    mutateAsync: registerOperatorFn,
+    isPending: isPendingRegisterOperator,
+  } = useMutation({
     mutationFn: (data: RegisterOperatorBody) =>
       registerOperator(data, token ?? ''),
-    onSuccess(_, { name, email, role }) {
-      const cached =
-        queryClient.getQueryData<NewOperatorSchema[]>(['operators']) || []
-
-      if (cached) {
-        queryClient.setQueryData(
-          ['operators'],
-          [...cached, { name, email, role }],
-        )
-      }
+    onSuccess() {
+      // Invalidate the 'operators' query to refetch data
+      queryClient.invalidateQueries({
+        queryKey: ['operators'],
+      })
     },
   })
 
@@ -92,22 +91,21 @@ export function NewOperatorDialog() {
         role: data.role,
         institutionsIds: data.institutionsIds,
       })
+
       toast({
-        title: 'You submitted the following values:',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
+        title: 'Sucesso!',
+        description: 'O operador foi registrado com sucesso.',
+        variant: 'default', // Styling variant (if supported)
       })
-    } catch {
+    } catch (error: unknown) {
+      const errorMessage =
+        (error as AxiosError)?.response?.data?.message ??
+        'Ocorreu um erro inesperado. Por favor, tente novamente.'
+
       toast({
-        title: 'Error ao cadastrar o estoque',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(error, null, 2)}</code>
-          </pre>
-        ),
+        title: 'Erro ao registrar operador',
+        description: errorMessage,
+        variant: 'destructive',
       })
     }
   }
@@ -121,7 +119,10 @@ export function NewOperatorDialog() {
         </DialogDescription>
       </DialogHeader>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleRegisterOperator)}>
+        <form
+          onSubmit={form.handleSubmit(handleRegisterOperator)}
+          className="flex flex-col gap-2"
+        >
           <FormField
             control={form.control}
             name="name"
@@ -197,7 +198,9 @@ export function NewOperatorDialog() {
             <DialogClose asChild>
               <Button variant={'ghost'}>Cancelar</Button>
             </DialogClose>
-            <Button type="submit">Cadastrar</Button>
+            <Button type="submit" disabled={isPendingRegisterOperator}>
+              Cadastrar
+            </Button>
           </DialogFooter>
         </form>
       </Form>

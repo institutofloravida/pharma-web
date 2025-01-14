@@ -1,6 +1,6 @@
 import { api } from '@/lib/axios'
 
-import type { Operator } from './get-operators'
+import type { Operator } from './fetch-operators'
 
 export interface GetOperatorDetailsResponse {
   operator: Operator

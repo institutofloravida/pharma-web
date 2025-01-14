@@ -1,5 +1,6 @@
 import { Search, UserMinus, UserPen } from 'lucide-react'
 
+import { Operator } from '@/api/operators/fetch-operators'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
@@ -13,12 +14,7 @@ import {
 import { TableCell, TableRow } from '@/components/ui/table'
 
 export interface OperatorTableRowProps {
-  operator: {
-    id: string
-    name: string
-    email: string
-    role: string
-  }
+  operator: Operator
 }
 
 export function OperatorTableRow({ operator }: OperatorTableRowProps) {
@@ -40,8 +36,19 @@ export function OperatorTableRow({ operator }: OperatorTableRowProps) {
       </TableCell>
       <TableCell className="text-muted-foreground">{operator.email}</TableCell>
       <TableCell className="flex-grow flex-col flex-wrap space-x-1 space-y-1">
-        <Badge variant={'outline'}>Ubs - módulo 20</Badge>
-        <Badge variant={'outline'}>...</Badge>
+        {operator.institutions.map((institution, index) => {
+          if (index > 1) {
+            return <></>
+          }
+          return (
+            <Badge key={institution.id} variant={'outline'}>
+              {institution.name}
+            </Badge>
+          )
+        })}
+        {operator.institutions.length > 2 && (
+          <Badge variant={'outline'}>...</Badge>
+        )}
       </TableCell>
       <TableCell className="font-medium">
         <Select defaultValue={operator.role}>
