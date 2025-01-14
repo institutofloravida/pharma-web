@@ -32,6 +32,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
+import type { ApiErrorResponse } from '@/lib/utils/axios-error'
+import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const newOperatorSchema = z.object({
   name: z
@@ -95,13 +97,10 @@ export function NewOperatorDialog() {
       toast({
         title: 'Sucesso!',
         description: 'O operador foi registrado com sucesso.',
-        variant: 'default', // Styling variant (if supported)
+        variant: 'default',
       })
-    } catch (error: unknown) {
-      const errorMessage =
-        (error as AxiosError)?.response?.data?.message ??
-        'Ocorreu um erro inesperado. Por favor, tente novamente.'
-
+    } catch (error) {
+      const errorMessage = handleApiError(error)
       toast({
         title: 'Erro ao registrar operador',
         description: errorMessage,
