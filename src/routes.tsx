@@ -18,6 +18,7 @@ import { Medicines } from './pages/app/panel/medicines/medicines'
 import { MedicinesEntries } from './pages/app/panel/movement/entry/medicines-entries'
 import { Operators } from './pages/app/panel/operators/operators'
 import { Test } from './pages/app/panel/test/test'
+import { Users } from './pages/app/panel/users/users'
 
 export const router = createBrowserRouter([
   {
@@ -164,6 +165,20 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <MedicinesEntries />
+          </PrivateRoute>
+        ),
+      },
+    ],
+  },
+  {
+    path: '/users',
+    element: <PanelLayout />,
+    children: [
+      {
+        path: '',
+        element: (
+          <PrivateRoute>
+            <Users />
           </PrivateRoute>
         ),
       },

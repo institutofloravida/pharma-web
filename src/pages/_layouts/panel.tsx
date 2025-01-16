@@ -16,6 +16,7 @@ import {
   Pill,
   Settings,
   Trash2,
+  UserRoundCog,
   Users,
 } from 'lucide-react'
 import { useState } from 'react'
@@ -96,7 +97,7 @@ const data = {
     {
       name: 'Operadores',
       url: '/operators',
-      icon: Users,
+      icon: UserRoundCog,
     },
   ],
   navMainWithManyItems: [
@@ -187,6 +188,18 @@ const data = {
         {
           title: 'Variantes',
           url: '/medicines/variants',
+        },
+      ],
+    },
+    {
+      title: 'Usuários',
+      url: '#',
+      icon: Users,
+      isActive: true,
+      items: [
+        {
+          title: 'Usuários',
+          url: '/users',
         },
       ],
     },

@@ -1,26 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { fetchInstitutions } from '@/api/auxiliary-records/institution/fetch-institutions'
-import {
-  ComboboxMany,
-  ComboboxMultiSelect,
-} from '@/components/comboboxes/combobox-many'
-import { Button } from '@/components/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
+
+import { NewUserForm } from '../users/new-user-form'
 
 const newOperatorSchema = z.object({
   intitutionsIds: z.array(z.string()),
@@ -65,32 +53,79 @@ export function Test() {
 
   return (
     <div className="flex h-full items-center justify-center">
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleRegisterOperator)}>
-          {/* <FormField
-            control={form.control}
-            name="intitutionsIds"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Instituições</FormLabel>
-                <ComboboxMany
-                  field={field}
-                  items={institutions ?? []}
-                  itemKey="id"
-                  onChange={(selectedItems) => field.onChange(selectedItems)}
-                  onQueryChange={setQueryInstitution}
-                  query={queryInstitution}
-                  isFetching={isLoading}
-                  formatItem={(item) => `${item.name}`}
-                />
-              </FormItem>
-            )}
-          /> */}
-          <Separator className="m-2" />
-          <Button variant={'ghost'}>Cancelar</Button>
-          <Button type="submit">Cadastrar</Button>
-        </form>
-      </Form>
+      <NewUserForm />
     </div>
   )
 }
+
+// "use client"
+
+// import * as React from "react"
+// import { format, parse, isValid } from "date-fns"
+// import { CalendarIcon } from 'lucide-react'
+
+// import { cn } from "@/lib/utils"
+// import { Button } from "@/components/ui/button"
+// import { Calendar } from "@/components/ui/calendar"
+// import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+// import { Input } from "@/components/ui/input"
+
+// export function DatePickerWithInput({
+//   className,
+// }: React.HTMLAttributes<HTMLDivElement>) {
+//   const [date, setDate] = React.useState<Date | undefined>(undefined)
+//   const [inputValue, setInputValue] = React.useState("")
+
+//   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+//     const value = event.target.value
+//     setInputValue(value)
+
+//     // Parse the input value
+//     const parsedDate = parse(value, "dd/MM/yyyy", new Date())
+//     if (isValid(parsedDate)) {
+//       setDate(parsedDate)
+//     }
+//   }
+
+//   const handleCalendarSelect = (newDate: Date | undefined) => {
+//     setDate(newDate)
+//     if (newDate) {
+//       setInputValue(format(newDate, "dd/MM/yyyy"))
+//     }
+//   }
+
+//   return (
+//     <div className={cn("grid gap-2", className)}>
+//       <Popover>
+//         <PopoverTrigger asChild>
+//           <Button
+//             id="date"
+//             variant={"outline"}
+//             className={cn(
+//               "w-[300px] justify-start text-left font-normal",
+//               !date && "text-muted-foreground"
+//             )}
+//           >
+//             <CalendarIcon className="mr-2 h-4 w-4" />
+//             {date ? format(date, "PPP") : <span>Selecione uma data</span>}
+//           </Button>
+//         </PopoverTrigger>
+//         <PopoverContent className="w-auto p-0" align="start">
+//           <Calendar
+//             mode="single"
+//             selected={date}
+//             onSelect={handleCalendarSelect}
+//             initialFocus
+//           />
+//         </PopoverContent>
+//       </Popover>
+//       <Input
+//         type="text"
+//         placeholder="DD/MM/YYYY"
+//         value={inputValue}
+//         onChange={handleInputChange}
+//         className="w-[300px]"
+//       />
+//     </div>
+//   )
+// }
