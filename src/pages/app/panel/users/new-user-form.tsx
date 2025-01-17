@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import InputMask from 'react-input-mask'
 import { z } from 'zod'
 
+import { fetchPathologies } from '@/api/auxiliary-records/pathology/fetch-pathology'
 import { ComboboxMany } from '@/components/comboboxes/combobox-many'
 import { SelectGender } from '@/components/selects/select-gender'
 import { SelectRace } from '@/components/selects/select-race'
@@ -90,15 +91,15 @@ export function NewUserForm() {
   //     },
   //   })
 
-  // const { data: pathologiesResult, isFetching: isFetchingPathology } = useQuery(
-  //   {
-  //     queryKey: ['pathologies', queryPathology],
-  //     queryFn: () =>
-  //       fetchPathologies({ page: 1, query: queryPathology }, token ?? ''),
-  //     staleTime: 1000,
-  //     refetchOnMount: true,
-  //   },
-  // )
+  const { data: pathologiesResult, isFetching: isFetchingPathology } = useQuery(
+    {
+      queryKey: ['pathologies', queryPathology],
+      queryFn: () =>
+        fetchPathologies({ page: 1, query: queryPathology }, token ?? ''),
+      staleTime: 1000,
+      refetchOnMount: true,
+    },
+  )
   const form = useForm<z.infer<typeof newUserSchema>>({
     resolver: zodResolver(newUserSchema),
     defaultValues: {},
@@ -257,8 +258,7 @@ export function NewUserForm() {
             </FormItem>
           )}
         />
-        {/* Pathologies field (optional) */}
-        {/* <FormField
+        <FormField
           control={form.control}
           name="pathologiesIds"
           render={({ field }) => (
@@ -266,18 +266,18 @@ export function NewUserForm() {
               <FormLabel>Pathologias</FormLabel>
               <ComboboxMany
                 field={field}
-                items={institutionsResult?.institutions ?? []}
+                items={pathologiesResult?.pathologies ?? []}
                 itemKey="id"
                 onChange={(selectedItems) => field.onChange(selectedItems)}
-                onQueryChange={setQueryInstitution}
-                query={queryInstitution}
-                isFetching={isFetchingInstitutions}
+                onQueryChange={setQueryPathology}
+                query={queryPathology}
+                isFetching={isFetchingPathology}
                 formatItem={(item) => `${item.name}`}
               />
               <FormMessage />
             </FormItem>
           )}
-        /> */}
+        />
 
         <div className="col-span-3 flex justify-between">
           <Button variant="ghost">Cancelar</Button>

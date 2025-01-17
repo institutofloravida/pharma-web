@@ -1,6 +1,8 @@
+import type { Meta } from '@/api/_types/meta'
 import { api } from '@/lib/axios'
 export interface FetchPathologiesQuery {
   page?: number | null
+  query?: string | null
 }
 
 export interface Pathology {
@@ -10,10 +12,11 @@ export interface Pathology {
 
 interface FetchPathologiesResponse {
   pathologies: Pathology[]
+  meta: Meta
 }
 
 export async function fetchPathologies(
-  { page }: FetchPathologiesQuery,
+  { page, query }: FetchPathologiesQuery,
   token: string,
 ) {
   const response = await api.get<FetchPathologiesResponse>('/pathologies', {
@@ -22,8 +25,9 @@ export async function fetchPathologies(
     },
     params: {
       page,
+      query,
     },
   })
 
-  return response.data.pathologies
+  return response.data
 }
