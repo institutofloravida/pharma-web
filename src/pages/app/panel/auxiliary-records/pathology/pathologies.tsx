@@ -25,7 +25,7 @@ export function Pathologies() {
 
   const [searchParams, _] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: pathologies } = useQuery({
+  const { data: pathologiesResult } = useQuery({
     queryKey: ['pathologies'],
     queryFn: () => fetchPathologies({ page }, token ?? ''),
   })
@@ -58,8 +58,8 @@ export function Pathologies() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pathologies &&
-                  pathologies.map((item) => {
+                {pathologiesResult &&
+                  pathologiesResult.pathologies.map((item) => {
                     return <PathologyTableRow pathology={item} key={item.id} />
                   })}
               </TableBody>

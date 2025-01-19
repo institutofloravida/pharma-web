@@ -19,15 +19,18 @@ export async function fetchPathologies(
   { page, query }: FetchPathologiesQuery,
   token: string,
 ) {
-  const response = await apiPharma.get<FetchPathologiesResponse>('/pathologies', {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const response = await apiPharma.get<FetchPathologiesResponse>(
+    '/pathologies',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        page,
+        query,
+      },
     },
-    params: {
-      page,
-      query,
-    },
-  })
+  )
 
   return response.data
 }
