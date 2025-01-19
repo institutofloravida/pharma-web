@@ -5,11 +5,11 @@ import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import type { TherapeuticClass } from '@/api/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
+import type { TherapeuticClass } from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
 import {
   registerMedicine,
   type RegisterMedicineBody,
-} from '@/api/medicines/resgister-medicine'
+} from '@/api/pharma/medicines/resgister-medicine'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {

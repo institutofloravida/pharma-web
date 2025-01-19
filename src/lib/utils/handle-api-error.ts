@@ -1,6 +1,6 @@
 import type { AxiosError } from 'axios'
 
-import type { ApiError } from '@/api/_error/api-error'
+import type { ApiError } from '@/api/pharma/_error/api-error'
 
 export function handleApiError(error: unknown): string {
   if ((error as AxiosError<ApiError>)?.response?.data?.message) {

@@ -1,4 +1,4 @@
-import type { OperatorRole } from '@/api/operators/register-operator'
+import type { OperatorRole } from '@/api/pharma/operators/register-operator'
 import {
   Select,
   SelectContent,

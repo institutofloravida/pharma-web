@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { createContext, ReactNode, useContext, useState } from 'react'
 
-import { getOperatorDetails } from '@/api/operators/get-operator-details'
+import { getOperatorDetails } from '@/api/pharma/operators/get-operator-details'
 import type { Operator } from '@/api/operators/get-operators'
-import { api } from '@/lib/axios'
+import { apiPharma } from '@/lib/axios'
 import { queryClient } from '@/lib/react-query'
 
 interface AuthContextType {
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     queryKey: ['me', token],
     queryFn: async () => {
       try {
-        const response = await api.get('/validate-token', {
+        const response = await apiPharma.get('/validate-token', {
           headers: { Authorization: `Bearer ${token}` },
         })
         if (!response.data.isValid) throw new Error('Token inválido')

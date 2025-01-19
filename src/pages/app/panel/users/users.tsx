@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchUsers } from '@/api/users/fetch-users'
+import { fetchUsers } from '@/api/pharma/users/fetch-users'
 import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
@@ -47,7 +47,7 @@ export function Users() {
             <Button
               className=""
               variant={'default'}
-              onClick={() => navigate('/new-user')}
+              onClick={() => navigate('/users/new')}
             >
               Novo Usuário
             </Button>

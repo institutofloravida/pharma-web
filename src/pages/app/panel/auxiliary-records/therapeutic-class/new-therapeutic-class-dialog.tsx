@@ -6,7 +6,7 @@ import { z } from 'zod'
 import {
   registerTherapeuticClass,
   type RegisterTherapeuticClassBody,
-} from '@/api/auxiliary-records/therapeutic-class/register-therapeutic-class'
+} from '@/api/pharma/auxiliary-records/therapeutic-class/register-therapeutic-class'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,

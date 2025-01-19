@@ -25,6 +25,7 @@ interface ComboboxProps<T> {
   }
   query: string
   placeholder?: string
+  placeholderAferSelected?: string
   isFetching: boolean
   onQueryChange: (query: string) => void
   onChange: (selectedItems: string[]) => void
@@ -37,6 +38,7 @@ export function ComboboxMany<T extends Record<string, any>>({
   field,
   query,
   placeholder = 'Selecione itens...',
+  placeholderAferSelected = 'item(s) selecionado(s)',
   isFetching,
   onQueryChange,
   onChange,
@@ -75,7 +77,7 @@ export function ComboboxMany<T extends Record<string, any>>({
               )}
             >
               {selectedItems.length
-                ? `${selectedItems.length} item(s) selected`
+                ? `${selectedItems.length} ${placeholderAferSelected}`
                 : placeholder}
               <ChevronsUpDown className="opacity-50" />
             </Button>
@@ -131,8 +133,7 @@ export function ComboboxMany<T extends Record<string, any>>({
       {/* Selected Items Section */}
       {selectedItems.length > 0 && (
         <div className="mt-4">
-          {/* <h4 className="text-xs">Items Selecionados</h4> */}
-          <ul className="mt-2 space-y-1">
+          <ul className="grid grid-cols-3 gap-1">
             {selectedItems.map((id) => {
               const selectedItem = items.find((item) => item[itemKey] === id)
               if (!selectedItem) return null
@@ -140,7 +141,7 @@ export function ComboboxMany<T extends Record<string, any>>({
               return (
                 <li
                   key={id}
-                  className="flex items-center justify-between rounded-md border p-1 text-xs"
+                  className="col-span-1 flex items-center justify-between rounded-md border p-1 text-xs"
                 >
                   <span className="">{formatItem(selectedItem)}</span>
                   <Button

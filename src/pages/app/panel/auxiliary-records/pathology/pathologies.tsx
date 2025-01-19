@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchPathologies } from '@/api/auxiliary-records/pathology/fetch-pathology'
+import { fetchPathologies } from '@/api/pharma/auxiliary-records/pathology/fetch-pathology'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { Pagination } from '@/components/ui/pagination'

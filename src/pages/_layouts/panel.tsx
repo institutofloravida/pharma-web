@@ -22,7 +22,7 @@ import {
 import { useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 
-import { getOperatorDetails } from '@/api/operators/get-operator-details'
+import { getOperatorDetails } from '@/api/pharma/operators/get-operator-details'
 import { SelectInstitutionGlobal } from '@/components/selects/select-institution-global'
 import { ModeToggle } from '@/components/theme/mode-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -200,6 +200,10 @@ const data = {
         {
           title: 'Usuários',
           url: '/users',
+        },
+        {
+          title: 'Novo Usuário',
+          url: '/users/new',
         },
       ],
     },

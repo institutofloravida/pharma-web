@@ -1,6 +1,6 @@
 import { PenLine, Search, Trash } from 'lucide-react'
 
-import type { MedicineEntry } from '@/api/movement/entry/fetch-medicines-entries'
+import type { MedicineEntry } from '@/api/pharma/movement/entry/fetch-medicines-entries'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'

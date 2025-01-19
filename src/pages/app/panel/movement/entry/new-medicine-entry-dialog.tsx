@@ -7,17 +7,17 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { fetchManufacturers } from '@/api/auxiliary-records/manufacturer/fetch-manufacturer'
-import { fetchStocks } from '@/api/auxiliary-records/stock/fetch-stocks'
-import { fetchUnitsMeasure } from '@/api/auxiliary-records/unit-measure/fetch-units-measure'
+import { fetchManufacturers } from '@/api/pharma/auxiliary-records/manufacturer/fetch-manufacturer'
+import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
+import { fetchUnitsMeasure } from '@/api/pharma/auxiliary-records/unit-measure/fetch-units-measure'
 import {
   fetchMedicinesVariants,
   type FetchMedicinesVariantsResponse,
-} from '@/api/medicines-variants/fetch-medicines-variants'
+} from '@/api/pharma/medicines-variants/fetch-medicines-variants'
 import {
   registerMedicineEntry,
   type RegisterMedicineEntryBodyAndParams,
-} from '@/api/movement/entry/register-medicine-entry'
+} from '@/api/pharma/movement/entry/register-medicine-entry'
 import { ComboboxUp } from '@/components/comboboxes/combobox-up'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'

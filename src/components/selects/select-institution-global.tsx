@@ -6,7 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import {
   fetchInstitutions,
   type Institution,
-} from '@/api/auxiliary-records/institution/fetch-institutions'
+} from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
 import { useAuth } from '@/contexts/authContext'
 
 import {

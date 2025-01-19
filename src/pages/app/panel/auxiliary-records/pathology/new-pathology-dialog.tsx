@@ -8,7 +8,7 @@ import { z } from 'zod'
 import {
   registerPathology,
   type RegisterPathologyBody,
-} from '@/api/auxiliary-records/pathology/register-pathology'
+} from '@/api/pharma/auxiliary-records/pathology/register-pathology'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,

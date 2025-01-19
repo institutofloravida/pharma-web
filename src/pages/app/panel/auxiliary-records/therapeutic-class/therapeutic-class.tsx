@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchTherapeuticClasses } from '@/api/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
+import { fetchTherapeuticClasses } from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/pagination'
 import {

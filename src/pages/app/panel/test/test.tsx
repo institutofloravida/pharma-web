@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { fetchInstitutions } from '@/api/auxiliary-records/institution/fetch-institutions'
+import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 

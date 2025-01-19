@@ -1,4 +1,4 @@
-import type { TherapeuticClass } from '@/api/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
+import type { TherapeuticClass } from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
 import {
   Select,
   SelectContent,

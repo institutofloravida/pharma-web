@@ -8,7 +8,7 @@ import { z } from 'zod'
 import {
   registerPharmaceuticalForm,
   type RegisterPharmaceuticalFormBody,
-} from '@/api/auxiliary-records/pharmaceutical-form/register-pharmaceutical-form'
+} from '@/api/pharma/auxiliary-records/pharmaceutical-form/register-pharmaceutical-form'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,

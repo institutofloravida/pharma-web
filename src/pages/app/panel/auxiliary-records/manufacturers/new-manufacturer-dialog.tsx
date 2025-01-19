@@ -8,7 +8,7 @@ import { z } from 'zod'
 import {
   registerManufacturer,
   type RegisterManufacturerBody,
-} from '@/api/auxiliary-records/manufacturer/register-manufacturer'
+} from '@/api/pharma/auxiliary-records/manufacturer/register-manufacturer'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,

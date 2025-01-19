@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchStocks } from '@/api/auxiliary-records/stock/fetch-stocks'
+import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/ui/pagination'
 import {

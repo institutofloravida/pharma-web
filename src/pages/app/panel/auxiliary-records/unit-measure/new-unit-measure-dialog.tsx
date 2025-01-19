@@ -6,7 +6,7 @@ import { z } from 'zod'
 import {
   registerUnitMeasure,
   type RegisterUnitMeasureBody,
-} from '@/api/auxiliary-records/unit-measure/register-unit-measure'
+} from '@/api/pharma/auxiliary-records/unit-measure/register-unit-measure'
 import { Button } from '@/components/ui/button'
 import {
   DialogClose,

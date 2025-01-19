@@ -1,6 +1,6 @@
 import { Search, UserMinus, UserPen } from 'lucide-react'
 
-import { User } from '@/api/users/fetch-users'
+import { User } from '@/api/pharma/users/fetch-users'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'

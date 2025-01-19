@@ -3,7 +3,7 @@ import { Search, X } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchInstitutions } from '@/api/auxiliary-records/institution/fetch-institutions'
+import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/contexts/authContext'

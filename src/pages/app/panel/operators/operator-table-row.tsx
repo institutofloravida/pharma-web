@@ -1,6 +1,6 @@
 import { Search, UserMinus, UserPen } from 'lucide-react'
 
-import { Operator } from '@/api/operators/fetch-operators'
+import { Operator } from '@/api/pharma/operators/fetch-operators'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'

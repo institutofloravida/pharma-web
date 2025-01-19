@@ -6,11 +6,11 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { fetchInstitutions } from '@/api/auxiliary-records/institution/fetch-institutions'
+import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
 import {
   registerOperator,
   type RegisterOperatorBody,
-} from '@/api/operators/register-operator'
+} from '@/api/pharma/operators/register-operator'
 import { ComboboxMany } from '@/components/comboboxes/combobox-many'
 import { SelectRole } from '@/components/selects/select-role'
 import { Button } from '@/components/ui/button'

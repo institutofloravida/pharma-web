@@ -8,10 +8,10 @@ export enum Race {
 }
 
 const raceTranslations: Record<Race, string> = {
-  BLACK: 'Preto',
-  WHITE: 'Branco',
-  YELLOW: 'Amarelo',
-  MIXED: 'Pardo',
+  BLACK: 'Preta',
+  WHITE: 'Branca',
+  YELLOW: 'Amarela',
+  MIXED: 'Parda',
   UNDECLARED: 'Não declarado',
   INDIGENOUS: 'Indígena',
 };

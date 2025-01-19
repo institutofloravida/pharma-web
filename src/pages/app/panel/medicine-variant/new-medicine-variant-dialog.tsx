@@ -4,14 +4,14 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { fetchPharmaceuticalForms } from '@/api/auxiliary-records/pharmaceutical-form/fetch-pharmaceutical-form'
-import { fetchUnitsMeasure } from '@/api/auxiliary-records/unit-measure/fetch-units-measure'
-import { fetchMedicines } from '@/api/medicines/fetch-medicines'
-import type { FetchMedicinesVariantsResponse } from '@/api/medicines-variants/fetch-medicines-variants'
+import { fetchPharmaceuticalForms } from '@/api/pharma/auxiliary-records/pharmaceutical-form/fetch-pharmaceutical-form'
+import { fetchUnitsMeasure } from '@/api/pharma/auxiliary-records/unit-measure/fetch-units-measure'
+import { fetchMedicines } from '@/api/pharma/medicines/fetch-medicines'
+import type { FetchMedicinesVariantsResponse } from '@/api/pharma/medicines-variants/fetch-medicines-variants'
 import {
   registerMedicineVariant,
   type RegisterMedicineVariantBody,
-} from '@/api/medicines-variants/register-medicine-variant'
+} from '@/api/pharma/medicines-variants/register-medicine-variant'
 import { Combobox } from '@/components/comboboxes/pharmaceutical-form-combobox'
 import { Button } from '@/components/ui/button'
 import {

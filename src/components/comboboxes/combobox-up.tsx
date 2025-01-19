@@ -50,7 +50,7 @@ export function ComboboxUp<T extends Record<string, any>>({
             variant="outline"
             role="combobox"
             className={cn(
-              'w-[250px] justify-between',
+              'justify-between',
               !field.value && 'text-muted-foreground',
             )}
           >
@@ -70,8 +70,8 @@ export function ComboboxUp<T extends Record<string, any>>({
           </Button>
         </FormControl>
       </PopoverTrigger>
-      <PopoverContent className="w-[250px] p-0">
-        <Command>
+      <PopoverContent className="w-full p-0">
+        <Command className="w-full">
           <CommandInput
             placeholder="Search..."
             className="h-9"

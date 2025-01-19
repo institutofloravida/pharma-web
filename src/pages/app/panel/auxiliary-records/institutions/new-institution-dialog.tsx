@@ -8,7 +8,7 @@ import { z } from 'zod'
 import {
   registerInstitution,
   type RegisterInstitutionBody,
-} from '@/api/auxiliary-records/institution/register-institution'
+} from '@/api/pharma/auxiliary-records/institution/register-institution'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,

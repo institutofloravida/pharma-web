@@ -19,12 +19,12 @@ export function SelectRace({ value, onChange }: SelectRaceProps) {
         <SelectValue placeholder="Selecione uma cor/raça" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value={Race.MIXED}>Pardo</SelectItem>
-        <SelectItem value={Race.BLACK}>Preto</SelectItem>
-        <SelectItem value={Race.WHITE}>Branco</SelectItem>
-        <SelectItem value={Race.YELLOW}>Amarelo</SelectItem>
+        <SelectItem value={Race.MIXED}>Parda</SelectItem>
+        <SelectItem value={Race.BLACK}>Preta</SelectItem>
+        <SelectItem value={Race.WHITE}>Branca</SelectItem>
+        <SelectItem value={Race.YELLOW}>Amarela</SelectItem>
         <SelectItem value={Race.INDIGENOUS}>Indígena</SelectItem>
-        <SelectItem value={Race.UNDECLARED}>Não declarado</SelectItem>
+        <SelectItem value={Race.UNDECLARED}>Não declarada</SelectItem>
       </SelectContent>
     </Select>
   )
