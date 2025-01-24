@@ -26,7 +26,7 @@ const buttonVariants = cva(
         sm: 'h-9 rounded-md px-3',
         xs: 'h-8 rounded-md px-2.5',
         xxs: 'h-6 rounded-md px-2',
-        xxxs: 'h-3 rounded-md px-1',
+        xxxs: 'h-2 rounded-md ',
         lg: 'h-11 rounded-md px-8',
         icon: 'h-10 w-10',
       },

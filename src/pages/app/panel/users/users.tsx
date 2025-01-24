@@ -6,7 +6,6 @@ import { z } from 'zod'
 import { fetchUsers } from '@/api/pharma/users/fetch-users'
 import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import {
   Table,
   TableBody,

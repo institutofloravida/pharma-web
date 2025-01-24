@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import InputMask from 'react-input-mask'
+import { useNavigate } from 'react-router-dom'
 import { unknown, z } from 'zod'
 
 import { fetchCities } from '@/api/ibge/fetch-cities'
@@ -35,12 +36,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 import { handleApiError } from '@/lib/utils/handle-api-error'
 import { Race } from '@/lib/utils/race'
 const { BLACK, INDIGENOUS, MIXED, UNDECLARED, WHITE, YELLOW } = Race
-
 export const newUserSchema = z.object({
   name: z
     .string({ required_error: 'campo obrigatório' })
@@ -82,9 +83,15 @@ export const newUserSchema = z.object({
   }),
   pathologiesIds: z
     .array(
-      z.string().min(1, { message: 'O ID da patologia não pode estar vazio.' }),
+      z.object({
+        id: z
+          .string()
+          .min(1, { message: 'O ID da patologia não pode estar vazio.' }),
+        value: z.string(), // Inclui o valor para validar o formato dos objetos
+      }),
     )
-    .min(1, { message: 'Selecione pelo menos uma patologia.' }),
+    .min(1, { message: 'Selecione pelo menos uma patologia.' })
+    .transform((items) => items.map((item) => item.id)),
 })
 
 export type NewUserSchema = z.infer<typeof newUserSchema>
@@ -97,6 +104,10 @@ export function NewUserForm() {
   const [queryState, setQueryState] = useState('')
   const [date, setDate] = useState<Date | undefined>(undefined)
   const [zipCode, setZipCode] = useState('')
+  const [activeTab, setActiveTab] = useState('personal-data')
+
+  const navigate = useNavigate()
+
   const { mutateAsync: registerUserFn, isPending: isPendingRegisterUser } =
     useMutation({
       mutationFn: (data: RegisterUserBody) => registerUser(data, token ?? ''),
@@ -111,6 +122,48 @@ export function NewUserForm() {
     resolver: zodResolver(newUserSchema),
     defaultValues: {},
   })
+
+  const handleNext = async () => {
+    let isValid = false
+
+    if (activeTab === 'personal-data') {
+      isValid = await form.trigger([
+        'name',
+        'cpf',
+        'sus',
+        'generalRegistration',
+        'birthDate',
+        'gender',
+        'race',
+      ])
+    } else if (activeTab === 'address') {
+      isValid = await form.trigger([
+        'addressPatient.zipCode',
+        'addressPatient.state',
+        'addressPatient.city',
+        'addressPatient.neighborhood',
+        'addressPatient.street',
+        'addressPatient.number',
+      ])
+    }
+
+    if (isValid) {
+      if (activeTab === 'personal-data') {
+        setActiveTab('address')
+      } else if (activeTab === 'address') {
+        setActiveTab('pathologies')
+      }
+    } else {
+      console.log('Por favor, preencha os campos obrigatórios.')
+    }
+  }
+  const handlePrevious = () => {
+    if (activeTab === 'pathologies') {
+      setActiveTab('address')
+    } else if (activeTab === 'address') {
+      setActiveTab('personal-data')
+    }
+  }
 
   const {
     data: addressResult,
@@ -168,29 +221,25 @@ export function NewUserForm() {
   async function handleRegisterUser(data: NewUserSchema) {
     try {
       await registerUserFn({
-        name: data.name,
-        race: data.race,
         addressPatient: data.addressPatient,
         birthDate: data.birthDate,
         cpf: data.cpf,
         gender: data.gender,
+        name: data.name,
+        race: data.race,
+        sus: data.sus,
         generalRegistration: data.generalRegistration,
         pathologiesIds: data.pathologiesIds,
-        sus: data.sus,
-      })
-
-      toast({
-        title: 'Sucesso!',
-        description: 'O usuário foi registrado com sucesso.',
-        variant: 'default',
       })
       toast({
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ), // Converte o objeto em uma string formatada
+        title: `O usuário ${data.name} foi cadastrado com sucesso!`,
+        // description: (
+        //   <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+        //     <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+        //   </pre>
+        // ),
       })
+      setTimeout(() => navigate('/users'), 2000)
     } catch (error) {
       const errorMessage = handleApiError(error)
       toast({
@@ -205,283 +254,347 @@ export function NewUserForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(handleRegisterUser)}
-        className="grid w-full max-w-[600px] gap-2"
+        className="grid w-full max-w-[800px]"
       >
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem className="col-span-6 grid">
-              <FormLabel>Nome</FormLabel>
-              <FormControl>
-                <Input placeholder="Nome do Usuário..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          defaultValue="personal-data"
+        >
+          <TabsList>
+            <TabsTrigger
+              value="personal-data"
+              // disabled={['address', 'pathologies'].includes(activeTab)}
+            >
+              Dados Pessoais
+            </TabsTrigger>
+            <TabsTrigger
+              value="address"
+              // disabled={['personal-data', 'pathologies'].includes(activeTab)}
+            >
+              Endereço
+            </TabsTrigger>
+            <TabsTrigger
+              value="pathologies"
+              // disabled={['personal-data', 'address'].includes(activeTab)}
+            >
+              Patologias
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent
+            value="personal-data"
+            className="grid w-full gap-2 space-y-2"
+          >
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="col-span-6">
+                  <FormLabel>Nome</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nome do Usuário..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="cpf"
-          render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormLabel>CPF</FormLabel>
-              <FormControl>
-                <InputMask
-                  {...field}
-                  mask="999.999.999-99"
-                  placeholder="CPF..."
-                  onChange={(e: any) =>
-                    field.onChange(e.target.value.replace(/\D/g, ''))
-                  }
-                >
-                  {(inputProps: any) => <Input {...inputProps} />}
-                </InputMask>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="cpf"
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>CPF</FormLabel>
+                  <FormControl>
+                    <InputMask
+                      {...field}
+                      mask="999.999.999-99"
+                      placeholder="CPF..."
+                      onChange={(e: any) =>
+                        field.onChange(e.target.value.replace(/\D/g, ''))
+                      }
+                    >
+                      {(inputProps: any) => <Input {...inputProps} />}
+                    </InputMask>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="sus"
-          render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormLabel>SUS</FormLabel>
-              <FormControl>
-                <InputMask
-                  {...field}
-                  mask="99999.99999.99999"
-                  placeholder="SUS..."
-                  onChange={(e: any) =>
-                    field.onChange(e.target.value.replace(/\D/g, ''))
-                  }
-                >
-                  {(inputProps: any) => <Input {...inputProps} />}
-                </InputMask>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="sus"
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>SUS</FormLabel>
+                  <FormControl>
+                    <InputMask
+                      {...field}
+                      mask="99999.99999.99999"
+                      placeholder="SUS..."
+                      onChange={(e: any) =>
+                        field.onChange(e.target.value.replace(/\D/g, ''))
+                      }
+                    >
+                      {(inputProps: any) => <Input {...inputProps} />}
+                    </InputMask>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="generalRegistration"
-          render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormLabel>Registro Geral</FormLabel>
-              <FormControl>
-                <Input placeholder="RG" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="birthDate"
-          render={({ field }) => (
-            <FormItem className="col-span-1 grid">
-              <FormLabel>Data de Nascimento</FormLabel>
-              <FormControl>
-                <Input
-                  type="date"
-                  lang="pt"
-                  {...field}
-                  value={
-                    field.value ? field.value.toISOString().split('T')[0] : ''
-                  }
-                  onChange={(e) => field.onChange(new Date(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="gender"
-          render={({ field }) => (
-            <FormItem className="col-span-2 grid">
-              <FormLabel>Gênero</FormLabel>
-              <SelectGender onChange={field.onChange} value={field.value} />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="race"
-          render={({ field }) => (
-            <FormItem className="col-span-3 grid">
-              <FormLabel>Cor/Raça</FormLabel>
-              <SelectRace onChange={field.onChange} value={field.value} />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="addressPatient.zipCode"
-          render={({ field }) => (
-            <FormItem className="col-span-6">
-              <FormLabel>CEP</FormLabel>
-              <FormControl>
-                <InputMask
-                  {...field}
-                  mask="99-999-999"
-                  placeholder="CEP..."
-                  onChange={(e: any) => {
-                    const cleanZip = e.target.value.replace(/\D/g, '')
-                    setZipCode(cleanZip)
-                    form.setValue('addressPatient.zipCode', cleanZip)
-                  }}
-                >
-                  {(inputProps: any) => <Input {...inputProps} />}
-                </InputMask>
-              </FormControl>
-              <FormDescription>
-                {isFetchingAddress && <span>Carregando...</span>}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="generalRegistration"
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>Registro Geral</FormLabel>
+                  <FormControl>
+                    <Input placeholder="RG" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="birthDate"
+              render={({ field }) => (
+                <FormItem className="col-span-1">
+                  <FormLabel>Data de Nascimento</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      lang="pt"
+                      {...field}
+                      value={
+                        field.value
+                          ? field.value.toISOString().split('T')[0]
+                          : ''
+                      }
+                      onChange={(e) => field.onChange(new Date(e.target.value))}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>Gênero</FormLabel>
+                  <SelectGender onChange={field.onChange} value={field.value} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="race"
+              render={({ field }) => (
+                <FormItem className="col-span-3">
+                  <FormLabel>Cor/Raça</FormLabel>
+                  <SelectRace onChange={field.onChange} value={field.value} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="col-span-6 grid justify-end">
+              <Button type="submit" onClick={handleNext}>
+                Próximo
+              </Button>
+            </div>
+          </TabsContent>
+          <TabsContent
+            value="address"
+            className="grid w-full gap-2 space-y-2 pl-2"
+          >
+            <FormField
+              control={form.control}
+              name="addressPatient.zipCode"
+              render={({ field }) => (
+                <FormItem className="col-span-6">
+                  <FormLabel>CEP</FormLabel>
+                  <FormControl>
+                    <InputMask
+                      {...field}
+                      mask="99-999-999"
+                      placeholder="CEP..."
+                      onChange={(e: any) => {
+                        const cleanZip = e.target.value.replace(/\D/g, '')
+                        setZipCode(cleanZip)
+                        form.setValue('addressPatient.zipCode', cleanZip)
+                      }}
+                    >
+                      {(inputProps: any) => <Input {...inputProps} />}
+                    </InputMask>
+                  </FormControl>
+                  <FormDescription>
+                    {isFetchingAddress && <span>Carregando...</span>}
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="addressPatient.state"
-          render={({ field }) => (
-            <FormItem className="col-span-3 row-span-1 grid">
-              <FormLabel>Estado</FormLabel>
-              <ComboboxUp
-                field={field}
-                items={statesResult ?? []}
-                itemKey="sigla"
-                onQueryChange={setQueryState}
-                query={queryState}
-                isFetching={isFetchingStates}
-                formatItem={(item) => `${item.sigla} - ${item.nome}`}
-                placeholder="Selecione um estado"
-                onSelect={(item) => {
-                  form.setValue('addressPatient.state', item)
-                  form.setValue('addressPatient.city', '')
-                }}
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="addressPatient.state"
+              render={({ field }) => (
+                <FormItem className="col-span-3 flex flex-col gap-1">
+                  <FormLabel>Estado</FormLabel>
+                  <ComboboxUp
+                    field={field}
+                    items={statesResult ?? []}
+                    itemKey="sigla"
+                    onQueryChange={setQueryState}
+                    query={queryState}
+                    isFetching={isFetchingStates}
+                    formatItem={(item) => `${item.sigla} - ${item.nome}`}
+                    placeholder="Selecione um estado"
+                    onSelect={(item) => {
+                      form.setValue('addressPatient.state', item)
+                      form.setValue('addressPatient.city', '')
+                    }}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="addressPatient.city"
-          render={({ field }) => (
-            <FormItem className="col-span-3 row-span-1 grid">
-              <FormLabel>Cidade</FormLabel>
-              <ComboboxUp
-                field={field}
-                items={citiesResult ?? []}
-                itemKey="nome"
-                onQueryChange={setQueryCity}
-                query={queryCity}
-                isFetching={isFetchingCities}
-                formatItem={(item) => `${item.nome}`}
-                placeholder="Selecione uma cidade"
-                onSelect={(item) => form.setValue('addressPatient.city', item)}
-                // disabled={!form.watch('addressPatient.state')} // Desabilita se nenhum estado estiver selecionado
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="addressPatient.city"
+              render={({ field }) => (
+                <FormItem className="col-span-3 row-span-1 grid gap-1">
+                  <FormLabel>Cidade</FormLabel>
+                  <ComboboxUp
+                    field={field}
+                    items={citiesResult ?? []}
+                    itemKey="nome"
+                    onQueryChange={setQueryCity}
+                    query={queryCity}
+                    isFetching={isFetchingCities}
+                    formatItem={(item) => `${item.nome}`}
+                    placeholder="Selecione uma cidade"
+                    onSelect={(item) =>
+                      form.setValue('addressPatient.city', item)
+                    }
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="addressPatient.neighborhood"
-          render={({ field }) => (
-            <FormItem className="col-span-4 grid">
-              <FormLabel>Bairro</FormLabel>
-              <FormControl>
-                <Input placeholder="Bairro..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="addressPatient.neighborhood"
+              render={({ field }) => (
+                <FormItem className="col-span-6">
+                  <FormLabel>Bairro</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Bairro..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="addressPatient.street"
-          render={({ field }) => (
-            <FormItem className="col-span-5 grid">
-              <FormLabel>Rua</FormLabel>
-              <FormControl>
-                <Input placeholder="Rua..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="addressPatient.street"
+              render={({ field }) => (
+                <FormItem className="col-span-5">
+                  <FormLabel>Rua</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Rua..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="addressPatient.number"
-          render={({ field }) => (
-            <FormItem className="col-span-1 grid">
-              <FormLabel>Número</FormLabel>
-              <FormControl>
-                <Input placeholder="número..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="addressPatient.number"
+              render={({ field }) => (
+                <FormItem className="col-span-1">
+                  <FormLabel>Número</FormLabel>
+                  <FormControl>
+                    <Input placeholder="número..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="addressPatient.complement"
-          render={({ field }) => (
-            <FormItem className="col-span-4 grid">
-              <FormLabel>Complemento</FormLabel>
-              <FormControl>
-                <Input placeholder="Complemento..." {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <FormField
+              control={form.control}
+              name="addressPatient.complement"
+              render={({ field }) => (
+                <FormItem className="col-span-6">
+                  <FormLabel>Complemento</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Complemento..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-        <FormField
-          control={form.control}
-          name="pathologiesIds"
-          render={({ field }) => (
-            <FormItem className="col-span-6 row-span-2 grid">
-              <FormLabel>Pathologias</FormLabel>
-              <ComboboxMany
-                field={field}
-                items={pathologiesResult?.pathologies ?? []}
-                itemKey="id"
-                onChange={(selectedItems) => field.onChange(selectedItems)}
-                onQueryChange={setQueryPathology}
-                query={queryPathology}
-                isFetching={isFetchingPathology}
-                formatItem={(item) => `${item.name}`}
-                placeholder="Selecione uma pathologia"
-                placeholderAferSelected="pathologia(s) selecionada(s)"
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+            <div className="col-span-6 grid justify-end">
+              <div className="flex gap-2">
+                <Button variant="ghost" className="" onClick={handlePrevious}>
+                  Voltar
+                </Button>
 
-        <div className="col-span-6 flex justify-between">
-          <Button variant="ghost">Cancelar</Button>
-          <Button type="submit">Cadastrar</Button>
-        </div>
+                <Button className="" onClick={handleNext}>
+                  Próximo
+                </Button>
+              </div>
+            </div>
+          </TabsContent>
+          <TabsContent
+            value="pathologies"
+            className="grid w-full max-w-[300px] gap-2 space-y-2 pl-2"
+          >
+            <FormField
+              control={form.control}
+              name="pathologiesIds"
+              render={({ field }) => (
+                <FormItem className="col-span-6 row-span-2 ml-5 grid">
+                  <FormLabel>Pathologias</FormLabel>
+                  <ComboboxMany
+                    field={field}
+                    items={pathologiesResult?.pathologies ?? []}
+                    itemKey="id"
+                    onChange={(selectedItems) => field.onChange(selectedItems)} // Recebe objetos diretamente
+                    onQueryChange={setQueryPathology}
+                    query={queryPathology}
+                    isFetching={isFetchingPathology}
+                    formatItem={(item) => `${item.name}`}
+                    placeholder="Selecione uma pathologia"
+                    placeholderAferSelected="pathologia(s) selecionada(s)"
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="col-span-6 grid justify-end">
+              <div className="flex gap-2">
+                <Button variant="ghost" className="" onClick={handlePrevious}>
+                  Voltar
+                </Button>
+
+                <Button type="submit">Cadastrar</Button>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </form>
     </Form>
   )
