@@ -30,7 +30,7 @@ export async function registerMedicineEntry(
   token: string,
 ) {
   await apiPharma.post(
-    `/entry/stock/${stockId}/medicine-variant/${medicineVariantId}`,
+    `/medicine-entry/stock/${stockId}/medicine-variant/${medicineVariantId}`,
     { entryDate, movementTypeId, batches, newBatches },
     {
       headers: {

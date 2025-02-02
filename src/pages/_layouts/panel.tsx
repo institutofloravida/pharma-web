@@ -3,6 +3,7 @@ import {
   AudioWaveform,
   BadgeCheck,
   Bell,
+  BriefcaseMedical,
   ChevronRight,
   ChevronsUpDown,
   Command,
@@ -204,6 +205,22 @@ const data = {
         {
           title: 'Novo Usuário',
           url: '/users/new',
+        },
+      ],
+    },
+    {
+      title: 'Dispensas',
+      url: '#',
+      icon: BriefcaseMedical,
+      isActive: true,
+      items: [
+        {
+          title: 'Todas',
+          url: '/dispensation',
+        },
+        {
+          title: 'Nova',
+          url: '/dispensation/new',
         },
       ],
     },

@@ -264,19 +264,19 @@ export function NewUserForm() {
           <TabsList>
             <TabsTrigger
               value="personal-data"
-              // disabled={['address', 'pathologies'].includes(activeTab)}
+              disabled={['address', 'pathologies'].includes(activeTab)}
             >
               Dados Pessoais
             </TabsTrigger>
             <TabsTrigger
               value="address"
-              // disabled={['personal-data', 'pathologies'].includes(activeTab)}
+              disabled={['personal-data', 'pathologies'].includes(activeTab)}
             >
               Endereço
             </TabsTrigger>
             <TabsTrigger
               value="pathologies"
-              // disabled={['personal-data', 'address'].includes(activeTab)}
+              disabled={['personal-data', 'address'].includes(activeTab)}
             >
               Patologias
             </TabsTrigger>
@@ -586,7 +586,12 @@ export function NewUserForm() {
             />
             <div className="col-span-6 grid justify-end">
               <div className="flex gap-2">
-                <Button variant="ghost" className="" onClick={handlePrevious}>
+                <Button
+                  variant="ghost"
+                  disabled={form.formState.isSubmitting}
+                  className=""
+                  onClick={handlePrevious}
+                >
                   Voltar
                 </Button>
 

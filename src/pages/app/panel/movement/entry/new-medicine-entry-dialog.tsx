@@ -186,7 +186,7 @@ export function NewMedicineEntryDialog() {
             quantityToEntry: data.newBatches.quantityToEntry,
           },
         ],
-        movementTypeId: '033353fa-6a5a-42d7-889f-f1bb3687202e',
+        movementTypeId: 'cd0eadf1-d616-48ab-93b6-b867931ab36f',
       })
 
       toast({

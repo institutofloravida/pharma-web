@@ -13,6 +13,8 @@ import { Stocks } from './pages/app/panel/auxiliary-records/stocks/stocks'
 import { TherapeuticClass } from './pages/app/panel/auxiliary-records/therapeutic-class/therapeutic-class'
 import { UnitMeasure } from './pages/app/panel/auxiliary-records/unit-measure/units-measure'
 import { Dashboard } from './pages/app/panel/dashboard/dashboard'
+import { Dispensations } from './pages/app/panel/dispensation/dispensation'
+import { NewDispensation } from './pages/app/panel/dispensation/new-dispensation'
 import { MedicinesVariants } from './pages/app/panel/medicine-variant/medicines-variants'
 import { Medicines } from './pages/app/panel/medicines/medicines'
 import { MedicinesEntries } from './pages/app/panel/movement/entry/medicines-entries'
@@ -188,6 +190,28 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <NewUser />
+          </PrivateRoute>
+        ),
+      },
+    ],
+  },
+  {
+    path: '/dispensation',
+    element: <PanelLayout />,
+    children: [
+      {
+        path: '',
+        element: (
+          <PrivateRoute>
+            <Dispensations />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'new',
+        element: (
+          <PrivateRoute>
+            <NewDispensation />
           </PrivateRoute>
         ),
       },
