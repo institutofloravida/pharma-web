@@ -96,7 +96,7 @@ export function MedicinesEntries() {
             <Pagination
               pageIndex={medicinesEntriesResult.meta.page}
               totalCount={medicinesEntriesResult.meta.totalCount}
-              perPage={20}
+              perPage={10}
               onPageChange={handlePagination}
             />
           )}

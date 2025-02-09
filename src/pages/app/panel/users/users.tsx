@@ -81,7 +81,7 @@ export function Users() {
             <Pagination
               pageIndex={usersResult.meta.page}
               totalCount={usersResult.meta.totalCount}
-              perPage={20}
+              perPage={10}
               onPageChange={handlePagination}
             />
           )}

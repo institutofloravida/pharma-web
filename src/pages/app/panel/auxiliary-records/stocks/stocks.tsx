@@ -5,8 +5,8 @@ import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
+import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
-import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
   TableBody,
@@ -22,12 +22,19 @@ import { StockTableRow } from './stock-table-row'
 
 export function Stocks() {
   const { token } = useAuth()
-  const [searchParams, _] = useSearchParams()
-  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: stocksResult } = useQuery({
     queryKey: ['stocks'],
-    queryFn: () => fetchStocks({ page }, token ?? ''),
+    queryFn: () => fetchStocks({ page: pageIndex }, token ?? ''),
   })
+
+  function handlePagination(pageIndex: number) {
+    setSearchParams((state) => {
+      state.set('page', pageIndex.toString())
+      return state
+    })
+  }
 
   return (
     <>
@@ -68,7 +75,14 @@ export function Stocks() {
             </Table>
           </div>
 
-          <Pagination />
+          {stocksResult && (
+            <Pagination
+              pageIndex={stocksResult.meta.page}
+              totalCount={stocksResult.meta.totalCount}
+              perPage={10}
+              onPageChange={handlePagination}
+            />
+          )}
         </div>
       </div>
     </>

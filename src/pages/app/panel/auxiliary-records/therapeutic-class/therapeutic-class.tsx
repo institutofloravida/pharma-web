@@ -5,8 +5,8 @@ import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchTherapeuticClasses } from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
+import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
-import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
   TableBody,
@@ -22,12 +22,20 @@ import { TherapeuticClassTableRow } from './therapeutic-class-table-row'
 
 export function TherapeuticClass() {
   const { token } = useAuth()
-  const [searchParams, _] = useSearchParams()
-  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: therapeuticClasses } = useQuery({
+  const [searchParams, setSearchParams] = useSearchParams()
+  const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
+
+  const { data: therapeuticClassesResult } = useQuery({
     queryKey: ['therapeutic-class'],
-    queryFn: () => fetchTherapeuticClasses({ page }, token ?? ''),
+    queryFn: () => fetchTherapeuticClasses({ page: pageIndex }, token ?? ''),
   })
+
+  function handlePagination(pageIndex: number) {
+    setSearchParams((state) => {
+      state.set('page', pageIndex.toString())
+      return state
+    })
+  }
 
   return (
     <>
@@ -58,8 +66,8 @@ export function TherapeuticClass() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {therapeuticClasses?.length ? (
-                  therapeuticClasses.map((item) => (
+                {therapeuticClassesResult ? (
+                  therapeuticClassesResult.therapeutic_classes.map((item) => (
                     <TherapeuticClassTableRow
                       therapeuticClass={item ?? []}
                       key={item.id}
@@ -72,7 +80,14 @@ export function TherapeuticClass() {
             </Table>
           </div>
 
-          <Pagination />
+          {therapeuticClassesResult && (
+            <Pagination
+              pageIndex={therapeuticClassesResult.meta.page}
+              totalCount={therapeuticClassesResult.meta.totalCount}
+              perPage={10}
+              onPageChange={handlePagination}
+            />
+          )}
         </div>
       </div>
     </>

@@ -1,4 +1,6 @@
 import { apiPharma } from '@/lib/axios'
+
+import type { Meta } from '../../_types/meta'
 export interface FetchInstitutionsQuery {
   page?: number | null
   query?: string | null
@@ -13,24 +15,24 @@ export interface Institution {
 
 interface FetchInstitutionsResponse {
   institutions: Institution[]
-  meta: {
-    page: number
-    totalPage: number
-  }
+  meta: Meta
 }
 
 export async function fetchInstitutions(
   { page }: FetchInstitutionsQuery,
   token: string,
 ) {
-  const response = await apiPharma.get<FetchInstitutionsResponse>('/institutions', {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const response = await apiPharma.get<FetchInstitutionsResponse>(
+    '/institutions',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        page,
+      },
     },
-    params: {
-      page,
-    },
-  })
+  )
 
   return response.data
 }

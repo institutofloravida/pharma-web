@@ -82,7 +82,7 @@ export function Operators() {
             <Pagination
               pageIndex={operatorsResult.meta.page}
               totalCount={operatorsResult.meta.totalCount}
-              perPage={20}
+              perPage={10}
               onPageChange={handlePagination}
             />
           )}

@@ -85,7 +85,7 @@ export function Dispensations() {
             <Pagination
               pageIndex={dispensationsResult.meta.page}
               totalCount={dispensationsResult.meta.totalCount}
-              perPage={20}
+              perPage={10}
               onPageChange={handlePagination}
             />
           )} */}

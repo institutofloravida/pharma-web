@@ -4,17 +4,9 @@ import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
+import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
-import { Pagination } from '@/components/ui/pagination'
+import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -27,17 +19,23 @@ import { useAuth } from '@/contexts/authContext'
 import { InstitutionTableFilters } from './institution-table-filters'
 import { InstitutionTableRow } from './institution-table-row'
 import { NewInstitutionDialog } from './new-institution-dialog'
-// import { NewInstitutionDialog } from './new-institution-dialog'
 
 export function Institutions() {
   const { token } = useAuth()
 
   const [searchParams, setSearchParams] = useSearchParams()
-  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: institutionsResult } = useQuery({
     queryKey: ['institutions'],
-    queryFn: () => fetchInstitutions({ page }, token ?? ''),
+    queryFn: () => fetchInstitutions({ page: pageIndex }, token ?? ''),
   })
+
+  function handlePagination(pageIndex: number) {
+    setSearchParams((state) => {
+      state.set('page', pageIndex.toString())
+      return state
+    })
+  }
 
   return (
     <>
@@ -78,8 +76,14 @@ export function Institutions() {
               </TableBody>
             </Table>
           </div>
-
-          <Pagination />
+          {institutionsResult && (
+            <Pagination
+              pageIndex={institutionsResult.meta.page}
+              perPage={10}
+              onPageChange={handlePagination}
+              totalCount={institutionsResult.meta.totalCount}
+            />
+          )}
         </div>
       </div>
     </>

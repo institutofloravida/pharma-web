@@ -86,7 +86,7 @@ export function MedicinesVariants() {
             <Pagination
               pageIndex={medicinesVariants.meta.page}
               totalCount={medicinesVariants.meta.totalCount}
-              perPage={20}
+              perPage={10}
               onPageChange={handlePagination}
             />
           )}

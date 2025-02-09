@@ -25,10 +25,7 @@ export function Medicines() {
   const { token } = useAuth()
 
   const [searchParams, setSearchParams] = useSearchParams()
-  const pageIndex = z.coerce
-    .number()
-    // .transform((page) => page - 1)
-    .parse(searchParams.get('page') ?? '1')
+  const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: medicinesResult } = useQuery({
     queryKey: ['medicines', pageIndex],
     queryFn: () => fetchMedicines({ page: pageIndex }, token ?? ''),
@@ -45,6 +42,7 @@ export function Medicines() {
       return state
     })
   }
+
   return (
     <>
       <Helmet title="Medicamentos" />
@@ -87,7 +85,7 @@ export function Medicines() {
             <Pagination
               pageIndex={medicinesResult.meta.page}
               totalCount={medicinesResult.meta.totalCount}
-              perPage={20}
+              perPage={10}
               onPageChange={handlePagination}
             />
           )}
