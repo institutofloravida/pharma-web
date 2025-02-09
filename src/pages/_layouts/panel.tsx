@@ -94,14 +94,14 @@ const data = {
       plan: 'Pública',
     },
   ],
-  navMainWithSingleItem: [
+  admAreaSingleItems: [
     {
       name: 'Operadores',
       url: '/operators',
       icon: UserRoundCog,
     },
   ],
-  navMainWithManyItems: [
+  admAreaManyItems: [
     {
       title: 'Cadastros Gerais',
       url: '#',
@@ -315,7 +315,7 @@ export default function PanelLayout() {
         <SidebarContent>
           <SidebarGroup>
             <SidebarGroupLabel>Área Geral</SidebarGroupLabel>
-            {data.navMainWithSingleItem.map((item) => {
+            {data.admAreaSingleItems.map((item) => {
               return (
                 <SidebarMenuButton tooltip={item.name} asChild key={item.name}>
                   <Link to={item.url}>
@@ -326,7 +326,7 @@ export default function PanelLayout() {
               )
             })}
             <SidebarMenu>
-              {data.navMainWithManyItems.map((item) => (
+              {data.admAreaManyItems.map((item) => (
                 <Collapsible
                   key={item.title}
                   asChild
