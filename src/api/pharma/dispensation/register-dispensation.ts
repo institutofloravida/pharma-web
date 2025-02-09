@@ -1,8 +1,7 @@
 import { apiPharma } from '@/lib/axios'
 
 export interface RegisterDispensationBody {
-  medicineVariantId: string
-  stockId: string
+  medicineStockId: string
   patientId: string
   batchesStocks: {
     batchStockId: string
@@ -15,7 +14,7 @@ export async function registerDispensation(
   {
     batchesStocks,
     dispensationDate,
-    medicineVariantId,
+    medicineStockId,
     patientId,
   }: RegisterDispensationBody,
   token: string,
@@ -25,7 +24,7 @@ export async function registerDispensation(
     {
       batchesStocks,
       dispensationDate,
-      medicineVariantId,
+      medicineStockId,
       patientId,
     },
     {

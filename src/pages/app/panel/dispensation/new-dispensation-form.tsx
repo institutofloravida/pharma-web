@@ -1,5 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
+import { CalendarIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -11,26 +14,38 @@ import {
   type RegisterDispensationBody,
 } from '@/api/pharma/dispensation/register-dispensation'
 import { fetchMedicinesVariants } from '@/api/pharma/medicines-variants/fetch-medicines-variants'
+import { fetchBatchesOnStock } from '@/api/pharma/stock/bacth-stock/fetch-batches-stock'
+import { fetchMedicinesOnStock } from '@/api/pharma/stock/medicine-stock/fetch-medicines-stock'
 import { fetchUsers } from '@/api/pharma/users/fetch-users'
 import { ComboboxUp } from '@/components/comboboxes/combobox-up'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Calendar } from '@/components/ui/calendar'
 import {
   Form,
+  FormControl,
   FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
+import { cn } from '@/lib/utils'
 import { Formatter } from '@/lib/utils/formaters/formaters'
 import { dateFormatter } from '@/lib/utils/formatter'
 import { handleApiError } from '@/lib/utils/handle-api-error'
 
 export const newDispensationSchema = z.object({
-  medicineVariantId: z.string({
+  medicineStockId: z.string({
     required_error: 'O medicamento é obrigatório.',
   }),
   stockId: z.string({
@@ -39,23 +54,23 @@ export const newDispensationSchema = z.object({
   patientId: z.string({
     required_error: 'O paciente é obrigatório.',
   }),
-  // batchesStocks: z
-  //   .array(
-  //     z.object({
-  //       batchStockId: z.string({
-  //         required_error: 'O lote é obrigatório.',
-  //       }),
-  //       quantity: z
-  //         .number({
-  //           required_error: 'A quantidade é obrigatória.',
-  //         })
-  //         .min(1, 'A quantidade deve ser pelo menos 1.'),
-  //     }),
-  //   )
-  //   .min(1, 'Pelo menos um lote deve ser selecionado.'),
-  // dispensationDate: z.date({
-  //   required_error: 'A data da dispensação é obrigatória.',
-  // }),
+  batchesStocks: z
+    .array(
+      z.object({
+        batchStockId: z.string({
+          required_error: 'O lote é obrigatório.',
+        }),
+        quantity: z
+          .number({
+            required_error: 'A quantidade é obrigatória.',
+          })
+          .min(1, 'A quantidade deve ser pelo menos 1.'),
+      }),
+    )
+    .min(1, 'Pelo menos um lote deve ser selecionado.'),
+  dispensationDate: z.date({
+    required_error: 'A data da dispensação é obrigatória.',
+  }),
 })
 
 export type NewDispensationSchema = z.infer<typeof newDispensationSchema>
@@ -65,13 +80,18 @@ export function NewDispensationForm() {
   const { token } = useAuth()
   const [queryUsers, setQueryUsers] = useState('')
   const [queryStock, setQueryStock] = useState('')
-  const [queryMedicineVariant, setQueryMedicineVariant] = useState('')
+  const [queryMedicineStock, setQueryMedicineStock] = useState('')
   const [activeTab, setActiveTab] = useState('patient')
 
   const navigate = useNavigate()
 
+  const form = useForm<z.infer<typeof newDispensationSchema>>({
+    resolver: zodResolver(newDispensationSchema),
+    defaultValues: {},
+  })
+
   const { data: usersResult, isFetching: isFetchingUsers } = useQuery({
-    queryKey: ['states'],
+    queryKey: ['users'],
     queryFn: () => fetchUsers({ page: 1 }, token ?? ''),
     staleTime: 1000,
     refetchOnMount: true,
@@ -83,15 +103,39 @@ export function NewDispensationForm() {
     staleTime: 1000,
     refetchOnMount: true,
   })
-  const {
-    data: medicinesVariantsResult,
-    isFetching: isFetchingMedicinesVariants,
-  } = useQuery({
-    queryKey: ['medicines-variants'],
-    queryFn: () => fetchMedicinesVariants({ page: 1 }, token ?? ''),
-    staleTime: 1000,
-    refetchOnMount: true,
-  })
+  const { data: medicinesStockResult, isFetching: isFetchingMedicinesStock } =
+    useQuery({
+      queryKey: ['medicines-stock', form.watch('stockId'), queryMedicineStock],
+      queryFn: () =>
+        fetchMedicinesOnStock(
+          {
+            page: 1,
+            stockId: form.watch('stockId'),
+            medicineName: queryMedicineStock,
+          },
+          token ?? '',
+        ),
+      staleTime: 1000,
+      enabled: !!form.watch('stockId'),
+      refetchOnMount: true,
+    })
+
+  const { data: batchesStockResult, isFetching: isFetchingBatchesStock } =
+    useQuery({
+      queryKey: ['batches-stock', form.watch('medicineStockId')],
+      queryFn: () =>
+        fetchBatchesOnStock(
+          {
+            page: 1,
+            stockId: form.watch('stockId'),
+            medicineStockId: form.watch('medicineStockId'),
+          },
+          token ?? '',
+        ),
+      staleTime: 1000,
+      enabled: !!form.watch('medicineStockId'),
+      refetchOnMount: true,
+    })
 
   const {
     mutateAsync: registerDispensationFn,
@@ -106,18 +150,13 @@ export function NewDispensationForm() {
     },
   })
 
-  const form = useForm<z.infer<typeof newDispensationSchema>>({
-    resolver: zodResolver(newDispensationSchema),
-    defaultValues: {},
-  })
-
   const handleNext = async () => {
     let isValid = false
 
     if (activeTab === 'patient') {
       isValid = await form.trigger(['patientId'])
     } else if (activeTab === 'medicine') {
-      isValid = await form.trigger(['stockId', 'medicineVariantId'])
+      isValid = await form.trigger(['stockId', 'medicineStockId'])
     }
 
     if (isValid) {
@@ -140,17 +179,12 @@ export function NewDispensationForm() {
 
   async function handleRegisterDispensation(data: NewDispensationSchema) {
     try {
-      // await registerDispensationFn({
-      //   medicinePatient: data.medicinePatient,
-      //   birthDate: data.birthDate,
-      //   cpf: data.cpf,
-      //   gender: data.gender,
-      //   name: data.name,
-      //   race: data.race,
-      //   sus: data.sus,
-      //   generalRegistration: data.generalRegistration,
-      //   batchesIds: data.batchesIds,
-      // })
+      await registerDispensationFn({
+        batchesStocks: data.batchesStocks,
+        dispensationDate: data.dispensationDate,
+        medicineStockId: data.medicineStockId,
+        patientId: data.patientId,
+      })
       toast({
         // title: `O usuário ${data} foi cadastrado com sucesso!`,
         description: (
@@ -218,7 +252,7 @@ export function NewDispensationForm() {
                     formatItem={(item) =>
                       `${Formatter.cpf(item.cpf)} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
                     }
-                    placeholder="Psquise por um usuário"
+                    placeholder="Pesquise por um usuário"
                     onSelect={(item) => {
                       form.setValue('patientId', item)
                     }}
@@ -226,6 +260,48 @@ export function NewDispensationForm() {
                   <FormDescription>
                     Pesquise por cpf, nome ou data de nascimento{' '}
                   </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="dispensationDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Data de Fabricação</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'w-[240px] pl-3 text-left font-normal',
+                            !field.value && 'text-muted-foreground',
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, 'PPP', { locale: ptBR })
+                          ) : (
+                            <span>Selecione uma data</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) => date > new Date()}
+                        lang="pt-BR"
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+
                   <FormMessage />
                 </FormItem>
               )}
@@ -268,23 +344,23 @@ export function NewDispensationForm() {
             />
             <FormField
               control={form.control}
-              name="medicineVariantId"
+              name="medicineStockId"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Variante</FormLabel>
+                  <FormLabel>Medicamento</FormLabel>
                   <ComboboxUp
-                    items={medicinesVariantsResult?.medicines_variants ?? []}
+                    items={medicinesStockResult?.medicines_stock ?? []}
                     field={field}
-                    query={queryMedicineVariant}
-                    placeholder="Selecione a variante"
-                    isFetching={isFetchingMedicinesVariants}
-                    onQueryChange={setQueryMedicineVariant}
+                    query={queryMedicineStock}
+                    placeholder="Selecione um medicamento"
+                    isFetching={isFetchingMedicinesStock}
+                    onQueryChange={setQueryMedicineStock}
                     onSelect={(id, _) => {
-                      form.setValue('medicineVariantId', id)
+                      form.setValue('medicineStockId', id)
                     }}
                     itemKey="id"
                     formatItem={(item) => {
-                      return `${item.medicine} - ${item.dosage}${item.unitMeasure} - ${item.pharmaceuticalForm}`
+                      return `${item.medicine} - ${item.dosage}${item.unitMeasure} - ${item.pharmaceuticalForm} - [${item.quantity}] uni.`
                     }}
                   />
                   <FormMessage />
@@ -308,11 +384,42 @@ export function NewDispensationForm() {
             className="grid w-full max-w-[300px] gap-2 space-y-2 pl-2"
           >
             <div className="col-span-6 grid justify-end">
-              <div className="flex gap-2">
+              {batchesStockResult?.batches_stock.map((batch, index) => (
+                <>
+                  <input
+                    type="hidden"
+                    {...form.register(`batchesStocks.${index}.batchStockId`)}
+                    value={batch.id}
+                  />
+                  <FormField
+                    key={batch.id}
+                    control={form.control}
+                    name={`batchesStocks.${index}.quantity`}
+                    render={({ field }) => (
+                      <FormItem className="col-span-2">
+                        <FormLabel>Lote {batch.batch}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="number"
+                            max={batch.quantity}
+                            placeholder="Quantidade"
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              ))}
+
+              <div className="mt-4 flex gap-2">
                 <Button
                   variant="ghost"
                   disabled={form.formState.isSubmitting}
-                  className=""
                   onClick={handlePrevious}
                 >
                   Voltar

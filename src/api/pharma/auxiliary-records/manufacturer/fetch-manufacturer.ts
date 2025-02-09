@@ -24,16 +24,19 @@ export async function fetchManufacturers(
   { page, query, cnpj }: FetchManufacturersQuery,
   token: string,
 ) {
-  const response = await apiPharma.get<FetchManufacturersResponse>('/manufacturer', {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const response = await apiPharma.get<FetchManufacturersResponse>(
+    '/manufacturer',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        page,
+        query,
+        cnpj,
+      },
     },
-    params: {
-      page,
-      query,
-      cnpj,
-    },
-  })
+  )
 
   return response.data
 }
