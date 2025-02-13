@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { fetchManufacturers } from '@/api/pharma/auxiliary-records/manufacturer/fetch-manufacturer'
+import { fetchMovementTypes } from '@/api/pharma/auxiliary-records/movement-type/fetch-movement-types'
 import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
 import { fetchUnitsMeasure } from '@/api/pharma/auxiliary-records/unit-measure/fetch-units-measure'
 import {
@@ -47,6 +48,7 @@ import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
 import { cn } from '@/lib/utils'
+import { MovementTypeDirection } from '@/lib/utils/movement-type'
 
 const FormSchema = z.object({
   stockId: z.string({
@@ -54,6 +56,9 @@ const FormSchema = z.object({
   }),
   medicineVariantId: z.string({
     required_error: 'Selecione uma variante de medicamento.',
+  }),
+  movementTypeId: z.string({
+    required_error: 'Selecione umtipo de movimentação.',
   }),
   newBatches: z.object({
     code: z.string({
@@ -85,6 +90,7 @@ export function NewMedicineEntryDialog() {
   const [queryUnitMeasure, setQueryUnitMeasure] = useState('')
   const [queryMedicineVariant, setQueryMedicineVariant] = useState('')
   const [queryManufacturer, setQueryManufacturer] = useState('')
+  const [queryMovementType, setQueryMovementType] = useState('')
   const { token } = useAuth()
 
   const { mutateAsync: registerMedicineEntryFn } = useMutation({
@@ -157,12 +163,23 @@ export function NewMedicineEntryDialog() {
       refetchOnMount: true,
     })
 
-  const { data: unitsMeasureResult, isFetching: isFetchingUnitsMeasure } =
+  const { data: movementTypesResult, isFetching: isFetchingMovementTypes } =
     useQuery({
-      queryKey: ['units-measure', queryUnitMeasure],
+      queryKey: [
+        'movement-types',
+        queryMovementType,
+        MovementTypeDirection.ENTRY,
+      ],
       queryFn: () =>
-        fetchUnitsMeasure({ page: 1, query: queryUnitMeasure }, token ?? ''),
-      enabled: queryUnitMeasure !== null,
+        fetchMovementTypes(
+          {
+            page: 1,
+            query: queryMovementType,
+            direction: MovementTypeDirection.ENTRY,
+          },
+          token ?? '',
+        ),
+      enabled: queryStock !== null,
       staleTime: 1000,
       refetchOnMount: true,
     })
@@ -210,7 +227,7 @@ export function NewMedicineEntryDialog() {
   }
 
   return (
-    <DialogContent className="flex flex-col items-center">
+    <DialogContent className="flex max-w-[800px] flex-col items-center">
       <DialogHeader className="items-center">
         <DialogTitle>Nova Entrada</DialogTitle>
         <DialogDescription>
@@ -219,12 +236,15 @@ export function NewMedicineEntryDialog() {
       </DialogHeader>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 px-5">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="grid w-full max-w-[800px] grid-cols-6 space-x-2 space-y-2"
+        >
           <FormField
             control={form.control}
             name="stockId"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="col-span-3 flex flex-col">
                 <FormLabel>Stock</FormLabel>
                 <ComboboxUp
                   items={stocksResult?.stocks ?? []}
@@ -249,7 +269,7 @@ export function NewMedicineEntryDialog() {
             control={form.control}
             name="medicineVariantId"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="col-span-3 flex flex-col">
                 <FormLabel>Variante</FormLabel>
                 <ComboboxUp
                   items={medicinesVariantsResult?.medicines_variants ?? []}
@@ -274,7 +294,7 @@ export function NewMedicineEntryDialog() {
             control={form.control}
             name="newBatches.manufacturerId"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="col-span-3 flex flex-col gap-1">
                 <FormLabel>Fabricante</FormLabel>
                 <ComboboxUp
                   items={manufacturersResult?.manufacturers ?? []}
@@ -298,9 +318,35 @@ export function NewMedicineEntryDialog() {
 
           <FormField
             control={form.control}
+            name="movementTypeId"
+            render={({ field }) => (
+              <FormItem className="col-span-3 flex flex-col gap-1">
+                <FormLabel>Tipo de Movimentação</FormLabel>
+                <ComboboxUp
+                  items={movementTypesResult?.movement_types ?? []}
+                  field={field}
+                  query={queryMovementType}
+                  placeholder="Selecione um tipo"
+                  isFetching={isFetchingMovementTypes}
+                  onQueryChange={setQueryMovementType}
+                  onSelect={(id, _) => {
+                    form.setValue('movementTypeId', id)
+                  }}
+                  itemKey="id"
+                  formatItem={(item) => {
+                    return `${item.name}`
+                  }}
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="newBatches.code"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-3">
                 <FormLabel>Código</FormLabel>
                 <FormControl>
                   <Input placeholder="Código do lote" {...field} />
@@ -309,11 +355,32 @@ export function NewMedicineEntryDialog() {
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="newBatches.quantityToEntry"
+            render={({ field }) => (
+              <FormItem className="col-span-3 flex flex-col gap-1">
+                <FormLabel>Quantidade</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={10000}
+                    placeholder="quantidade do lote"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <FormField
             control={form.control}
             name="newBatches.manufacturingDate"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="col-span-3 flex flex-col gap-1">
                 <FormLabel>Data de Fabricação</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -321,7 +388,7 @@ export function NewMedicineEntryDialog() {
                       <Button
                         variant={'outline'}
                         className={cn(
-                          'w-[240px] pl-3 text-left font-normal',
+                          'pl-3 text-left font-normal',
                           !field.value && 'text-muted-foreground',
                         )}
                       >
@@ -354,7 +421,7 @@ export function NewMedicineEntryDialog() {
             control={form.control}
             name="newBatches.expirationDate"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="col-span-3 flex flex-col gap-1">
                 <FormLabel>Data de Validade</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -362,7 +429,7 @@ export function NewMedicineEntryDialog() {
                       <Button
                         variant={'outline'}
                         className={cn(
-                          'w-[240px] pl-3 text-left font-normal',
+                          'pl-3 text-left font-normal',
                           !field.value && 'text-muted-foreground',
                         )}
                       >
@@ -394,29 +461,10 @@ export function NewMedicineEntryDialog() {
 
           <FormField
             control={form.control}
-            name="newBatches.quantityToEntry"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Quantidade</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min={0}
-                    max={10000}
-                    placeholder="quantidade do lote"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
             name="entryDate"
             defaultValue={new Date()}
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="col-span-3 flex flex-col gap-1">
                 <FormLabel>Data de Entrada</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -454,11 +502,13 @@ export function NewMedicineEntryDialog() {
             )}
           />
 
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant={'ghost'}>Cancelar</Button>
-            </DialogClose>
-            <Button type="submit">Enviar</Button>
+          <DialogFooter className="col-span-6 grid justify-end">
+            <div className="flex-gap-2">
+              <DialogClose asChild>
+                <Button variant={'ghost'}>Cancelar</Button>
+              </DialogClose>
+              <Button type="submit">Enviar</Button>
+            </div>
           </DialogFooter>
         </form>
       </Form>
