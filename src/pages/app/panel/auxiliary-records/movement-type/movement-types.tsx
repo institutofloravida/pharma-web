@@ -26,7 +26,7 @@ export function MovementTypes() {
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
 
   const { data: movementTypesResult } = useQuery({
-    queryKey: ['movement-types'],
+    queryKey: ['movement-types', pageIndex],
     queryFn: () => fetchMovementTypes({ page: pageIndex }, token ?? ''),
   })
 

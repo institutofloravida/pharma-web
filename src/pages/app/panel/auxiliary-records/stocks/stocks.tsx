@@ -25,7 +25,7 @@ export function Stocks() {
   const [searchParams, setSearchParams] = useSearchParams()
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: stocksResult } = useQuery({
-    queryKey: ['stocks'],
+    queryKey: ['stocks', pageIndex],
     queryFn: () => fetchStocks({ page: pageIndex }, token ?? ''),
   })
 

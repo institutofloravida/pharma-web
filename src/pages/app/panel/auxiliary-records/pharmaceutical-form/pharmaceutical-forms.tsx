@@ -4,9 +4,9 @@ import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchPharmaceuticalForms } from '@/api/pharma/auxiliary-records/pharmaceutical-form/fetch-pharmaceutical-form'
+import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
   TableBody,
@@ -23,12 +23,19 @@ import { PharmaceuticalFormTableRow } from './pharmaceutical-form-table-row'
 export function PharmaceuticalForms() {
   const { token } = useAuth()
 
-  const [searchParams, _] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: pharmaceuticalformsResult } = useQuery({
-    queryKey: ['pharmaceutical-forms'],
+    queryKey: ['pharmaceutical-forms', page],
     queryFn: () => fetchPharmaceuticalForms({ page }, token ?? ''),
   })
+
+  function handlePagination(pageIndex: number) {
+    setSearchParams((state) => {
+      state.set('page', pageIndex.toString())
+      return state
+    })
+  }
 
   return (
     <>
@@ -75,7 +82,14 @@ export function PharmaceuticalForms() {
             </Table>
           </div>
 
-          <Pagination />
+          {pharmaceuticalformsResult && (
+            <Pagination
+              pageIndex={pharmaceuticalformsResult.meta.page}
+              totalCount={pharmaceuticalformsResult.meta.totalCount}
+              perPage={10}
+              onPageChange={handlePagination}
+            />
+          )}
         </div>
       </div>
     </>

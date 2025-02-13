@@ -24,7 +24,7 @@ export function Users() {
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: usersResult } = useQuery({
-    queryKey: ['users'],
+    queryKey: ['users', page],
     queryFn: () => fetchUsers({ page }, token ?? ''),
   })
 

@@ -58,7 +58,9 @@ export function Medicines() {
                 </Button>
               </DialogTrigger>
               <NewMedicineDialog
-                therapeuticClasses={therapeuticClasses ?? []}
+                therapeuticClasses={
+                  therapeuticClasses?.therapeutic_classes ?? []
+                }
               />
             </Dialog>
           </div>

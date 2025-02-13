@@ -48,6 +48,7 @@ import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
 import { cn } from '@/lib/utils'
+import { handleApiError } from '@/lib/utils/handle-api-error'
 import { MovementTypeDirection } from '@/lib/utils/movement-type'
 
 const FormSchema = z.object({
@@ -96,38 +97,10 @@ export function NewMedicineEntryDialog() {
   const { mutateAsync: registerMedicineEntryFn } = useMutation({
     mutationFn: (data: RegisterMedicineEntryBodyAndParams) =>
       registerMedicineEntry(data, token ?? ''),
-    onSuccess(
-      _,
-      {
-        entryDate,
-        medicineVariantId,
-        movementTypeId,
-        stockId,
-        batches,
-        newBatches,
-      },
-    ) {
-      const cached = queryClient.getQueryData<FetchMedicinesVariantsResponse>([
-        'medicines-variants',
-        1,
-      ]) || { medicines_variants: [], meta: { page: 1, totalCount: 0 } }
-
-      const medicineName = queryMedicine
-      const unitMeasureAcronym = queryUnitMeasure
-      const pharmaceuticalFormName = queryPharmaceuticalForm
-
-      if (cached.medicines_variants) {
-        const updatedData = {
-          ...cached,
-          medicines_variants: [{}, ...cached.medicines_variants],
-          meta: {
-            ...cached.meta,
-            totalCount: cached.meta.totalCount + 1,
-          },
-        }
-
-        queryClient.setQueryData(['medicines-variants', 1], updatedData)
-      }
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ['medicines-entries'],
+      })
     },
   })
 
@@ -203,25 +176,19 @@ export function NewMedicineEntryDialog() {
             quantityToEntry: data.newBatches.quantityToEntry,
           },
         ],
-        movementTypeId: 'cd0eadf1-d616-48ab-93b6-b867931ab36f',
+        movementTypeId: data.movementTypeId,
       })
 
       toast({
-        title: 'You submitted the following values:',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
+        title: 'Entrada de Medicamento',
+        description: 'Entrada Realizada comsucesso!',
       })
     } catch (error: any) {
+      const errorMessage = handleApiError(error)
       toast({
-        title: 'You submitted the following values:',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            {error.message}
-          </pre>
-        ),
+        title: 'Erro ao registrar entrada',
+        description: errorMessage,
+        variant: 'destructive',
       })
     }
   }

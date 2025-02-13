@@ -26,7 +26,7 @@ export function Operators() {
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: operatorsResult } = useQuery({
-    queryKey: ['operators'],
+    queryKey: ['operators', page],
     queryFn: () => fetchOperators({ page }, token ?? ''),
   })
 

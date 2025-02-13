@@ -4,9 +4,9 @@ import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchPathologies } from '@/api/pharma/auxiliary-records/pathology/fetch-pathology'
+import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
   TableBody,
@@ -23,12 +23,19 @@ import { PathologyTableRow } from './pathology-table-row'
 export function Pathologies() {
   const { token } = useAuth()
 
-  const [searchParams, _] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: pathologiesResult } = useQuery({
-    queryKey: ['pathologies'],
+    queryKey: ['pathologies', page],
     queryFn: () => fetchPathologies({ page }, token ?? ''),
   })
+
+  function handlePagination(pageIndex: number) {
+    setSearchParams((state) => {
+      state.set('page', pageIndex.toString())
+      return state
+    })
+  }
 
   return (
     <>
@@ -66,7 +73,14 @@ export function Pathologies() {
             </Table>
           </div>
 
-          <Pagination />
+          {pathologiesResult && (
+            <Pagination
+              pageIndex={pathologiesResult.meta.page}
+              totalCount={pathologiesResult.meta.totalCount}
+              perPage={10}
+              onPageChange={handlePagination}
+            />
+          )}
         </div>
       </div>
     </>

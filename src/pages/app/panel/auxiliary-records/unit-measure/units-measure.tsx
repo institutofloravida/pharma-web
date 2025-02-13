@@ -5,8 +5,8 @@ import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchUnitsMeasure } from '@/api/pharma/auxiliary-records/unit-measure/fetch-units-measure'
+import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
-import { Pagination } from '@/components/ui/pagination'
 import {
   Table,
   TableBody,
@@ -22,12 +22,19 @@ import { UnitMeasureTableRow } from './units-measure-table-row'
 
 export function UnitMeasure() {
   const { token } = useAuth()
-  const [searchParams, _] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: unitsMeasure } = useQuery({
-    queryKey: ['units-measure'],
+  const { data: unitsMeasureResult } = useQuery({
+    queryKey: ['units-measure', page],
     queryFn: () => fetchUnitsMeasure({ page }, token ?? ''),
   })
+
+  function handlePagination(pageIndex: number) {
+    setSearchParams((state) => {
+      state.set('page', pageIndex.toString())
+      return state
+    })
+  }
 
   return (
     <>
@@ -58,8 +65,8 @@ export function UnitMeasure() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {unitsMeasure?.units_measure ? (
-                  unitsMeasure.units_measure.map((item) => (
+                {unitsMeasureResult?.units_measure ? (
+                  unitsMeasureResult.units_measure.map((item) => (
                     <UnitMeasureTableRow
                       unitMeasure={item ?? []}
                       key={item.id}
@@ -73,8 +80,14 @@ export function UnitMeasure() {
               </TableBody>
             </Table>
           </div>
-
-          <Pagination />
+          {unitsMeasureResult && (
+            <Pagination
+              pageIndex={unitsMeasureResult.meta.page}
+              totalCount={unitsMeasureResult.meta.totalCount}
+              perPage={10}
+              onPageChange={handlePagination}
+            />
+          )}
         </div>
       </div>
     </>

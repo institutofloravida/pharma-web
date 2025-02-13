@@ -26,7 +26,7 @@ export function Institutions() {
   const [searchParams, setSearchParams] = useSearchParams()
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: institutionsResult } = useQuery({
-    queryKey: ['institutions'],
+    queryKey: ['institutions', pageIndex],
     queryFn: () => fetchInstitutions({ page: pageIndex }, token ?? ''),
   })
 

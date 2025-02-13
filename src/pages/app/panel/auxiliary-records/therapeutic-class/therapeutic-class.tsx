@@ -26,7 +26,7 @@ export function TherapeuticClass() {
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
 
   const { data: therapeuticClassesResult } = useQuery({
-    queryKey: ['therapeutic-class'],
+    queryKey: ['therapeutic-class', pageIndex],
     queryFn: () => fetchTherapeuticClasses({ page: pageIndex }, token ?? ''),
   })
 
