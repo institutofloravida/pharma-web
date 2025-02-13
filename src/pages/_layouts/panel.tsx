@@ -136,6 +136,10 @@ const data = {
           title: 'Patologias',
           url: '/pathologies',
         },
+        {
+          title: 'Tipos de Movimentação',
+          url: '/movement-types',
+        },
       ],
     },
     {

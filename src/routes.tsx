@@ -7,6 +7,10 @@ import { PrivateRoute } from './pages/_private/private-route'
 import { SignIn } from './pages/app/auth/sign-in'
 import { Institutions } from './pages/app/panel/auxiliary-records/institutions/institutions'
 import { Manufacturers } from './pages/app/panel/auxiliary-records/manufacturers/manufacturers'
+import {
+  MovementType,
+  MovementTypes,
+} from './pages/app/panel/auxiliary-records/movement-type/movement-types'
 import { Pathologies } from './pages/app/panel/auxiliary-records/pathology/pathologies'
 import { PharmaceuticalForms } from './pages/app/panel/auxiliary-records/pharmaceutical-form/pharmaceutical-forms'
 import { Stocks } from './pages/app/panel/auxiliary-records/stocks/stocks'
@@ -132,6 +136,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Pathologies />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'movement-types',
+        element: (
+          <PrivateRoute>
+            <MovementTypes />
           </PrivateRoute>
         ),
       },
