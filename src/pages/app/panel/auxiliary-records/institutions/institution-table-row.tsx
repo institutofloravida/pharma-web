@@ -1,18 +1,14 @@
-import { PenLine, Search, Trash, UserMinus, UserPen } from 'lucide-react'
+import { PenLine, Search, Trash } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { TableCell, TableRow } from '@/components/ui/table'
+
+import { UpdateInstitutionDialog } from './update-instituion-dialog'
 
 export interface InstitutionTableRowProps {
   institution: {
+    id: string
     name: string
     cnpj: string
     description: string
@@ -42,9 +38,14 @@ export function InstitutionTableRow({ institution }: InstitutionTableRowProps) {
       <TableCell>{institution.description}</TableCell>
 
       <TableCell>
-        <Button variant={'outline'} size={'xs'}>
-          <PenLine className="h-3 w-3" />
-        </Button>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant={'outline'} size={'xs'}>
+              <PenLine className="h-3 w-3" />
+            </Button>
+          </DialogTrigger>
+          <UpdateInstitutionDialog institutionId={institution.id} />
+        </Dialog>
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>

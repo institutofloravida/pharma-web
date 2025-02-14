@@ -46,7 +46,6 @@ export function NewInstitutionDialog() {
 
   async function handleRegisterInstitution(data: NewInstitutionSchema) {
     try {
-      //
       await registerInstitutionFn({
         name: data.name,
         cnpj: data.cnpj,

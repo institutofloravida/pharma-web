@@ -181,7 +181,7 @@ export function NewMedicineEntryDialog() {
 
       toast({
         title: 'Entrada de Medicamento',
-        description: 'Entrada Realizada comsucesso!',
+        description: 'Entrada realizada com sucesso!',
       })
     } catch (error: any) {
       const errorMessage = handleApiError(error)
