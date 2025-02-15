@@ -10,7 +10,7 @@ export interface Pathology {
   name: string
 }
 
-interface FetchPathologiesResponse {
+export interface FetchPathologiesResponse {
   pathologies: Pathology[]
   meta: Meta
 }

@@ -1,8 +1,11 @@
 import { PenLine, Search, Trash } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
+
+import { UpdatePathologyDialog } from './update-pathology-dialog'
 
 export interface PathologyTableRowProps {
   pathology: {
@@ -12,6 +15,8 @@ export interface PathologyTableRowProps {
 }
 
 export function PathologyTableRow({ pathology }: PathologyTableRowProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
     <TableRow>
       <TableCell>
@@ -30,9 +35,14 @@ export function PathologyTableRow({ pathology }: PathologyTableRowProps) {
       </TableCell>
 
       <TableCell>
-        <Button variant={'outline'} size={'xs'}>
-          <PenLine className="h-3 w-3" />
-        </Button>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button variant={'outline'} size={'xs'}>
+              <PenLine className="h-3 w-3" />
+            </Button>
+          </DialogTrigger>
+          <UpdatePathologyDialog open={isOpen} pathologyId={pathology.id} />
+        </Dialog>
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>

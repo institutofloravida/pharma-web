@@ -51,16 +51,19 @@ type UpdateInstitutionSchema = z.infer<typeof updateInstitutionSchema>
 
 interface UpdateInstitutionProps {
   institutionId: string
+  open: boolean
 }
 
 export function UpdateInstitutionDialog({
   institutionId,
+  open,
 }: UpdateInstitutionProps) {
   const { token } = useAuth()
 
   const { data: institution } = useQuery({
     queryKey: ['institution', institutionId],
     queryFn: () => getInstitution({ id: institutionId }, token ?? ''),
+    enabled: open,
   })
 
   const form = useForm<UpdateInstitutionSchema>({
