@@ -1,11 +1,15 @@
 import { PenLine, Search, Trash } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
 
+import { UpdateTherapeuticClassDialog } from './update-therapeutic-class-dialog'
+
 export interface TherapeuticClassTableRowProps {
   therapeuticClass: {
+    id: string
     name: string
     description: string
   }
@@ -14,6 +18,8 @@ export interface TherapeuticClassTableRowProps {
 export function TherapeuticClassTableRow({
   therapeuticClass,
 }: TherapeuticClassTableRowProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
     <TableRow>
       <TableCell>
@@ -34,9 +40,17 @@ export function TherapeuticClassTableRow({
       <TableCell>{therapeuticClass.description}</TableCell>
 
       <TableCell>
-        <Button variant={'outline'} size={'xs'}>
-          <PenLine className="h-3 w-3" />
-        </Button>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button variant={'outline'} size={'xs'}>
+              <PenLine className="h-3 w-3" />
+            </Button>
+          </DialogTrigger>
+          <UpdateTherapeuticClassDialog
+            therapeuticClassId={therapeuticClass.id}
+            open={isOpen}
+          />
+        </Dialog>
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>

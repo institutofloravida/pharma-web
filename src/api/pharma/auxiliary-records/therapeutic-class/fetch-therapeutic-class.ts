@@ -3,6 +3,7 @@ import { apiPharma } from '@/lib/axios'
 import { Meta } from '../../_types/meta'
 export interface FetchTherapeuticClassesQuery {
   page?: number | null
+  query?: string | null
 }
 
 export interface TherapeuticClass {
@@ -17,7 +18,7 @@ interface FetchTherapeuticClassesResponse {
 }
 
 export async function fetchTherapeuticClasses(
-  { page }: FetchTherapeuticClassesQuery,
+  { page, query }: FetchTherapeuticClassesQuery,
   token: string,
 ) {
   const response = await apiPharma.get<FetchTherapeuticClassesResponse>(
@@ -28,6 +29,7 @@ export async function fetchTherapeuticClasses(
       },
       params: {
         page,
+        query,
       },
     },
   )

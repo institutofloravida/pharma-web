@@ -17,17 +17,21 @@ import {
 import { useAuth } from '@/contexts/authContext'
 
 import { NewTherapeuticClassDialog } from './new-therapeutic-class-dialog'
-import { StockTableFilters } from './therapeutic-class-table-filters'
+import { TherapeuticClassTableFilters } from './therapeutic-class-table-filters'
 import { TherapeuticClassTableRow } from './therapeutic-class-table-row'
 
 export function TherapeuticClass() {
   const { token } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
+
+  const query = searchParams.get('query')
+
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
 
   const { data: therapeuticClassesResult } = useQuery({
-    queryKey: ['therapeutic-class', pageIndex],
-    queryFn: () => fetchTherapeuticClasses({ page: pageIndex }, token ?? ''),
+    queryKey: ['therapeutic-class', pageIndex, query],
+    queryFn: () =>
+      fetchTherapeuticClasses({ page: pageIndex, query }, token ?? ''),
   })
 
   function handlePagination(pageIndex: number) {
@@ -46,7 +50,7 @@ export function TherapeuticClass() {
         </h1>
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            <StockTableFilters />
+            <TherapeuticClassTableFilters />
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant={'default'}>Nova Classe Terapeutica</Button>
@@ -59,7 +63,7 @@ export function TherapeuticClass() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[64px]"></TableHead>
-                  <TableHead className="w-[180px]">Nome</TableHead>
+                  <TableHead className="w-[300px]">Nome</TableHead>
                   <TableHead>Descrição</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
