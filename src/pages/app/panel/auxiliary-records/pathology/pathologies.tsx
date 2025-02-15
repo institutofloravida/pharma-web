@@ -24,10 +24,13 @@ export function Pathologies() {
   const { token } = useAuth()
 
   const [searchParams, setSearchParams] = useSearchParams()
+
+  const query = searchParams.get('query')
+
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: pathologiesResult } = useQuery({
-    queryKey: ['pathologies', page],
-    queryFn: () => fetchPathologies({ page }, token ?? ''),
+    queryKey: ['pathologies', page, query],
+    queryFn: () => fetchPathologies({ page, query }, token ?? ''),
   })
 
   function handlePagination(pageIndex: number) {
