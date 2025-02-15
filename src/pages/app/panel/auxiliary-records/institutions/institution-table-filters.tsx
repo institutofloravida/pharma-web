@@ -17,7 +17,17 @@ import { Input } from '@/components/ui/input'
 
 const institutionsFiltersSchema = z.object({
   query: z.string().optional(),
-  cnpj: z.string().optional(),
+  cnpj: z
+    .string()
+    .optional()
+    .superRefine((value, ctx) => {
+      if (value && value.length !== 14) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'O CNPJ deve ter exatamente 14 dígitos.',
+        })
+      }
+    }),
 })
 
 type InstitutionsFiltersSchema = z.infer<typeof institutionsFiltersSchema>
@@ -83,10 +93,10 @@ export function InstitutionTableFilters() {
           name="query"
           render={({ field }) => (
             <FormItem className="h-8 w-auto">
-              <FormMessage />
               <FormControl>
                 <Input placeholder="Nome..." {...field} />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
