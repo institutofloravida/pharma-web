@@ -1,11 +1,15 @@
 import { PenLine, Search, Trash } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
 
+import { UpdatePharmaceuticalFormDialog } from './update-pharmaceutical-form-dialog'
+
 export interface PharmaceuticalFormTableRowProps {
   pharmaceuticalForm: {
+    id: string
     name: string
   }
 }
@@ -13,6 +17,8 @@ export interface PharmaceuticalFormTableRowProps {
 export function PharmaceuticalFormTableRow({
   pharmaceuticalForm,
 }: PharmaceuticalFormTableRowProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
     <TableRow>
       <TableCell>
@@ -31,9 +37,17 @@ export function PharmaceuticalFormTableRow({
       </TableCell>
 
       <TableCell>
-        <Button variant={'outline'} size={'xs'}>
-          <PenLine className="h-3 w-3" />
-        </Button>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button variant={'outline'} size={'xs'}>
+              <PenLine className="h-3 w-3" />
+            </Button>
+          </DialogTrigger>
+          <UpdatePharmaceuticalFormDialog
+            open={isOpen}
+            pharmaceuticalformId={pharmaceuticalForm.id}
+          />
+        </Dialog>
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>

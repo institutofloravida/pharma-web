@@ -25,9 +25,12 @@ export function PharmaceuticalForms() {
 
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+
+  const query = searchParams.get('query')
+
   const { data: pharmaceuticalformsResult } = useQuery({
-    queryKey: ['pharmaceutical-forms', page],
-    queryFn: () => fetchPharmaceuticalForms({ page }, token ?? ''),
+    queryKey: ['pharmaceutical-forms', page, query],
+    queryFn: () => fetchPharmaceuticalForms({ page, query }, token ?? ''),
   })
 
   function handlePagination(pageIndex: number) {
