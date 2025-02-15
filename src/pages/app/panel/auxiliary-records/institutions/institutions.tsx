@@ -24,10 +24,15 @@ export function Institutions() {
   const { token } = useAuth()
 
   const [searchParams, setSearchParams] = useSearchParams()
+
+  const query = searchParams.get('query')
+  const cnpj = searchParams.get('cnpj')
+
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: institutionsResult } = useQuery({
-    queryKey: ['institutions', pageIndex],
-    queryFn: () => fetchInstitutions({ page: pageIndex }, token ?? ''),
+    queryKey: ['institutions', pageIndex, query, cnpj],
+    queryFn: () =>
+      fetchInstitutions({ page: pageIndex, cnpj, query }, token ?? ''),
   })
 
   function handlePagination(pageIndex: number) {
@@ -43,7 +48,7 @@ export function Institutions() {
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Instituições</h1>
         <div className="space-y-2.5">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pb-6">
             <InstitutionTableFilters />
             <Dialog>
               <DialogTrigger asChild>

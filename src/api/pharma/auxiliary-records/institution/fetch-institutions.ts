@@ -4,6 +4,7 @@ import type { Meta } from '../../_types/meta'
 export interface FetchInstitutionsQuery {
   page?: number | null
   query?: string | null
+  cnpj?: string | null
 }
 
 export interface Institution {
@@ -19,7 +20,7 @@ interface FetchInstitutionsResponse {
 }
 
 export async function fetchInstitutions(
-  { page }: FetchInstitutionsQuery,
+  { page, cnpj, query }: FetchInstitutionsQuery,
   token: string,
 ) {
   const response = await apiPharma.get<FetchInstitutionsResponse>(
@@ -30,6 +31,8 @@ export async function fetchInstitutions(
       },
       params: {
         page,
+        query,
+        cnpj,
       },
     },
   )
