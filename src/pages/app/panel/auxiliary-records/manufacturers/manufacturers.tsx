@@ -25,9 +25,13 @@ export function Manufacturers() {
 
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+
+  const query = searchParams.get('query') ?? ''
+  const cnpj = searchParams.get('cnpj') ?? ''
+
   const { data: manufacturersResult } = useQuery({
-    queryKey: ['manufacturers', page],
-    queryFn: () => fetchManufacturers({ page }, token ?? ''),
+    queryKey: ['manufacturers', page, query, cnpj],
+    queryFn: () => fetchManufacturers({ page, query, cnpj }, token ?? ''),
   })
 
   function handlePagination(pageIndex: number) {
@@ -43,7 +47,7 @@ export function Manufacturers() {
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Fabricantes</h1>
         <div className="space-y-2.5">
-          <div className="flex items-center justify-between">
+          <div className="mb-8 flex items-center justify-between">
             <ManufacturerTableFilters />
             <Dialog>
               <DialogTrigger asChild>
