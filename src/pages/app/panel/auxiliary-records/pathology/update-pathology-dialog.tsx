@@ -25,6 +25,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
@@ -58,7 +59,7 @@ export function UpdatePathologyDialog({
 }: UpdatePathologyProps) {
   const { token } = useAuth()
 
-  const { data: pathology } = useQuery({
+  const { data: pathology, isLoading } = useQuery({
     queryKey: ['pathology', pathologyId],
     queryFn: () => getPathology({ id: pathologyId }, token ?? ''),
     enabled: open,
@@ -111,19 +112,23 @@ export function UpdatePathologyDialog({
           onSubmit={form.handleSubmit(handleUpdatePathology)}
           className="grid grid-cols-3 space-y-2"
         >
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem className="col-span-3">
-                <FormLabel>Nome</FormLabel>
-                <FormControl>
-                  <Input placeholder="Nome..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {isLoading ? (
+            <Skeleton className="col-span-3 h-8" />
+          ) : (
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="col-span-3">
+                  <FormLabel>Nome</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nome..." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
 
           <DialogFooter className="col-span-3 grid justify-end">
             <div className="flex gap-2">
