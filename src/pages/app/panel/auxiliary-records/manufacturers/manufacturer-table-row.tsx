@@ -1,8 +1,11 @@
 import { PenLine, Search, Trash } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
+
+import { UpdateManufacturerDialog } from './update-manufacturer-dialog'
 
 export interface ManufacturerTableRowProps {
   manufacturer: {
@@ -16,6 +19,8 @@ export interface ManufacturerTableRowProps {
 export function ManufacturerTableRow({
   manufacturer,
 }: ManufacturerTableRowProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
     <TableRow>
       <TableCell>
@@ -38,9 +43,17 @@ export function ManufacturerTableRow({
       <TableCell>{manufacturer.description}</TableCell>
 
       <TableCell>
-        <Button variant={'outline'} size={'xs'}>
-          <PenLine className="h-3 w-3" />
-        </Button>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button variant={'outline'} size={'xs'}>
+              <PenLine className="h-3 w-3" />
+            </Button>
+          </DialogTrigger>
+          <UpdateManufacturerDialog
+            open={isOpen}
+            manufacturerId={manufacturer.id}
+          />
+        </Dialog>
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>

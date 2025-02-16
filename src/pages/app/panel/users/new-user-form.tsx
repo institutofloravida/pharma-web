@@ -567,7 +567,7 @@ export function NewUserForm() {
               name="pathologiesIds"
               render={({ field }) => (
                 <FormItem className="col-span-6 row-span-2 ml-5 grid">
-                  <FormLabel>Pathologias</FormLabel>
+                  <FormLabel>Patologias</FormLabel>
                   <ComboboxMany
                     field={field}
                     items={pathologiesResult?.pathologies ?? []}
@@ -577,8 +577,8 @@ export function NewUserForm() {
                     query={queryPathology}
                     isFetching={isFetchingPathology}
                     formatItem={(item) => `${item.name}`}
-                    placeholder="Selecione uma pathologia"
-                    placeholderAferSelected="pathologia(s) selecionada(s)"
+                    placeholder="Selecione uma patologia"
+                    placeholderAferSelected="patologia(s) selecionada(s)"
                   />
                   <FormMessage />
                 </FormItem>

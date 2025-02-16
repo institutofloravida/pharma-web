@@ -90,12 +90,12 @@ export function UpdatePathologyDialog({
       })
 
       toast({
-        title: `Pathologia atualizada com sucesso!`,
+        title: `Patologia atualizada com sucesso!`,
       })
     } catch (error) {
       const errorMessage = handleApiError(error)
       toast({
-        title: 'Erro ao tentar atualizar a pathologia.',
+        title: 'Erro ao tentar atualizar a patologia.',
         description: errorMessage,
         variant: 'destructive',
       })
@@ -105,7 +105,7 @@ export function UpdatePathologyDialog({
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
-        <DialogTitle>Atualizar Pathologia</DialogTitle>
+        <DialogTitle>Atualizar Patologia</DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form
