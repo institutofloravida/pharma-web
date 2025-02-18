@@ -12,7 +12,7 @@ export const apiViaCep = axios.create({
   baseURL: env.VITE_API_VIA_CEP_URL,
 })
 
-apiPharma.interceptors.request.use(async (config) => {
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-  return config
-})
+//apiPharma.interceptors.request.use(async (config) => {
+//  await new Promise((resolve) => setTimeout(resolve, 1000))
+//  return config
+//})
