@@ -26,6 +26,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
@@ -118,56 +119,66 @@ export function UpdateInstitutionDialog({
           onSubmit={form.handleSubmit(handleUpdateInstitution)}
           className="grid grid-cols-3 space-y-2"
         >
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem className="col-span-3">
-                <FormLabel>Nome</FormLabel>
-                <FormControl>
-                  <Input placeholder="Nome..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {institution ? (
+            <>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="col-span-3">
+                    <FormLabel>Nome</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nome..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <FormField
-            control={form.control}
-            name="cnpj"
-            render={({ field }) => (
-              <FormItem className="col-span-3 grid">
-                <FormLabel>CNPJ</FormLabel>
-                <FormControl>
-                  <InputMask
-                    {...field}
-                    mask="99.999.999/9999-99"
-                    placeholder="CNPJ..."
-                    onChange={(e: any) =>
-                      field.onChange(e.target.value.replace(/\D/g, ''))
-                    }
-                  >
-                    {(inputProps: any) => <Input {...inputProps} />}
-                  </InputMask>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              <FormField
+                control={form.control}
+                name="cnpj"
+                render={({ field }) => (
+                  <FormItem className="col-span-3 grid">
+                    <FormLabel>CNPJ</FormLabel>
+                    <FormControl>
+                      <InputMask
+                        {...field}
+                        mask="99.999.999/9999-99"
+                        placeholder="CNPJ..."
+                        onChange={(e: any) =>
+                          field.onChange(e.target.value.replace(/\D/g, ''))
+                        }
+                      >
+                        {(inputProps: any) => <Input {...inputProps} />}
+                      </InputMask>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem className="col-span-3 grid">
-                <FormLabel>Descrição</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Descrição..." {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="col-span-3 grid">
+                    <FormLabel>Descrição</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Descrição..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          ) : (
+            <>
+              <Skeleton className="col-span-3 h-8" />
+              <Skeleton className="col-span-3 h-8" />
+              <Skeleton className="col-span-3 h-24" />
+            </>
+          )}
 
           <DialogFooter className="col-span-3 grid justify-end">
             <div className="flex gap-2">
