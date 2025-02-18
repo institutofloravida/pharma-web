@@ -22,15 +22,18 @@ export async function fetchUnitsMeasure(
   { page, query }: FetchUnitMeasuresQuery,
   token: string,
 ) {
-  const response = await apiPharma.get<FetchUnitMeasuresResponse>('/unit-measure', {
-    headers: {
-      Authorization: `Bearer ${token}`,
+  const response = await apiPharma.get<FetchUnitMeasuresResponse>(
+    '/unit-measure',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      params: {
+        page,
+        query,
+      },
     },
-    params: {
-      page,
-      query,
-    },
-  })
+  )
 
   return response.data
 }

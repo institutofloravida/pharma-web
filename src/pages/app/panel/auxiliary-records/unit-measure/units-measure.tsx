@@ -24,9 +24,12 @@ export function UnitMeasure() {
   const { token } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+
+  const query = searchParams.get('query')
+
   const { data: unitsMeasureResult } = useQuery({
-    queryKey: ['units-measure', page],
-    queryFn: () => fetchUnitsMeasure({ page }, token ?? ''),
+    queryKey: ['units-measure', page, query],
+    queryFn: () => fetchUnitsMeasure({ page, query }, token ?? ''),
   })
 
   function handlePagination(pageIndex: number) {
