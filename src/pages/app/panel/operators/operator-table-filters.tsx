@@ -1,40 +1,215 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { useSearchParams } from 'react-router-dom'
+import { z } from 'zod'
 
+import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
+import { OperatorRole } from '@/api/pharma/operators/register-operator'
+import { Combobox } from '@/components/comboboxes/pharmaceutical-form-combobox'
+import { SelectRole } from '@/components/selects/select-role'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { useAuth } from '@/contexts/authContext'
+
+const unitsmeasureFiltersSchema = z.object({
+  name: z.string().optional(),
+  institutionId: z.string().optional(),
+  role: z.nativeEnum(OperatorRole).optional().or(z.literal('')),
+  email: z.string().email().or(z.literal('')),
+})
+
+type UnitsMeasureFiltersSchema = z.infer<typeof unitsmeasureFiltersSchema>
 
 export function OperatorTableFilters() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [queryInstitution, setQueryInstitution] = useState('')
+
+  const { token } = useAuth()
+
+  const name = searchParams.get('name')
+  const email = searchParams.get('email')
+  const institutionId = searchParams.get('institutionId')
+  const role = searchParams.get('role')
+
+  const form = useForm<UnitsMeasureFiltersSchema>({
+    resolver: zodResolver(unitsmeasureFiltersSchema),
+    defaultValues: {
+      name: name ?? '',
+      email: email ?? '',
+      institutionId: institutionId ?? '',
+      role:
+        role && Object.values(OperatorRole).includes(role as OperatorRole)
+          ? (role as OperatorRole)
+          : undefined,
+    },
+  })
+
+  function handleFilter({
+    name,
+    email,
+    institutionId,
+    role,
+  }: UnitsMeasureFiltersSchema) {
+    setSearchParams((state) => {
+      if (name) {
+        state.set('name', name)
+      } else {
+        state.delete('name')
+      }
+
+      if (email) {
+        state.set('email', email)
+      } else {
+        state.delete('email')
+      }
+
+      if (institutionId) {
+        state.set('institutionId', institutionId)
+      } else {
+        state.delete('institutionId')
+      }
+
+      if (role) {
+        state.set('role', role)
+      } else {
+        state.delete('role')
+      }
+
+      state.set('page', '1')
+
+      return state
+    })
+  }
+
+  function handleClearFilters() {
+    setSearchParams((state) => {
+      state.delete('name')
+      state.delete('email')
+      state.delete('institutionId')
+      state.delete('role')
+      state.set('page', '1')
+
+      return state
+    })
+
+    form.reset({
+      name: '',
+      email: '',
+      institutionId: '',
+      role: undefined,
+    })
+  }
+
+  const { data: institutionsResult, isFetching: isFetchingInstitutions } =
+    useQuery({
+      queryKey: ['institutions', queryInstitution],
+      queryFn: () =>
+        fetchInstitutions({ page: 1, query: queryInstitution }, token ?? ''),
+      enabled: queryInstitution !== null,
+      staleTime: 1000,
+      refetchOnMount: true,
+    })
+
   return (
-    <form className="flex items-center gap-2">
-      <span className="text-sm font-semibold">Filtros:</span>
-      <Input placeholder="Nome do operador" className="h-8 w-[320px]" />
-      <Select>
-        <SelectTrigger className="h-8 w-[240px]">
-          <SelectValue placeholder="Selecione uma Instituição" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">Todas</SelectItem>
-          <SelectItem value="pending">Instituto Flora Vida</SelectItem>
-          <SelectItem value="canceled">UBS - módulo 32</SelectItem>
-          <SelectItem value="canceled">UBS - módulo 15</SelectItem>
-          <SelectItem value="delivering">Clínica Meliuz</SelectItem>
-        </SelectContent>
-      </Select>
-      <Button type="submit" variant={'secondary'} size={'xs'}>
-        <Search className="mr-2 h-4 w-4" />
-        Filtrar Resultados
-      </Button>
-      <Button type="button" variant={'outline'} size={'xs'}>
-        <X className="mr-2 h-4 w-4" />
-        Remover Filtros
-      </Button>
-    </form>
+    <Form {...form}>
+      <form
+        className="grid grid-cols-10 grid-rows-2 space-x-2 p-2"
+        onSubmit={form.handleSubmit(handleFilter)}
+      >
+        <span className="col-span-1 text-sm font-semibold">Filtros:</span>
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="col-span-5 h-8">
+              <FormControl>
+                <Input placeholder="Nome..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="col-span-4 h-8">
+              <FormControl>
+                <Input type="email" placeholder="Email..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="institutionId"
+          render={({ field }) => (
+            <FormItem className="col-span-3">
+              <Combobox
+                items={institutionsResult?.institutions || []}
+                field={field}
+                query={queryInstitution}
+                placeholder="Selecione uma instituição "
+                isFetching={isFetchingInstitutions}
+                onQueryChange={setQueryInstitution}
+                onSelect={(id, name) => {
+                  form.setValue('institutionId', id)
+                  setQueryInstitution(name)
+                }}
+                itemKey="id"
+                itemValue="name"
+              />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="role"
+          render={({ field }) => (
+            <FormItem className="col-span-3">
+              <SelectRole
+                onChange={field.onChange}
+                value={field.value || undefined}
+              />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button
+          type="submit"
+          variant={'secondary'}
+          size={'xs'}
+          className="col-span-2 flex justify-between"
+        >
+          <Search className="mr-2 h-4 w-4" />
+          Filtrar Resultados
+        </Button>
+        <Button
+          className="col-span-2 flex justify-between"
+          onClick={handleClearFilters}
+          type="button"
+          variant={'outline'}
+          size={'xs'}
+        >
+          <X className="mr-2 h-4 w-4" />
+          Remover Filtros
+        </Button>
+      </form>
+    </Form>
   )
 }

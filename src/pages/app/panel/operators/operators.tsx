@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchOperators } from '@/api/pharma/operators/fetch-operators'
+import { OperatorRole } from '@/api/pharma/operators/register-operator'
 import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
@@ -25,9 +26,23 @@ export function Operators() {
 
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+
+  const name = searchParams.get('name')
+  const email = searchParams.get('email')
+  const institutionId = searchParams.get('institutionId')
+  const role = searchParams.get('role')
+
+  const roleFilter =
+    role && Object.values(OperatorRole).includes(role as OperatorRole)
+      ? (role as OperatorRole)
+      : undefined
   const { data: operatorsResult } = useQuery({
-    queryKey: ['operators', page],
-    queryFn: () => fetchOperators({ page }, token ?? ''),
+    queryKey: ['operators', page, name, email, institutionId, role],
+    queryFn: () =>
+      fetchOperators(
+        { page, email, institutionId, name, role: roleFilter },
+        token ?? '',
+      ),
   })
 
   function handlePagination(pageIndex: number) {

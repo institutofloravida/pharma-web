@@ -1,4 +1,4 @@
-import type { OperatorRole } from '@/api/pharma/operators/register-operator'
+import { OperatorRole } from '@/api/pharma/operators/register-operator'
 import {
   Select,
   SelectContent,
@@ -8,13 +8,15 @@ import {
 } from '@/components/ui/select'
 
 interface SelectRoleProps {
-  value: OperatorRole
+  value?: OperatorRole
   onChange: (value: OperatorRole) => void
 }
 
 export function SelectRole({ value, onChange }: SelectRoleProps) {
   return (
-    <Select value={value} onValueChange={onChange}>
+    <Select value={value || ''} onValueChange={onChange}>
+      {' '}
+      {/* Usando '' como fallback */}
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Selecione o tipo de usuário" />
       </SelectTrigger>

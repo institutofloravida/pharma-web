@@ -1,6 +1,10 @@
 import { apiPharma } from '@/lib/axios'
 
-export type OperatorRole = 'SUPER_ADMIN' | 'MANAGER' | 'COMMON'
+export enum OperatorRole{
+  COMMON='COMMON',
+  MANAGER='MANAGER',
+  SUPER_ADMIN='SUPER_ADMIN'
+}
 
 export interface RegisterOperatorBody {
   name: string
