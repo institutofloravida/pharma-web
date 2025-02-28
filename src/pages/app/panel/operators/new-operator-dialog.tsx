@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
 import {
+  OperatorRole,
   registerOperator,
   type RegisterOperatorBody,
 } from '@/api/pharma/operators/register-operator'
@@ -32,7 +32,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
-import type { ApiErrorResponse } from '@/lib/utils/axios-error'
 import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const newOperatorSchema = z.object({
@@ -62,7 +61,6 @@ export function NewOperatorDialog() {
     mutationFn: (data: RegisterOperatorBody) =>
       registerOperator(data, token ?? ''),
     onSuccess() {
-      // Invalidate the 'operators' query to refetch data
       queryClient.invalidateQueries({
         queryKey: ['operators'],
       })
@@ -77,6 +75,7 @@ export function NewOperatorDialog() {
       staleTime: 1000,
       refetchOnMount: true,
     })
+
   const form = useForm<z.infer<typeof newOperatorSchema>>({
     resolver: zodResolver(newOperatorSchema),
     defaultValues: {
@@ -90,7 +89,7 @@ export function NewOperatorDialog() {
         name: data.name,
         email: data.email,
         password: data.password,
-        role: data.role,
+        role: OperatorRole[data.role],
         institutionsIds: data.institutionsIds,
       })
 
@@ -175,22 +174,39 @@ export function NewOperatorDialog() {
           <FormField
             control={form.control}
             name="institutionsIds"
-            render={({ field }) => (
-              <FormItem className="w-[200px]">
-                <FormLabel>Instituições</FormLabel>
-                <ComboboxMany
-                  field={field}
-                  items={institutionsResult?.institutions ?? []}
-                  itemKey="id"
-                  onChange={(selectedItems) => field.onChange(selectedItems)}
-                  onQueryChange={setQueryInstitution}
-                  query={queryInstitution}
-                  isFetching={isFetchingInstitutions}
-                  formatItem={(item) => `${item.name}`}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
+            render={({ field }) => {
+              return (
+                <FormItem className="col-span-3">
+                  <FormLabel>Instituições</FormLabel>
+                  <ComboboxMany
+                    field={{
+                      value: field.value.map((id) => {
+                        const institution =
+                          institutionsResult?.institutions.find(
+                            (inst) => inst.id === id,
+                          )
+                        return {
+                          id,
+                          value: institution
+                            ? institution.name
+                            : 'Carregando...',
+                        }
+                      }),
+                    }}
+                    items={institutionsResult?.institutions ?? []}
+                    itemKey="id"
+                    onChange={(selectedItems) =>
+                      field.onChange(selectedItems.map((item) => item.id))
+                    }
+                    onQueryChange={setQueryInstitution}
+                    query={queryInstitution}
+                    isFetching={isFetchingInstitutions}
+                    formatItem={(item) => `${item.name}`}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )
+            }}
           />
 
           <DialogFooter className="mt-2">

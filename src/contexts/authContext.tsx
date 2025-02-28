@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { createContext, ReactNode, useContext, useState } from 'react'
 
-import { getOperatorDetails } from '@/api/pharma/operators/get-operator-details'
-import type { Operator } from '@/api/operators/get-operators'
+import { getOperatorDetails } from '@/api/pharma/auth/get-operator-details'
+import { Operator } from '@/api/pharma/operators/fetch-operators'
 import { apiPharma } from '@/lib/axios'
 import { queryClient } from '@/lib/react-query'
 
