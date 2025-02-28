@@ -57,11 +57,7 @@ export function Medicines() {
                   Novo Medicamento
                 </Button>
               </DialogTrigger>
-              <NewMedicineDialog
-                therapeuticClasses={
-                  therapeuticClasses?.therapeutic_classes ?? []
-                }
-              />
+              <NewMedicineDialog />
             </Dialog>
           </div>
           <div className="rounded-md border">

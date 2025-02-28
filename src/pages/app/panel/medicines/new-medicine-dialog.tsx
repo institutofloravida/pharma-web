@@ -1,20 +1,27 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import type { TherapeuticClass } from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
+import {
+  fetchTherapeuticClasses,
+  type TherapeuticClass,
+} from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
 import {
   registerMedicine,
   type RegisterMedicineBody,
 } from '@/api/pharma/medicines/resgister-medicine'
+import { ComboboxMany } from '@/components/comboboxes/combobox-many'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -34,6 +41,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
+import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const FormSchema = z.object({
   therapeuticClassesIds: z
@@ -48,10 +56,11 @@ interface NewMedicineDialogProps {
   therapeuticClasses: TherapeuticClass[]
 }
 
-export function NewMedicineDialog({
-  therapeuticClasses,
-}: NewMedicineDialogProps) {
+export function NewMedicineDialog() {
   const { token } = useAuth()
+
+  const [queryTherapeuticClass, setQueryTherapeuticClass] = useState('')
+
   const { mutateAsync: registerMedicineFn } = useMutation({
     mutationFn: (data: RegisterMedicineBody) =>
       registerMedicine(data, token ?? ''),
@@ -66,6 +75,14 @@ export function NewMedicineDialog({
         )
       }
     },
+  })
+
+  const {
+    data: therapeuticClassesResult,
+    isLoading: isLoadingTherapeuticClasses,
+  } = useQuery({
+    queryKey: ['therapeutic-classes'],
+    queryFn: () => fetchTherapeuticClasses({ page: 1 }, token ?? ''),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -84,27 +101,20 @@ export function NewMedicineDialog({
       })
 
       toast({
-        title: 'You submitted the following values:',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
+        title: 'Medicamento cadastrado com Sucesso!',
       })
     } catch (error) {
+      const errorMessage = handleApiError(error)
       toast({
-        title: 'Error ao cadastrar o estoque',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(error, null, 2)}</code>
-          </pre>
-        ),
+        title: 'Error ao cadastrar o medicamento',
+        description: errorMessage,
+        variant: 'destructive',
       })
     }
   }
   return (
-    <DialogContent className="flex flex-col items-center">
-      <DialogHeader className="items-center">
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
         <DialogTitle>Novo Medicamento</DialogTitle>
         <DialogDescription>
           Preencha os dados para cadastrar um novo medicamento.
@@ -114,13 +124,13 @@ export function NewMedicineDialog({
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(handleRegisterMedicine)}
-          className="space-y-8"
+          className="grid grid-cols-3 space-y-2"
         >
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-3">
                 <FormLabel>Nome</FormLabel>
                 <FormControl>
                   <Input placeholder="Nome do Medicamento..." {...field} />
@@ -133,7 +143,7 @@ export function NewMedicineDialog({
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-3">
                 <FormLabel>Descrição</FormLabel>
                 <FormControl>
                   <Textarea
@@ -148,63 +158,48 @@ export function NewMedicineDialog({
           <FormField
             control={form.control}
             name="therapeuticClassesIds"
-            render={() => (
-              <FormItem>
-                <div className="mb-4">
-                  <FormLabel className="text-base">
-                    Classes Terapêuticas
-                  </FormLabel>
-                  <FormDescription>
-                    Selecione as classes terapẽuticas que o medicamento possui.
-                  </FormDescription>
-                </div>
-                <ScrollArea
-                  className="m-10 h-48 rounded-md"
-                  aria-label="Selectable items"
-                >
-                  <div className="p-2">
-                    {therapeuticClasses.map((item) => (
-                      <>
-                        <FormField
-                          control={form.control}
-                          name="therapeuticClassesIds"
-                          render={({ field }) => (
-                            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(item.id)}
-                                  onCheckedChange={(checked) =>
-                                    checked
-                                      ? field.onChange([
-                                          ...field.value,
-                                          item.id,
-                                        ])
-                                      : field.onChange(
-                                          field.value?.filter(
-                                            (value) => value !== item.id,
-                                          ),
-                                        )
-                                  }
-                                />
-                              </FormControl>
-                              <FormLabel className="text-sm font-normal">
-                                {item.name}
-                              </FormLabel>
-                            </FormItem>
-                          )}
-                        />
-                        <Separator className="my-2" />
-                      </>
-                    ))}
-                  </div>
-                </ScrollArea>
-                <FormMessage>
-                  {form.formState.errors.therapeuticClassesIds?.message}
-                </FormMessage>
+            render={({ field }) => (
+              <FormItem className="col-span-3 row-span-2">
+                <FormLabel>Classes Terapeuticas</FormLabel>
+                <ComboboxMany
+                  field={{
+                    value: field.value.map((id) => {
+                      const therapeuticClass =
+                        therapeuticClassesResult?.therapeutic_classes.find(
+                          (inst) => inst.id === id,
+                        )
+                      return {
+                        id,
+                        value: therapeuticClass
+                          ? therapeuticClass.name
+                          : 'Carregando...',
+                      }
+                    }),
+                  }}
+                  items={therapeuticClassesResult?.therapeutic_classes ?? []}
+                  itemKey="id"
+                  onChange={(selectedItems) =>
+                    field.onChange(selectedItems.map((item) => item.id))
+                  }
+                  onQueryChange={setQueryTherapeuticClass}
+                  query={queryTherapeuticClass}
+                  isFetching={isLoadingTherapeuticClasses}
+                  formatItem={(item) => `${item.name}`}
+                  placeholder="Selecione uma classe terapeutica"
+                  placeholderAferSelected="classe(s) terapeutica(s)"
+                />
+                <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit">Submit</Button>
+          <DialogFooter className="col-span-3 grid justify-end">
+            <div className="flex-gap-2">
+              <DialogClose asChild>
+                <Button variant={'ghost'}>Cancelar</Button>
+              </DialogClose>
+              <Button type="submit">Enviar</Button>
+            </div>
+          </DialogFooter>
         </form>
       </Form>
     </DialogContent>
