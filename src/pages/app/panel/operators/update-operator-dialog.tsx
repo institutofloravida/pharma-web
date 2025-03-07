@@ -57,13 +57,27 @@ const updateOperatorSchema = z
       )
       .min(1, {
         message: 'Selecione pelo menos uma instituição',
-      }),
+      })
+      .optional(),
   })
+  .refine(
+    (data) => {
+      if (data.role === 'SUPER_ADMIN') {
+        return true
+      }
+      return data.institutionsIds && data.institutionsIds.length > 0
+    },
+    {
+      message: 'Selecione pelo menos uma instituição',
+      path: ['institutionsIds'],
+    },
+  )
   .transform((data) => ({
     ...data,
-    institutionsIds: data.institutionsIds.map((item) =>
-      typeof item === 'string' ? item : item.id,
-    ),
+    institutionsIds:
+      data.institutionsIds?.map((item) =>
+        typeof item === 'string' ? item : item.id,
+      ) ?? [],
   }))
 
 type UpdateOperatorSchema = z.infer<typeof updateOperatorSchema>
@@ -106,6 +120,9 @@ export function UpdateOperatorDialog({
     },
   })
 
+  const roleWatch = form.watch('role')
+  const isSuperAdmin = roleWatch === 'SUPER_ADMIN'
+
   const { mutateAsync: updateOperatorFn } = useMutation({
     mutationFn: (data: UpdateOperatorBody) => updateOperator(data, token ?? ''),
     onSuccess() {
@@ -122,16 +139,16 @@ export function UpdateOperatorDialog({
         name: data.name,
         email: data.email,
         role: data.role ? OperatorRole[data.role] : undefined,
-        institutionsIds: data.institutionsIds,
+        institutionsIds: isSuperAdmin ? [] : data.institutionsIds,
       })
 
       toast({
-        title: `Instituição atualizada com sucesso!`,
+        title: `Operador atualizada com sucesso!`,
       })
     } catch (error) {
       const errorMessage = handleApiError(error)
       toast({
-        title: 'Erro ao tentar atualizar a instiuição.',
+        title: 'Erro ao tentar atualizar a operador.',
         description: errorMessage,
         variant: 'destructive',
       })
@@ -141,7 +158,7 @@ export function UpdateOperatorDialog({
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
-        <DialogTitle>Atualizar Instituição</DialogTitle>
+        <DialogTitle>Atualizar Operador</DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form
@@ -188,43 +205,45 @@ export function UpdateOperatorDialog({
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="institutionsIds"
-                render={({ field }) => {
-                  return (
-                    <FormItem className="col-span-3">
-                      <FormLabel>Instituições</FormLabel>
-                      <ComboboxMany
-                        field={{
-                          value: field.value.map((id) => {
-                            const institution =
-                              institutionsResult?.institutions.find(
-                                (inst) => inst.id === id,
-                              )
-                            return {
-                              id,
-                              value: institution
-                                ? institution.name
-                                : 'Carregando...',
-                            }
-                          }),
-                        }}
-                        items={institutionsResult?.institutions ?? []}
-                        itemKey="id"
-                        onChange={(selectedItems) =>
-                          field.onChange(selectedItems.map((item) => item.id))
-                        }
-                        onQueryChange={setQueryInstitution}
-                        query={queryInstitution}
-                        isFetching={isFetchingInstitutions}
-                        formatItem={(item) => `${item.name}`}
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )
-                }}
-              />
+              {!isSuperAdmin && (
+                <FormField
+                  control={form.control}
+                  name="institutionsIds"
+                  render={({ field }) => {
+                    return (
+                      <FormItem className="col-span-3">
+                        <FormLabel>Instituições</FormLabel>
+                        <ComboboxMany
+                          field={{
+                            value: field.value.map((id) => {
+                              const institution =
+                                institutionsResult?.institutions.find(
+                                  (inst) => inst.id === id,
+                                )
+                              return {
+                                id,
+                                value: institution
+                                  ? institution.name
+                                  : 'Carregando...',
+                              }
+                            }),
+                          }}
+                          items={institutionsResult?.institutions ?? []}
+                          itemKey="id"
+                          onChange={(selectedItems) =>
+                            field.onChange(selectedItems.map((item) => item.id))
+                          }
+                          onQueryChange={setQueryInstitution}
+                          query={queryInstitution}
+                          isFetching={isFetchingInstitutions}
+                          formatItem={(item) => `${item.name}`}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )
+                  }}
+                />
+              )}
             </>
           ) : (
             <>
