@@ -4,7 +4,6 @@ import { useMutation } from '@tanstack/react-query'
 import { register } from 'module'
 import { useForm } from 'react-hook-form'
 import InputMask from 'react-input-mask'
-import { toast } from 'sonner'
 import { z } from 'zod'
 
 import {
@@ -31,7 +30,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/authContext'
+import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
+import { handleApiError } from '@/lib/utils/handle-api-error'
 const newManufacturerSchema = z.object({
   name: z
     .string({
@@ -83,10 +84,15 @@ export function NewManufacturerDialog() {
         cnpj: data.cnpj,
         description: data.description,
       })
-
-      toast.success(`Fabricante ${data.name} registrada com sucesso!`)
+      toast({
+        title: 'Fabricante cadastrado com suceso!',
+      })
     } catch (error) {
-      toast.error('Não foi possível registra o fabricante. Tente Novamente!')
+      const errorMessage = handleApiError(error)
+      toast({
+        title: 'Error ao cadastrar o fabricante',
+        description: errorMessage,
+      })
     }
   }
 

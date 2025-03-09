@@ -33,6 +33,7 @@ import { Switch } from '@/components/ui/switch'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
+import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const FormSchema = z.object({
   name: z
@@ -88,21 +89,13 @@ export function NewStockDialog() {
       })
 
       toast({
-        title: 'You submitted the following values:',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
+        title: 'Estoque cadastrado com suceso!',
       })
     } catch (error) {
+      const errorMessage = handleApiError(error)
       toast({
         title: 'Error ao cadastrar o estoque',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(error, null, 2)}</code>
-          </pre>
-        ),
+        description: errorMessage,
       })
     }
   }

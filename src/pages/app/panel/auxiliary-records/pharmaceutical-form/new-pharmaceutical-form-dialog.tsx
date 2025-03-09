@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { z } from 'zod'
 
 import {
@@ -20,7 +19,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/contexts/authContext'
+import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
+import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const newPharmaceuticalFormSchema = z.object({
   name: z.string().min(3),
@@ -62,11 +63,16 @@ export function NewPharmaceuticalFormDialog() {
         name: data.name,
       })
 
-      toast.success(`Forma farmacêutica ${data.name} registrada com sucesso!`)
+      toast({
+        title: 'Forma farmaceutica cadastrada com sucesso!',
+      })
     } catch (error) {
-      toast.error(
-        'Não foi possível registrar a forma farmacêutica. Tente Novamente!',
-      )
+      const errorMessage = handleApiError(error)
+
+      toast({
+        title: 'Error ao cadastrar a forma farmacêutica!',
+        description: errorMessage,
+      })
     }
   }
 
