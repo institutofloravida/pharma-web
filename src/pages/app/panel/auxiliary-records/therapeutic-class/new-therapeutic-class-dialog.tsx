@@ -9,8 +9,10 @@ import {
 } from '@/api/pharma/auxiliary-records/therapeutic-class/register-therapeutic-class'
 import { Button } from '@/components/ui/button'
 import {
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -27,6 +29,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
+import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const FormSchema = z.object({
   name: z
@@ -72,29 +75,22 @@ export function NewTherapeuticClassDialog() {
       })
 
       toast({
-        title: 'Therapeutic-class',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
+        title: 'Classe Terapêutica',
+        description: 'Classe Terapêutica cadastrada com sucesso!',
       })
     } catch (error) {
+      const errorMessage = handleApiError(error)
+
       toast({
-        title: 'Error ao cadastrar a classe terapuetica',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">
-              {JSON.stringify(error.message, null, 2)}
-            </code>
-          </pre>
-        ),
+        title: 'Error ao cadastrar a classe terapêutica',
+        description: errorMessage,
+        variant: 'destructive',
       })
     }
   }
 
   return (
-    <DialogContent>
+    <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
         <DialogTitle>Nova Classe Terapêutica</DialogTitle>
         <DialogDescription>
@@ -104,13 +100,13 @@ export function NewTherapeuticClassDialog() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-2/3 space-y-6"
+          className="grid grid-cols-3 space-y-2"
         >
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-3">
                 <FormLabel>Nome</FormLabel>
                 <FormControl>
                   <Input placeholder="Classe Terapêutica..." {...field} />
@@ -124,7 +120,7 @@ export function NewTherapeuticClassDialog() {
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-3">
                 <FormLabel>Descrição</FormLabel>
                 <FormControl>
                   <Textarea
@@ -138,7 +134,16 @@ export function NewTherapeuticClassDialog() {
             )}
           />
 
-          <Button type="submit">Submit</Button>
+          <DialogFooter className="col-span-3 grid justify-end">
+            <div className="flex gap-2">
+              <DialogClose asChild>
+                <Button variant={'ghost'}>Cancelar</Button>
+              </DialogClose>
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                Atualizar
+              </Button>
+            </div>
+          </DialogFooter>
         </form>
       </Form>
     </DialogContent>

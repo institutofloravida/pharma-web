@@ -1,11 +1,15 @@
 import { PenLine, Search, Trash } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
 
+import { UpdateStockDialog } from './update-stock-dialog'
+
 export interface StockTableRowProps {
   stock: {
+    id: string
     name: string
     status: boolean
     institutionName: string
@@ -13,6 +17,8 @@ export interface StockTableRowProps {
 }
 
 export function StockTableRow({ stock }: StockTableRowProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
     <TableRow>
       <TableCell>
@@ -47,9 +53,14 @@ export function StockTableRow({ stock }: StockTableRowProps) {
       <TableCell>{stock.institutionName}</TableCell>
 
       <TableCell>
-        <Button variant={'outline'} size={'xs'}>
-          <PenLine className="h-3 w-3" />
-        </Button>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button variant={'outline'} size={'xs'}>
+              <PenLine className="h-3 w-3" />
+            </Button>
+          </DialogTrigger>
+          <UpdateStockDialog open={isOpen} stockId={stock.id} />
+        </Dialog>
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>

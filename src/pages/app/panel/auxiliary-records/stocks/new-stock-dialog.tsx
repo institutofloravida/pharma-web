@@ -15,6 +15,7 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -107,7 +108,7 @@ export function NewStockDialog() {
   }
 
   return (
-    <DialogContent className="flex flex-col items-center">
+    <DialogContent className="sm:max-w-[425px]">
       <DialogHeader className="items-center">
         <DialogTitle>Novo Estoque</DialogTitle>
         <DialogDescription>Cadastre seu novo estoque.</DialogDescription>
@@ -115,13 +116,13 @@ export function NewStockDialog() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-2/3 space-y-6"
+          className="grid grid-cols-3 space-y-2"
         >
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-3">
                 <FormLabel>Nome</FormLabel>
                 <FormControl>
                   <Input placeholder="Nome do estoque..." {...field} />
@@ -135,7 +136,7 @@ export function NewStockDialog() {
             control={form.control}
             name="institutionId"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-3">
                 <FormLabel>Instituição</FormLabel>
                 <FormControl>
                   <SelectInstitutions
@@ -153,7 +154,7 @@ export function NewStockDialog() {
             control={form.control}
             name="status"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-2 shadow-sm">
+              <FormItem className="col-span-3 flex flex-row items-center justify-between rounded-lg border p-2 shadow-sm">
                 <div className="space-y-0.5">
                   <FormLabel>Status</FormLabel>
                   <FormDescription>
@@ -170,12 +171,16 @@ export function NewStockDialog() {
               </FormItem>
             )}
           />
-          <div className="flex items-center gap-3">
-            <DialogClose asChild>
-              <Button variant={'outline'}>Cancelar</Button>
-            </DialogClose>
-            <Button type="submit">Submit</Button>
-          </div>
+          <DialogFooter className="col-span-3 grid justify-end">
+            <div className="flex gap-2">
+              <DialogClose asChild>
+                <Button variant={'ghost'}>Cancelar</Button>
+              </DialogClose>
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                Salvar
+              </Button>
+            </div>
+          </DialogFooter>
         </form>
       </Form>
     </DialogContent>

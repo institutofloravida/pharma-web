@@ -8,7 +8,7 @@ import { unknown, z } from 'zod'
 
 import { fetchCities } from '@/api/ibge/fetch-cities'
 import { fetchStates } from '@/api/ibge/fetch-states'
-import { fetchPathologies } from '@/api/pharma/auxiliary-records/pathology/fetch-pathology'
+import { fetchPathologies } from '@/api/pharma/auxiliary-records/pharmaceutical-form/pathology/fetch-pathology'
 import {
   registerUser,
   type RegisterUserBody,
