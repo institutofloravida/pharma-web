@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { Formatter } from '@/lib/utils/formaters/formaters'
 
 import { UpdateManufacturerDialog } from './update-manufacturer-dialog'
 
@@ -38,7 +39,7 @@ export function ManufacturerTableRow({
         {manufacturer.name}
       </TableCell>
       <TableCell className="text-muted-foreground">
-        {manufacturer.cnpj}
+        {Formatter.cnpj(manufacturer.cnpj)}
       </TableCell>
       <TableCell>{manufacturer.description}</TableCell>
 
