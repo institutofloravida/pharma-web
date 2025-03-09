@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { useMutation } from '@tanstack/react-query'
-import { register } from 'module'
 import { useForm } from 'react-hook-form'
 import InputMask from 'react-input-mask'
 import { z } from 'zod'
@@ -27,7 +26,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'

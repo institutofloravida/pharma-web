@@ -32,6 +32,7 @@ import { Input } from '@/components/ui/input'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
+import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const FormSchema = z.object({
   medicineId: z.string({
@@ -47,11 +48,6 @@ const FormSchema = z.object({
     required_error: 'Selecione uma unidade de medida',
   }),
 })
-
-// type NewMedicineVariantSchema = z.infer<typeof FormSchema>
-// interface NewMedicineVariantDialogProps {
-//   medicinesVariants: MedicineVariant[]
-// }
 
 export function NewMedicineVariantDialog() {
   const [queryMedicine, setQueryMedicine] = useState('')
@@ -146,21 +142,13 @@ export function NewMedicineVariantDialog() {
       })
 
       toast({
-        title: 'You submitted the following values:',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
+        title: 'Variante cadastrada com sucesso!',
       })
     } catch (error) {
+      const errorMessage = handleApiError(error)
       toast({
-        title: 'You submitted the following values:',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            {error.message}
-          </pre>
-        ),
+        title: 'Error ao cadastrar variante!',
+        description: errorMessage,
       })
     }
   }

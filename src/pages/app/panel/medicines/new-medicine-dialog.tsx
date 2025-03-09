@@ -6,17 +6,13 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import {
-  fetchTherapeuticClasses,
-  type TherapeuticClass,
-} from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
+import { fetchTherapeuticClasses } from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
 import {
   registerMedicine,
   type RegisterMedicineBody,
 } from '@/api/pharma/medicines/resgister-medicine'
 import { ComboboxMany } from '@/components/comboboxes/combobox-many'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   DialogClose,
   DialogContent,
@@ -28,15 +24,12 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
@@ -52,9 +45,6 @@ const FormSchema = z.object({
 })
 
 type NewMedicineSchema = z.infer<typeof FormSchema>
-interface NewMedicineDialogProps {
-  therapeuticClasses: TherapeuticClass[]
-}
 
 export function NewMedicineDialog() {
   const { token } = useAuth()

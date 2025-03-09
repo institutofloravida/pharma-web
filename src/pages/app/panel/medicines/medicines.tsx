@@ -3,7 +3,6 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchTherapeuticClasses } from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
 import { fetchMedicines } from '@/api/pharma/medicines/fetch-medicines'
 import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
@@ -29,11 +28,6 @@ export function Medicines() {
   const { data: medicinesResult } = useQuery({
     queryKey: ['medicines', pageIndex],
     queryFn: () => fetchMedicines({ page: pageIndex }, token ?? ''),
-  })
-
-  const { data: therapeuticClasses } = useQuery({
-    queryKey: ['therapeutic-classes'],
-    queryFn: () => fetchTherapeuticClasses({ page: 1 }, token ?? ''),
   })
 
   function handlePagination(pageIndex: number) {

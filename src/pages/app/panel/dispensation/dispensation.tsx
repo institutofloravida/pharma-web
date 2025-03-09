@@ -4,7 +4,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchDispensations } from '@/api/pharma/dispensation/fetch-dispensations'
-import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import {
   Table,

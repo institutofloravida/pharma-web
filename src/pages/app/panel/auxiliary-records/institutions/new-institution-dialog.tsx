@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { useMutation } from '@tanstack/react-query'
-import { register } from 'module'
 import { useForm } from 'react-hook-form'
 import InputMask from 'react-input-mask'
 import { z } from 'zod'

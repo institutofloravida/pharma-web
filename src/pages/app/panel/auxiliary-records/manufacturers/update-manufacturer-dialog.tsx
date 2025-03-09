@@ -95,12 +95,11 @@ export function UpdateManufacturerDialog({
     },
   })
 
-  // Verifica se o campo cnpj foi alterado e revalida o formulário
   useEffect(() => {
     if (form.formState.isSubmitted) {
-      form.trigger() // Força a revalidação
+      form.trigger()
     }
-  }, [form.watch('cnpj')]) // Dependência: sempre que o 'cnpj' mudar, revalidar
+  }, [form.watch('cnpj')])
 
   async function handleUpdateManufacturer(data: UpdateManufacturerSchema) {
     try {

@@ -1,4 +1,4 @@
-import { PenLine, Search, UserMinus, UserPen } from 'lucide-react'
+import { PenLine, Search, UserMinus } from 'lucide-react'
 import { useState } from 'react'
 
 import { Operator } from '@/api/pharma/operators/fetch-operators'
@@ -6,13 +6,6 @@ import { OperatorRole } from '@/api/pharma/operators/register-operator'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { getOperatorRoleTranslation } from '@/lib/utils/translations-mappers/operator-role-translation'
 
