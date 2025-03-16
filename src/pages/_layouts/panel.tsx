@@ -4,6 +4,7 @@ import {
   BadgeCheck,
   Bell,
   BriefcaseMedical,
+  Building2,
   ChevronRight,
   ChevronsUpDown,
   Command,
@@ -97,6 +98,11 @@ const data = {
   ],
   admAreaSingleItems: [
     {
+      name: 'Instituições',
+      url: '/institutions',
+      icon: Building2,
+    },
+    {
       name: 'Operadores',
       url: '/operators',
       icon: UserRoundCog,
@@ -114,11 +120,6 @@ const data = {
       icon: MonitorCog,
       isActive: true,
       items: [
-        {
-          title: 'Instituições',
-          url: '/institutions',
-        },
-
         {
           title: 'Classes Terapêuticas',
           url: '/therapeutic-class',

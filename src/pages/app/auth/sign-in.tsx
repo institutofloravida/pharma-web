@@ -83,9 +83,9 @@ export function SignIn() {
           </div>
           <form onSubmit={handleSubmit(handleSignIn)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Seu Email</Label>
+              <Label htmlFor="email">Email</Label>
               <Input id="email" {...register('email')} />
-              <Label htmlFor="password">Sua Senha</Label>
+              <Label htmlFor="password">Senha</Label>
               <Input type="password" id="password" {...register('password')} />
             </div>
             <Button disabled={isSubmitting} className="w-full" type="submit">
