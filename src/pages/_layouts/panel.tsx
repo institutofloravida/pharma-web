@@ -11,6 +11,7 @@ import {
   Folder,
   Forward,
   GalleryVerticalEnd,
+  Layers2,
   LogOut,
   MonitorCog,
   MoreHorizontal,
@@ -100,6 +101,11 @@ const data = {
       url: '/operators',
       icon: UserRoundCog,
     },
+    {
+      name: 'Estoques',
+      url: '/stocks',
+      icon: Layers2,
+    },
   ],
   admAreaManyItems: [
     {
@@ -112,10 +118,7 @@ const data = {
           title: 'Instituições',
           url: '/institutions',
         },
-        {
-          title: 'Estoques',
-          url: '/stocks',
-        },
+
         {
           title: 'Classes Terapêuticas',
           url: '/therapeutic-class',
@@ -177,22 +180,6 @@ const data = {
         {
           title: 'Entradas',
           url: '/movement/entries',
-        },
-      ],
-    },
-    {
-      title: 'Medicamentos',
-      url: '#',
-      icon: Pill,
-      isActive: true,
-      items: [
-        {
-          title: 'Medicamentos',
-          url: '/medicines',
-        },
-        {
-          title: 'Variantes',
-          url: '/medicines/variants',
         },
       ],
     },
@@ -318,7 +305,7 @@ export default function PanelLayout() {
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <SidebarGroupLabel>Área Geral</SidebarGroupLabel>
+            <SidebarGroupLabel>Área Administrativa</SidebarGroupLabel>
             {data.admAreaSingleItems.map((item) => {
               return (
                 <SidebarMenuButton tooltip={item.name} asChild key={item.name}>
