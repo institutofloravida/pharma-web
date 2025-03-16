@@ -184,14 +184,18 @@ export function NewDispensationForm() {
         patientId: data.patientId,
       })
       toast({
-        // title: `O usuário ${data} foi cadastrado com sucesso!`,
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
+        title: `Dispensa registrada com sucesso!`,
       })
-      // setTimeout(() => navigate('/dispensations'), 2000)
+
+      form.reset({
+        batchesStocks: [],
+        dispensationDate: new Date(),
+        medicineStockId: '',
+        patientId: '',
+        stockId: '',
+      })
+
+      setActiveTab('patient')
     } catch (error) {
       const errorMessage = handleApiError(error)
       toast({
@@ -268,7 +272,7 @@ export function NewDispensationForm() {
               name="dispensationDate"
               render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Data de Fabricação</FormLabel>
+                  <FormLabel>Data da dispensa</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
