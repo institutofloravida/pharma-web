@@ -88,7 +88,6 @@ export function UpdateInstitutionDialog({
 
   async function handleUpdateInstitution(data: UpdateInstitutionSchema) {
     try {
-      console.log(data)
       await updateInstitutionFn({
         institutionId,
         name: data.name,

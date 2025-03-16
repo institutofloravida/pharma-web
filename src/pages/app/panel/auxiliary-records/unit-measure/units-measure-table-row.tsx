@@ -1,17 +1,22 @@
 import { PenLine, Search, Trash } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
 
+import { UpdateUnitMeasureDialog } from './update-unit-measure'
+
 export interface UnitMeasureTableRowProps {
   unitMeasure: {
+    id: string
     name: string
     acronym: string
   }
 }
 
 export function UnitMeasureTableRow({ unitMeasure }: UnitMeasureTableRowProps) {
+  const [isOpen, setIsOpen] = useState(false)
   return (
     <TableRow>
       <TableCell>
@@ -32,9 +37,17 @@ export function UnitMeasureTableRow({ unitMeasure }: UnitMeasureTableRowProps) {
       <TableCell>{unitMeasure.acronym}</TableCell>
 
       <TableCell>
-        <Button variant={'outline'} size={'xs'}>
-          <PenLine className="h-3 w-3" />
-        </Button>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button variant={'outline'} size={'xs'}>
+              <PenLine className="h-3 w-3" />
+            </Button>
+          </DialogTrigger>
+          <UpdateUnitMeasureDialog
+            open={isOpen}
+            unitMeasureId={unitMeasure.id}
+          />
+        </Dialog>
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>

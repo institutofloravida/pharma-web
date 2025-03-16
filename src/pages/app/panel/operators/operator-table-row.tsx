@@ -1,23 +1,23 @@
-import { Search, UserMinus, UserPen } from 'lucide-react'
+import { PenLine, Search, UserMinus } from 'lucide-react'
+import { useState } from 'react'
 
 import { Operator } from '@/api/pharma/operators/fetch-operators'
+import { OperatorRole } from '@/api/pharma/operators/register-operator'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { getOperatorRoleTranslation } from '@/lib/utils/translations-mappers/operator-role-translation'
+
+import { UpdateOperatorDialog } from './update-operator-dialog'
 
 export interface OperatorTableRowProps {
   operator: Operator
 }
 
 export function OperatorTableRow({ operator }: OperatorTableRowProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
     <TableRow>
       <TableCell>
@@ -51,21 +51,19 @@ export function OperatorTableRow({ operator }: OperatorTableRowProps) {
         )}
       </TableCell>
       <TableCell className="font-medium">
-        <Select defaultValue={operator.role}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="SUPER_ADMIN">Super Administrador</SelectItem>
-            <SelectItem value="MANAGER">Administrador</SelectItem>
-            <SelectItem value="COMMON">Comum</SelectItem>
-          </SelectContent>
-        </Select>
+        <Badge variant={'secondary'}>
+          {getOperatorRoleTranslation(OperatorRole[operator.role])}
+        </Badge>
       </TableCell>
       <TableCell>
-        <Button variant={'outline'} size={'xs'}>
-          <UserPen className="h-3 w-3" />
-        </Button>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button variant={'outline'} size={'xs'}>
+              <PenLine className="h-3 w-3" />
+            </Button>
+          </DialogTrigger>
+          <UpdateOperatorDialog open={isOpen} operatorId={operator.id} />
+        </Dialog>
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>

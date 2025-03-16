@@ -1,4 +1,3 @@
-import { DialogContent } from '@radix-ui/react-dialog'
 import { useQuery } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
@@ -20,7 +19,6 @@ import { useAuth } from '@/contexts/authContext'
 import { MedicineEntryTableRow } from './medicine-entry-table-row'
 import { MedicineVariantTableFilters } from './medicine-variant-table-filters'
 import { NewMedicineEntryDialog } from './new-medicine-entry-dialog'
-import { DatePickerForm } from './teste'
 
 export function MedicinesEntries() {
   const { token, institutionId } = useAuth()

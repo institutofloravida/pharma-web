@@ -10,11 +10,7 @@ import { z } from 'zod'
 import { fetchManufacturers } from '@/api/pharma/auxiliary-records/manufacturer/fetch-manufacturer'
 import { fetchMovementTypes } from '@/api/pharma/auxiliary-records/movement-type/fetch-movement-types'
 import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
-import { fetchUnitsMeasure } from '@/api/pharma/auxiliary-records/unit-measure/fetch-units-measure'
-import {
-  fetchMedicinesVariants,
-  type FetchMedicinesVariantsResponse,
-} from '@/api/pharma/medicines-variants/fetch-medicines-variants'
+import { fetchMedicinesVariants } from '@/api/pharma/medicines-variants/fetch-medicines-variants'
 import {
   registerMedicineEntry,
   type RegisterMedicineEntryBodyAndParams,
@@ -79,16 +75,8 @@ const FormSchema = z.object({
   }),
 })
 
-// type NewMedicineVariantSchema = z.infer<typeof FormSchema>
-// interface NewMedicineVariantDialogProps {
-//   medicinesVariants: MedicineVariant[]
-// }
-
 export function NewMedicineEntryDialog() {
-  const [queryMedicine, setQueryMedicine] = useState('')
   const [queryStock, setQueryStock] = useState('')
-  const [queryPharmaceuticalForm, setQueryPharmaceuticalForm] = useState('')
-  const [queryUnitMeasure, setQueryUnitMeasure] = useState('')
   const [queryMedicineVariant, setQueryMedicineVariant] = useState('')
   const [queryManufacturer, setQueryManufacturer] = useState('')
   const [queryMovementType, setQueryMovementType] = useState('')

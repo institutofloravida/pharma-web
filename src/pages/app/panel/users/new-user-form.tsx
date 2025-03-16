@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import InputMask from 'react-input-mask'
 import { useNavigate } from 'react-router-dom'
-import { unknown, z } from 'zod'
+import { z } from 'zod'
 
 import { fetchCities } from '@/api/ibge/fetch-cities'
 import { fetchStates } from '@/api/ibge/fetch-states'
-import { fetchPathologies } from '@/api/pharma/auxiliary-records/pathology/fetch-pathology'
+import { fetchPathologies } from '@/api/pharma/auxiliary-records/pharmaceutical-form/pathology/fetch-pathology'
 import {
   registerUser,
   type RegisterUserBody,
@@ -29,13 +29,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
@@ -233,11 +226,6 @@ export function NewUserForm() {
       })
       toast({
         title: `O usuário ${data.name} foi cadastrado com sucesso!`,
-        // description: (
-        //   <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-        //     <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        //   </pre>
-        // ),
       })
       setTimeout(() => navigate('/users'), 2000)
     } catch (error) {

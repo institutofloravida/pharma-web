@@ -13,12 +13,10 @@ import {
   registerDispensation,
   type RegisterDispensationBody,
 } from '@/api/pharma/dispensation/register-dispensation'
-import { fetchMedicinesVariants } from '@/api/pharma/medicines-variants/fetch-medicines-variants'
 import { fetchBatchesOnStock } from '@/api/pharma/stock/bacth-stock/fetch-batches-stock'
 import { fetchMedicinesOnStock } from '@/api/pharma/stock/medicine-stock/fetch-medicines-stock'
 import { fetchUsers } from '@/api/pharma/users/fetch-users'
 import { ComboboxUp } from '@/components/comboboxes/combobox-up'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import {

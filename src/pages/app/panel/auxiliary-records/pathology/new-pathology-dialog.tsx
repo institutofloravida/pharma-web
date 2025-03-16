@@ -2,13 +2,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { z } from 'zod'
 
 import {
   registerPathology,
   type RegisterPathologyBody,
-} from '@/api/pharma/auxiliary-records/pathology/register-pathology'
+} from '@/api/pharma/auxiliary-records/pharmaceutical-form/pathology/register-pathology'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,
@@ -20,7 +19,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/contexts/authContext'
+import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
+import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const newPathologySchema = z.object({
   name: z
@@ -61,9 +62,15 @@ export function NewPathologyDialog() {
         name: data.name,
       })
 
-      toast.success(`Patologia ${data.name} registrada com sucesso!`)
+      toast({
+        title: 'Patologia cadastrada com suceso!',
+      })
     } catch (error) {
-      toast.error('Não foi possível registrar a patologia. Tente Novamente!')
+      const errorMessage = handleApiError(error)
+      toast({
+        title: 'Error ao cadastrara patologia',
+        description: errorMessage,
+      })
     }
   }
 

@@ -3,7 +3,6 @@ import { Helmet } from 'react-helmet-async'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
-import { fetchTherapeuticClasses } from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
 import { fetchMedicines } from '@/api/pharma/medicines/fetch-medicines'
 import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
@@ -31,11 +30,6 @@ export function Medicines() {
     queryFn: () => fetchMedicines({ page: pageIndex }, token ?? ''),
   })
 
-  const { data: therapeuticClasses } = useQuery({
-    queryKey: ['therapeutic-classes'],
-    queryFn: () => fetchTherapeuticClasses({ page: 1 }, token ?? ''),
-  })
-
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
       state.set('page', pageIndex.toString())
@@ -57,11 +51,7 @@ export function Medicines() {
                   Novo Medicamento
                 </Button>
               </DialogTrigger>
-              <NewMedicineDialog
-                therapeuticClasses={
-                  therapeuticClasses?.therapeutic_classes ?? []
-                }
-              />
+              <NewMedicineDialog />
             </Dialog>
           </div>
           <div className="rounded-md border">

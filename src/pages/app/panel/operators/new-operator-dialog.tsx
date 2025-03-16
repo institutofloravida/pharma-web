@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { AxiosError } from 'axios'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
 import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
 import {
+  OperatorRole,
   registerOperator,
   type RegisterOperatorBody,
 } from '@/api/pharma/operators/register-operator'
@@ -32,22 +32,33 @@ import {
 import { Input } from '@/components/ui/input'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
-import type { ApiErrorResponse } from '@/lib/utils/axios-error'
 import { handleApiError } from '@/lib/utils/handle-api-error'
 
-const newOperatorSchema = z.object({
-  name: z
-    .string({
-      required_error: 'digite um nome',
-    })
-    .min(3, { message: 'mínimo de 3 caracteres' }),
-  email: z.string().email(),
-  password: z.string().min(8),
-  role: z.enum(['SUPER_ADMIN', 'MANAGER', 'COMMON']),
-  institutionsIds: z.array(z.string()).min(1, {
-    message: 'selecione pelo menos uma instituição',
-  }),
-})
+const newOperatorSchema = z
+  .object({
+    name: z
+      .string({
+        required_error: 'Digite um nome',
+      })
+      .min(3, { message: 'Mínimo de 3 caracteres' }),
+    email: z.string().email(),
+    password: z.string().min(8, { message: 'Mínimo de 8 caracteres' }),
+    role: z.nativeEnum(OperatorRole),
+    institutionsIds: z.array(z.string()).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.role === 'SUPER_ADMIN') {
+        return true
+      }
+      return data.institutionsIds && data.institutionsIds.length > 0
+    },
+    {
+      message: 'Selecione pelo menos uma instituição',
+      path: ['institutionsIds'],
+    },
+  )
+
 type NewOperatorSchema = z.infer<typeof newOperatorSchema>
 
 export function NewOperatorDialog() {
@@ -62,7 +73,6 @@ export function NewOperatorDialog() {
     mutationFn: (data: RegisterOperatorBody) =>
       registerOperator(data, token ?? ''),
     onSuccess() {
-      // Invalidate the 'operators' query to refetch data
       queryClient.invalidateQueries({
         queryKey: ['operators'],
       })
@@ -77,6 +87,7 @@ export function NewOperatorDialog() {
       staleTime: 1000,
       refetchOnMount: true,
     })
+
   const form = useForm<z.infer<typeof newOperatorSchema>>({
     resolver: zodResolver(newOperatorSchema),
     defaultValues: {
@@ -84,14 +95,17 @@ export function NewOperatorDialog() {
     },
   })
 
+  const roleWatch = form.watch('role')
+  const isSuperAdmin = roleWatch === 'SUPER_ADMIN'
+
   async function handleRegisterOperator(data: NewOperatorSchema) {
     try {
       await registerOperatorFn({
         name: data.name,
         email: data.email,
         password: data.password,
-        role: data.role,
-        institutionsIds: data.institutionsIds,
+        role: OperatorRole[data.role],
+        institutionsIds: isSuperAdmin ? [] : data.institutionsIds,
       })
 
       toast({
@@ -172,26 +186,45 @@ export function NewOperatorDialog() {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="institutionsIds"
-            render={({ field }) => (
-              <FormItem className="w-[200px]">
-                <FormLabel>Instituições</FormLabel>
-                <ComboboxMany
-                  field={field}
-                  items={institutionsResult?.institutions ?? []}
-                  itemKey="id"
-                  onChange={(selectedItems) => field.onChange(selectedItems)}
-                  onQueryChange={setQueryInstitution}
-                  query={queryInstitution}
-                  isFetching={isFetchingInstitutions}
-                  formatItem={(item) => `${item.name}`}
-                />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {!isSuperAdmin && (
+            <FormField
+              control={form.control}
+              name="institutionsIds"
+              render={({ field }) => {
+                return (
+                  <FormItem>
+                    <FormLabel>Instituições</FormLabel>
+                    <ComboboxMany
+                      field={{
+                        value: field.value.map((id) => {
+                          const institution =
+                            institutionsResult?.institutions.find(
+                              (inst) => inst.id === id,
+                            )
+                          return {
+                            id,
+                            value: institution
+                              ? institution.name
+                              : 'Carregando...',
+                          }
+                        }),
+                      }}
+                      items={institutionsResult?.institutions ?? []}
+                      itemKey="id"
+                      onChange={(selectedItems) =>
+                        field.onChange(selectedItems.map((item) => item.id))
+                      }
+                      onQueryChange={setQueryInstitution}
+                      query={queryInstitution}
+                      isFetching={isFetchingInstitutions}
+                      formatItem={(item) => `${item.name}`}
+                    />
+                    <FormMessage />
+                  </FormItem>
+                )
+              }}
+            />
+          )}
 
           <DialogFooter className="mt-2">
             <DialogClose asChild>

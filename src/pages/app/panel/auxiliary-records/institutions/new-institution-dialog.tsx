@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+import InputMask from 'react-input-mask'
 import { z } from 'zod'
 
 import {
@@ -17,31 +17,45 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/authContext'
+import { toast } from '@/hooks/use-toast'
+import { queryClient } from '@/lib/react-query'
+import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const newInstitutionSchema = z.object({
   name: z.string().min(3),
-  cnpj: z.string(),
-  description: z.string(),
+  cnpj: z
+    .string()
+    .min(14, { message: 'O CNPJ deve ter 14 caracteres' })
+    .max(14, { message: 'O CNPJ deve ter 14 caracteres' }),
+  description: z.string().optional(),
 })
 type NewInstitutionSchema = z.infer<typeof newInstitutionSchema>
 
 export function NewInstitutionDialog() {
   const { token } = useAuth()
-  const {
-    register,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = useForm<NewInstitutionSchema>({
+  const form = useForm<NewInstitutionSchema>({
     resolver: zodResolver(newInstitutionSchema),
   })
 
   const { mutateAsync: registerInstitutionFn } = useMutation({
     mutationFn: (data: RegisterInstitutionBody) =>
       registerInstitution(data, token ?? ''),
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ['institutions'],
+      })
+    },
   })
 
   async function handleRegisterInstitution(data: NewInstitutionSchema) {
@@ -52,9 +66,17 @@ export function NewInstitutionDialog() {
         description: data.description,
       })
 
-      toast.success(`Instituição ${data.name} registrada com sucesso!`)
+      toast({
+        title: `Instituição ${data.name} registrada com sucesso!`,
+      })
     } catch (error) {
-      toast.error('Não foi possível registrar a Institutição. Tente Novamente!')
+      const errorMessage = handleApiError(error)
+
+      toast({
+        title: 'Não foi possível registrar a Institutição!',
+        description: errorMessage,
+        variant: 'destructive',
+      })
     }
   }
 
@@ -66,42 +88,71 @@ export function NewInstitutionDialog() {
           Preencha todas as informações para registrar uma nova instituição.
         </DialogDescription>
       </DialogHeader>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(handleRegisterInstitution)}
+          className="grid grid-cols-3 space-y-2"
+        >
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem className="col-span-3">
+                <FormLabel>Nome</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nome da instituição..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="cnpj"
+            render={({ field }) => (
+              <FormItem className="col-span-3">
+                <FormLabel>CNPJ</FormLabel>
+                <FormControl>
+                  <InputMask
+                    {...field}
+                    mask="99.999.999/9999-99"
+                    placeholder="CNPJ..."
+                    onChange={(e: any) =>
+                      field.onChange(e.target.value.replace(/\D/g, ''))
+                    }
+                  >
+                    {(inputProps: any) => <Input {...inputProps} />}
+                  </InputMask>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <form onSubmit={handleSubmit(handleRegisterInstitution)}>
-        <div className="grid gap-2">
-          <div className="flex-col gap-2">
-            <Label htmlFor="name" className="text-right">
-              Nome
-            </Label>
-            <Input id="name" className="col-span-3" {...register('name')} />
-          </div>
-          <div className="flex-col">
-            <Label htmlFor="cnpj" className="text-right">
-              CNPJ
-            </Label>
-            <Input id="cnpj" className="col-span-3" {...register('cnpj')} />
-          </div>
-          <div className="flex-col">
-            <Label htmlFor="description" className="text-right">
-              Descrição
-            </Label>
-            <Textarea
-              id="description"
-              className="col-span-3 min-h-[120px]"
-              placeholder="Sobre a instituição..."
-              {...register('description')}
-            />
-          </div>
-        </div>
-        <DialogFooter className="mt-2">
-          <DialogClose asChild>
-            <Button variant={'ghost'}>Cancelar</Button>
-          </DialogClose>
-          <Button type="submit" disabled={isSubmitting}>
-            Cadastrar
-          </Button>
-        </DialogFooter>
-      </form>
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="col-span-3">
+                <FormLabel>Descrição</FormLabel>
+                <FormControl>
+                  <Textarea placeholder="sobre a instituição..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <DialogFooter className="col-span-3 grid justify-end">
+            <div className="flex-gap-2">
+              <DialogClose asChild>
+                <Button variant={'ghost'}>Cancelar</Button>
+              </DialogClose>
+              <Button type="submit">Enviar</Button>
+            </div>
+          </DialogFooter>
+        </form>
+      </Form>
     </DialogContent>
   )
 }

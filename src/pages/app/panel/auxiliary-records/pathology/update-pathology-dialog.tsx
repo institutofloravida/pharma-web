@@ -4,11 +4,11 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { getPathology } from '@/api/pharma/auxiliary-records/pathology/get-pathology'
+import { getPathology } from '@/api/pharma/auxiliary-records/pharmaceutical-form/pathology/get-pathology'
 import {
   updatePathology,
   type UpdatePathologyBody,
-} from '@/api/pharma/auxiliary-records/pathology/update-pathology'
+} from '@/api/pharma/auxiliary-records/pharmaceutical-form/pathology/update-pathology'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,

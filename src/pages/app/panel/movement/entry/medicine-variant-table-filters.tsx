@@ -6,7 +6,6 @@ import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
-import { fetchMedicines } from '@/api/pharma/medicines/fetch-medicines'
 import { SelectInstitutions } from '@/components/selects/select-institutions'
 import { Button } from '@/components/ui/button'
 import {

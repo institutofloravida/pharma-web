@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import InputMask from 'react-input-mask'
 import { z } from 'zod'
@@ -34,19 +35,27 @@ import { queryClient } from '@/lib/react-query'
 import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const updateManufacturerSchema = z.object({
-  name: z.string().min(3).optional(),
+  name: z
+    .string({
+      required_error: 'O nome é obrigatório.',
+    })
+    .min(3, { message: 'O nome deve ter pelo menos 3 caracteres.' }),
+
   cnpj: z
     .string({
-      required_error: ' campo obrigatório',
+      required_error: 'O CNPJ é obrigatório.',
     })
-    .min(14, {
-      message: 'O campo deve conter 14 caracteres',
-    })
-    .max(14, {
-      message: 'O CNPJ deve conter 14 caracteres',
+    .length(14, {
+      message: 'O CNPJ deve ter exatamente 14 dígitos (apenas números).',
     }),
-  description: z.string().optional(),
+
+  description: z
+    .string({
+      required_error: 'A descrição é obrigatória.',
+    })
+    .optional(),
 })
+
 type UpdateManufacturerSchema = z.infer<typeof updateManufacturerSchema>
 
 interface UpdateManufacturerProps {
@@ -68,7 +77,7 @@ export function UpdateManufacturerDialog({
 
   const form = useForm<UpdateManufacturerSchema>({
     resolver: zodResolver(updateManufacturerSchema),
-    values: {
+    defaultValues: {
       cnpj: manufacturer?.cnpj ?? '',
       description: manufacturer?.description ?? '',
       name: manufacturer?.name ?? '',
@@ -79,14 +88,18 @@ export function UpdateManufacturerDialog({
     mutationFn: (data: UpdateManufacturerBody) =>
       updateManufacturer(data, token ?? ''),
     onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: ['manufacturers'],
-      })
+      queryClient.invalidateQueries({ queryKey: ['manufacturers'] })
       queryClient.invalidateQueries({
         queryKey: ['manufacturer', manufacturerId],
       })
     },
   })
+
+  useEffect(() => {
+    if (form.formState.isSubmitted) {
+      form.trigger()
+    }
+  }, [form.watch('cnpj')])
 
   async function handleUpdateManufacturer(data: UpdateManufacturerSchema) {
     try {
@@ -97,13 +110,11 @@ export function UpdateManufacturerDialog({
         description: data.description,
       })
 
-      toast({
-        title: `Instituição atualizada com sucesso!`,
-      })
+      toast({ title: `Fabricante atualizado com sucesso!` })
     } catch (error) {
       const errorMessage = handleApiError(error)
       toast({
-        title: 'Erro ao tentar atualizar a instiuição.',
+        title: 'Erro ao tentar atualizar o fabricante.',
         description: errorMessage,
         variant: 'destructive',
       })
@@ -188,7 +199,12 @@ export function UpdateManufacturerDialog({
               <DialogClose asChild>
                 <Button variant={'ghost'}>Cancelar</Button>
               </DialogClose>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                disabled={
+                  form.formState.isSubmitting || !form.formState.isValid
+                }
+              >
                 Atualizar
               </Button>
             </div>

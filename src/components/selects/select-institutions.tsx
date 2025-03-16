@@ -12,18 +12,19 @@ import {
 export interface SelectInstitutionsProps {
   institutions: Institution[]
   value: string | undefined
+  isDisabled?: boolean
   onChange: (value: string) => void
 }
 
 export function SelectInstitutions({
   institutions,
   value,
+  isDisabled = false,
   onChange,
 }: SelectInstitutionsProps) {
-  console.log('institutions: ', institutions)
   return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="w-[280px]">
+    <Select value={value} onValueChange={onChange} disabled={isDisabled}>
+      <SelectTrigger className="">
         <SelectValue placeholder="Selecione uma Instituição" />
       </SelectTrigger>
       <SelectContent>

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
@@ -15,6 +15,7 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -32,6 +33,7 @@ import { Switch } from '@/components/ui/switch'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
+import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const FormSchema = z.object({
   name: z
@@ -87,27 +89,19 @@ export function NewStockDialog() {
       })
 
       toast({
-        title: 'You submitted the following values:',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
+        title: 'Estoque cadastrado com suceso!',
       })
     } catch (error) {
+      const errorMessage = handleApiError(error)
       toast({
         title: 'Error ao cadastrar o estoque',
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(error, null, 2)}</code>
-          </pre>
-        ),
+        description: errorMessage,
       })
     }
   }
 
   return (
-    <DialogContent className="flex flex-col items-center">
+    <DialogContent className="sm:max-w-[425px]">
       <DialogHeader className="items-center">
         <DialogTitle>Novo Estoque</DialogTitle>
         <DialogDescription>Cadastre seu novo estoque.</DialogDescription>
@@ -115,13 +109,13 @@ export function NewStockDialog() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-2/3 space-y-6"
+          className="grid grid-cols-3 space-y-2"
         >
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-3">
                 <FormLabel>Nome</FormLabel>
                 <FormControl>
                   <Input placeholder="Nome do estoque..." {...field} />
@@ -135,7 +129,7 @@ export function NewStockDialog() {
             control={form.control}
             name="institutionId"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="col-span-3">
                 <FormLabel>Instituição</FormLabel>
                 <FormControl>
                   <SelectInstitutions
@@ -153,7 +147,7 @@ export function NewStockDialog() {
             control={form.control}
             name="status"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-2 shadow-sm">
+              <FormItem className="col-span-3 flex flex-row items-center justify-between rounded-lg border p-2 shadow-sm">
                 <div className="space-y-0.5">
                   <FormLabel>Status</FormLabel>
                   <FormDescription>
@@ -170,12 +164,16 @@ export function NewStockDialog() {
               </FormItem>
             )}
           />
-          <div className="flex items-center gap-3">
-            <DialogClose asChild>
-              <Button variant={'outline'}>Cancelar</Button>
-            </DialogClose>
-            <Button type="submit">Submit</Button>
-          </div>
+          <DialogFooter className="col-span-3 grid justify-end">
+            <div className="flex gap-2">
+              <DialogClose asChild>
+                <Button variant={'ghost'}>Cancelar</Button>
+              </DialogClose>
+              <Button type="submit" disabled={form.formState.isSubmitting}>
+                Salvar
+              </Button>
+            </div>
+          </DialogFooter>
         </form>
       </Form>
     </DialogContent>

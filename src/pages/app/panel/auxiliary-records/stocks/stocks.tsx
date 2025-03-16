@@ -23,10 +23,22 @@ import { StockTableRow } from './stock-table-row'
 export function Stocks() {
   const { token } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
+
+  const name = searchParams.get('name')
+  const institutionsIdsParam = searchParams.get('institutionsIds')
+
+  const institutionsIds = institutionsIdsParam
+    ? institutionsIdsParam.split(',')
+    : []
+
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: stocksResult } = useQuery({
-    queryKey: ['stocks', pageIndex],
-    queryFn: () => fetchStocks({ page: pageIndex }, token ?? ''),
+    queryKey: ['stocks', pageIndex, name, institutionsIds],
+    queryFn: () =>
+      fetchStocks(
+        { page: pageIndex, query: name, institutionsIds },
+        token ?? '',
+      ),
   })
 
   function handlePagination(pageIndex: number) {

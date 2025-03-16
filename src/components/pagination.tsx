@@ -29,7 +29,7 @@ export function Pagination({
       </span>
 
       <div className="flex items-center space-x-6 lg:space-x-8">
-        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+        <div className="flex w-[100px] items-center justify-center text-sm font-medium text-muted-foreground">
           Página {pageIndex} de {pages}
         </div>
         <div className="flex items-center space-x-2">

@@ -1,6 +1,6 @@
 import { apiPharma } from '@/lib/axios'
 
-import type { Operator } from './fetch-operators'
+import type { Operator } from '../operators/fetch-operators'
 
 export interface GetOperatorDetailsResponse {
   operator: Operator

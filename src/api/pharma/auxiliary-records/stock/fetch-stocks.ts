@@ -1,7 +1,8 @@
 import { apiPharma } from '@/lib/axios'
 export interface FetchStocksQuery {
   page?: number | null
-  query?: string
+  query?: string | null
+  institutionsIds?: string[]
 }
 
 interface FetchStocksResponse {
@@ -18,7 +19,7 @@ interface FetchStocksResponse {
 }
 
 export async function fetchStocks(
-  { page, query }: FetchStocksQuery,
+  { page, query, institutionsIds }: FetchStocksQuery,
   token: string,
 ) {
   const response = await apiPharma.get<FetchStocksResponse>('/stocks', {
@@ -28,6 +29,7 @@ export async function fetchStocks(
     params: {
       page,
       query,
+      institutionsIds,
     },
   })
 
