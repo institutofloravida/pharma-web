@@ -50,28 +50,28 @@ export function StockTableFilters() {
     resolver: zodResolver(stocksFiltersSchema),
     defaultValues: {
       name: name ?? '',
-      institutionsIds: institutionsIds ?? [],
+      institutionsIds: institutionsIds ?? '',
     },
   })
 
   function handleFilter({ name, institutionsIds }: StocksFiltersSchema) {
-    setSearchParams((state) => {
-      if (name) {
-        state.set('name', name)
-      } else {
-        state.delete('name')
-      }
+    const newParams = new URLSearchParams(searchParams)
 
-      if (institutionsIds.length > 0) {
-        state.set('institutionsIds', institutionsIds.join(','))
-      } else {
-        state.delete('institutionsIds')
-      }
+    if (name) {
+      newParams.set('name', name)
+    } else {
+      newParams.delete('name')
+    }
 
-      state.set('page', '1')
+    if (institutionsIds.length > 0) {
+      newParams.set('institutionsIds', institutionsIds.join(','))
+    } else {
+      newParams.delete('institutionsIds')
+    }
 
-      return state
-    })
+    newParams.set('page', '1')
+
+    setSearchParams(newParams)
   }
 
   function handleClearFilters() {
