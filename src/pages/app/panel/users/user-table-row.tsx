@@ -13,7 +13,6 @@ export interface UserTableRowProps {
 }
 
 export function UserTableRow({ user }: UserTableRowProps) {
-  console.log('>>>>:', user)
   return (
     <TableRow>
       <TableCell>
