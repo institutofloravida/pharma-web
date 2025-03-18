@@ -24,10 +24,22 @@ export function Medicines() {
   const { token } = useAuth()
 
   const [searchParams, setSearchParams] = useSearchParams()
+
+  const name = searchParams.get('name')
+  const therapeuticClassesIdsParam = searchParams.get('therapeuticClassesIds')
+
+  const therapeuticClassesIds = therapeuticClassesIdsParam
+    ? therapeuticClassesIdsParam.split(',')
+    : []
+
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
   const { data: medicinesResult } = useQuery({
-    queryKey: ['medicines', pageIndex],
-    queryFn: () => fetchMedicines({ page: pageIndex }, token ?? ''),
+    queryKey: ['medicines', pageIndex, name, therapeuticClassesIds],
+    queryFn: () =>
+      fetchMedicines(
+        { page: pageIndex, query: name, therapeuticClassesIds },
+        token ?? '',
+      ),
   })
 
   function handlePagination(pageIndex: number) {
