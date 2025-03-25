@@ -1,5 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import InputMask from 'react-input-mask'
@@ -16,6 +18,7 @@ import {
 import { getAddressByCep } from '@/api/viacep/get-address-by-cep'
 import { ComboboxMany } from '@/components/comboboxes/combobox-many'
 import { ComboboxUp } from '@/components/comboboxes/combobox-up'
+import { DateTimePicker } from '@/components/datetime-picker'
 import { SelectGender } from '@/components/selects/select-gender'
 import { SelectRace } from '@/components/selects/select-race'
 import { Button } from '@/components/ui/button'
@@ -46,7 +49,7 @@ export const newUserSchema = z.object({
   sus: z
     .string()
     .regex(/^\d{15}$/, { message: 'O SUS deve conter exatamente 15 dígitos.' }),
-  birthDate: z.date(),
+  birthDate: z.coerce.date(),
   gender: z.enum(['M', 'F', 'O'], {
     errorMap: () => ({ message: 'Gênero inválido. Deve ser M, F ou O.' }),
   }),
@@ -286,7 +289,6 @@ export function NewUserForm() {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="cpf"
@@ -309,7 +311,6 @@ export function NewUserForm() {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="sus"
@@ -332,7 +333,6 @@ export function NewUserForm() {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="generalRegistration"
@@ -346,7 +346,7 @@ export function NewUserForm() {
                 </FormItem>
               )}
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="birthDate"
               render={({ field }) => (
@@ -368,7 +368,27 @@ export function NewUserForm() {
                   <FormMessage />
                 </FormItem>
               )}
+            /> */}
+
+            <FormField
+              control={form.control}
+              name="birthDate"
+              render={({ field }) => (
+                <FormItem className="col-span-1">
+                  <FormLabel>Data de Nascimento</FormLabel>
+                  <FormControl>
+                    <DateTimePicker
+                      hideTime
+                      timezone="UTC"
+                      value={field.value || null} // ✅ Garante que não quebre se for null
+                      onChange={(date) => field.onChange(date?.toISOString())} // ✅ Atualiza o formulário corretamente
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
+
             <FormField
               control={form.control}
               name="gender"
