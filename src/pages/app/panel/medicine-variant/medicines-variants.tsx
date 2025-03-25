@@ -24,10 +24,18 @@ export function MedicinesVariants() {
   const { token } = useAuth()
 
   const [searchParams, setSearchParams] = useSearchParams()
+
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const medicineId = searchParams.get('medicineId')
+  const query = searchParams.get('query')
+
   const { data: medicinesVariants } = useQuery({
-    queryKey: ['medicines-variants', pageIndex],
-    queryFn: () => fetchMedicinesVariants({ page: pageIndex }, token ?? ''),
+    queryKey: ['medicines-variants', pageIndex, medicineId, query],
+    queryFn: () =>
+      fetchMedicinesVariants(
+        { page: pageIndex, query, medicineId },
+        token ?? '',
+      ),
   })
 
   function handlePagination(pageIndex: number) {
