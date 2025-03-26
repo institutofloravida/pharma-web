@@ -16,6 +16,7 @@ import {
 import { getAddressByCep } from '@/api/viacep/get-address-by-cep'
 import { ComboboxMany } from '@/components/comboboxes/combobox-many'
 import { ComboboxUp } from '@/components/comboboxes/combobox-up'
+import { DatePicker } from '@/components/date-picker'
 import { SelectGender } from '@/components/selects/select-gender'
 import { SelectRace } from '@/components/selects/select-race'
 import { Button } from '@/components/ui/button'
@@ -346,24 +347,15 @@ export function NewUserForm() {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="birthDate"
               render={({ field }) => (
-                <FormItem className="col-span-1">
+                <FormItem className="flex flex-col">
                   <FormLabel>Data de Nascimento</FormLabel>
                   <FormControl>
-                    <Input
-                      type="date"
-                      lang="pt"
-                      {...field}
-                      value={
-                        field.value
-                          ? field.value.toISOString().split('T')[0]
-                          : ''
-                      }
-                      onChange={(e) => field.onChange(new Date(e.target.value))}
-                    />
+                    <DatePicker value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

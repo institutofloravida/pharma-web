@@ -1,0 +1,551 @@
+[33mcommit 160edd4b4c2fdf8f22b3d3883b616982bee37fae[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/dev[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmaster[m[33m)[m
+Merge: 62dc41b dda598f
+Author: Carlos Yuri <82901729+oyurisousa@users.noreply.github.com>
+Date:   Tue Mar 25 21:58:32 2025 -0300
+
+    Merge pull request #1 from institutofloravida/dev
+    
+    Dev
+
+[33mcommit dda598f901e09bf14bb7837f214bc7c9aaf41d3f[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Mar 25 20:59:02 2025 -0300
+
+    refactor: field birth date
+
+[33mcommit 16fece8f3d1481ae17920c5b873cd745e9f25870[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Mar 25 20:13:49 2025 -0300
+
+    feat(medicine variant): filters
+
+[33mcommit 660974fafe68cf3ae6d63aa125d06235b62534ca[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Mar 25 19:25:02 2025 -0300
+
+    feat: spinner loader
+
+[33mcommit 374a2289a0555e0982a6d12d6f96e7b8a44b7817[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Fri Mar 21 14:09:01 2025 -0300
+
+    feat(medicine): update
+
+[33mcommit 62dc41bb382f734a0cffd113d729d2c943c2bc1c[m
+Merge: 64e7915 10b332b
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Mar 18 19:03:28 2025 -0300
+
+    Merge branch 'dev'
+
+[33mcommit 10b332b0afd8013724d7cea07aa9b87d597cd2f0[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Mar 18 19:03:03 2025 -0300
+
+    refactor: remove consoles
+
+[33mcommit 4c3547456989516eb37a71715eb8c4b453bad94f[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Mar 18 19:01:57 2025 -0300
+
+    feat(medicine): filters
+
+[33mcommit d9cc6f78120a09f50e91df2f17c7aa43a9553689[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Mon Mar 17 19:31:01 2025 -0300
+
+    chore(auth): redirect
+
+[33mcommit 4f5a2e904a4372fad2ffa8c731210c9175bffd11[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Mon Mar 17 19:14:17 2025 -0300
+
+    chore(stock):filter search params
+
+[33mcommit 64e79158a03a4cc200a9ba790ab3c4ec0820fc1e[m
+Merge: cf146e8 5264dd8
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Mar 16 20:29:47 2025 -0300
+
+    Merge branch 'dev'
+
+[33mcommit 5264dd852712dccc681927bd27df6b407a51ece8[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Mar 16 20:29:21 2025 -0300
+
+    refactor: panel
+
+[33mcommit 971adbe1af6b62c0bedb4c0251dcd36c00471489[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Mar 16 16:36:52 2025 -0300
+
+    chore: upgrade panel & scroll
+
+[33mcommit cf146e8cb23aa2a68ec2d7903ddbf54d95179c63[m
+Merge: c891114 d849564
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Mar 16 16:27:09 2025 -0300
+
+    chore: resolve merge conflict
+
+[33mcommit d849564e8db3f6ddd17fbb7f297790f642408a60[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Mar 16 16:24:20 2025 -0300
+
+    config: env example
+
+[33mcommit 0121d038cba8130d7f727ff3c7492a0cff366eb9[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Mar 9 15:57:15 2025 -0300
+
+    chore: remove unused imports
+
+[33mcommit d3313e857ffded1a867606df50841db404d99823[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Mar 9 15:48:59 2025 -0300
+
+    refactor: error handling
+
+[33mcommit 3dcf0f25b552b929ad46f1fb7fe825e84995d4e6[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Mar 9 15:24:11 2025 -0300
+
+    refactor(manufacturer): forms create & update
+
+[33mcommit 1522530bcb5a404807abe7c1a55a07229cf1e6f9[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Mar 9 09:24:25 2025 -0300
+
+    feat(stock): update & filters
+
+[33mcommit e0662939bc3b8f5e819ee2cac904228a15f0ad36[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Mar 6 21:52:39 2025 -0300
+
+    chore(operator): permissions
+
+[33mcommit 28a52c9be87f00f8117efd8ded73e62d943c4880[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Feb 27 22:09:15 2025 -0300
+
+    refactor(medicine): new medicine form
+
+[33mcommit 5f0c42e856c3049b358487190dad39d5ec68530e[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Feb 27 21:26:56 2025 -0300
+
+    refactor: register institution form
+
+[33mcommit 59d31aebba81b796f1b1850981a941d417646af1[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Feb 27 21:00:59 2025 -0300
+
+    fix(operator): associate institutions
+
+[33mcommit 373bb62680b04543564c863a2f4151d74d3a1553[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Fri Feb 21 21:02:11 2025 -0300
+
+    feat(operator): filters
+
+[33mcommit 0c973681b18eb1135fdf506ee3ccbb8546237615[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Feb 18 21:39:38 2025 -0300
+
+    refactor(unit measure): create form
+
+[33mcommit 1ab365eccf7a9760b76f434ead559f114868d490[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Feb 18 21:28:09 2025 -0300
+
+    feat(unit measure): update
+
+[33mcommit c891114711d505ce011bee4c340ec1a2dddab694[m
+Author: Carlos Yuri <82901729+oyurisousa@users.noreply.github.com>
+Date:   Tue Feb 18 14:28:37 2025 +0000
+
+    config: vercel deployment
+
+[33mcommit 73bea449235184117f77a2fbd33921407c0822ea[m
+Author: Carlos Yuri <82901729+oyurisousa@users.noreply.github.com>
+Date:   Tue Feb 18 13:39:35 2025 +0000
+
+    chore: remove interceptor on prod
+
+[33mcommit a1740d910d19241a54b066696e0fd895aa091f48[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Mon Feb 17 21:56:59 2025 -0300
+
+    feat(unit measure): filters
+
+[33mcommit c899a0f725c39cdba84430bb9c1c7338079e0a19[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Mon Feb 17 21:50:28 2025 -0300
+
+    feat(institution): skeleton update
+
+[33mcommit 44f7d59dfa0b72d895e59296da08302832105104[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Feb 16 10:00:58 2025 -0300
+
+    feat(manufacturer): update
+
+[33mcommit 85900c84e9da845bdc5d67b76d7b41701514b9df[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Feb 16 09:17:25 2025 -0300
+
+    feat(manufacturer): filters
+
+[33mcommit afe71a4d73192b53dde2f05ad57f2f45b4b4ae49[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Feb 16 08:18:07 2025 -0300
+
+    feat(pathology): loading pré update
+
+[33mcommit 5a0813f7f560036bdaba4427e782e68acd31b707[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Feb 15 16:13:42 2025 -0300
+
+    feat(pharmaceutical form): update
+
+[33mcommit 02a3aa3943a5f297a225680e0d970a5b2faa180d[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Feb 15 15:46:27 2025 -0300
+
+    feat(therapeutic class): filters & update
+
+[33mcommit 94781496729ebfbab904542cc221553661150105[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Feb 15 09:09:13 2025 -0300
+
+    feat(pathology): update
+
+[33mcommit b4abf55248c1f403d775482d519346f04254e274[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Feb 15 08:04:15 2025 -0300
+
+    feat(pathology): filters
+
+[33mcommit 486af022bd1db0cd1a3477a1ab97b7e91e0e62f2[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Feb 15 07:52:04 2025 -0300
+
+    chore: validate cnpj lenth on institution filters
+
+[33mcommit d93f190629ad340cf894fc1efa1704beaf6c07ec[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Fri Feb 14 21:45:07 2025 -0300
+
+    feat(institution): filters
+
+[33mcommit 97ee1e530ddf0866405735ecf50b222ef4852353[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Fri Feb 14 20:41:19 2025 -0300
+
+    feat(institution): update
+
+[33mcommit 0521c09800308d1b4ea698400377a662620e6ecc[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Feb 13 19:27:04 2025 -0300
+
+    feat(forms, manuf, unit, pathol, moveme. type): pagination
+
+[33mcommit 851f507e42feafdbdabb7deae8068719bf98fef1[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Wed Feb 12 21:51:22 2025 -0300
+
+    chore: add field movement type on entry meicine
+
+[33mcommit 8e1a018133bdf67ea82dd4c2fbdc5ecd004d9871[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Wed Feb 12 21:01:31 2025 -0300
+
+    feat(movement type): fetch & create
+
+[33mcommit adb6506947d83756a2a4cde8b7322b535e20e970[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Feb 9 19:58:52 2025 -0300
+
+    feat(therapeutic class,institution,stock ): add pagination
+
+[33mcommit fc46bbb44603d205b0caccacdc1e1498fa1dee68[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Feb 8 21:16:06 2025 -0300
+
+    chore: semantic panel
+
+[33mcommit e3e0a68386b2ca0728baae02569b6138e6c06ea5[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Feb 8 21:07:46 2025 -0300
+
+    feat: register dispensation
+
+[33mcommit 400466f09ad9ee1203967f15d194146dbf5522de[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Feb 1 21:50:13 2025 -0300
+
+    feat: list dispensations
+
+[33mcommit 047925924e76255edb3f64610adb4cf7b246757d[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Jan 23 22:19:32 2025 -0300
+
+    refactor: register pacient form
+
+[33mcommit 2027f4ac94a4f13344af51e3d38667cae3446364[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Jan 19 09:28:32 2025 -0300
+
+    fix: fetching pathologies on table
+
+[33mcommit 079e1d0100ae259484e0d583f85788cbabffdd36[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Jan 18 21:23:22 2025 -0300
+
+    feat: register patient
+
+[33mcommit b725416cee9c01a1e6a79e55e8a2e64372818d8e[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Jan 16 22:00:45 2025 -0300
+
+    feat(form users): add field pathologies
+
+[33mcommit 31d6f327495d550b302da90dd49152038de49718[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Wed Jan 15 21:51:42 2025 -0300
+
+    feat: fetch users
+
+[33mcommit 543c410487c34208bab557e658775849419cc90e[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Jan 14 15:11:28 2025 -0300
+
+    chore: define type errors api
+
+[33mcommit 6b88635c5caa7b3dc8ba3ba625ffc78794f5f9e2[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Jan 14 15:03:18 2025 -0300
+
+    feat: message success/error on register operator
+
+[33mcommit 6acbae7bebf52ce0fa760643a88cd125c2ab329b[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Mon Jan 13 14:33:19 2025 -0300
+
+    fix: institutions fetch
+
+[33mcommit c8be48e0c91b6753111214b7f657e7564d765e37[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Jan 7 21:49:03 2025 -0300
+
+    chore: skeleton loading user
+
+[33mcommit 2f71782844035bc6bd281c2bc0c32bcbd9ffb140[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Jan 7 21:12:51 2025 -0300
+
+    fix: loading instituions in start panel
+
+[33mcommit 2bfcd9c2ca0419cd989ff74900130ea7f393e658[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Jan 7 21:10:33 2025 -0300
+
+    fix: toasts login
+
+[33mcommit cdd99cf24b8d7080058a76deff8305711266f27e[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Mon Jan 6 22:08:49 2025 -0300
+
+    refactor: use form shadcn
+
+[33mcommit bf90e24e812f0aa63bb1d53d7cbcea943d2b8d8f[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Mon Jan 6 21:25:16 2025 -0300
+
+    feat: operators paginated
+
+[33mcommit ea5d05059e858a8c617c2fc3fe3ab996d79f432b[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Mon Jan 6 21:16:48 2025 -0300
+
+    feat: route (/) to panel
+
+[33mcommit 20fa7c9d3bd4858c998bafe1089b5ef4e80939aa[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Jan 4 22:52:38 2025 -0300
+
+    feat: add field entry date
+
+[33mcommit e59ea78f39c38779da57895eb0dcc917b12dca55[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Jan 4 22:25:33 2025 -0300
+
+    refactor: remove item duplicity in panel
+
+[33mcommit 6ff634bc4952427ec245548070d6777c853e5b41[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Jan 4 22:19:06 2025 -0300
+
+    fix: unit measure result
+
+[33mcommit d39e8bd9176ce7777273b1b300f249f06d7a96fe[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Jan 4 22:16:10 2025 -0300
+
+    fix: manufacturers result
+
+[33mcommit cfbcf403e69de863903e1046eb785f41bc4f3ff1[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Jan 4 22:15:20 2025 -0300
+
+    fix: pharmaceutical form result
+
+[33mcommit 66235eab78b8444a3573c47e3c5f051041a7f92b[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Jan 4 22:10:00 2025 -0300
+
+    refactor(instituion): folder & path api
+
+[33mcommit 11df703e8ca354c6d7b4ef444ccbfe6b2012f8e1[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Jan 4 22:04:27 2025 -0300
+
+    refactor(stock): change endpoints
+
+[33mcommit bc5624511791f85299c1ff8e9c26b33ca257189f[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Jan 4 21:40:11 2025 -0300
+
+    feat(entry): register & list
+
+[33mcommit 05a4a06ffe1f13909af544c492510b4275c14e52[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Dec 8 14:57:47 2024 -0300
+
+    feat(medicine variant): register
+
+[33mcommit 13b9199024bb628d763bf4f5a248e145e07b4e68[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Nov 24 21:09:52 2024 -0300
+
+    feat(medicines): pagination
+
+[33mcommit 4778337b275f0ef6d5d0c434c8649e854f7cd79e[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Nov 24 21:09:25 2024 -0300
+
+    feat(medicine-variant):fetch
+
+[33mcommit 9125c0bba82e811d827f37c158847f2bcfda3c70[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Fri Nov 22 18:54:49 2024 -0300
+
+    feat(medicine): register
+
+[33mcommit ce9013737cb637a083d11ddba4033830ddbb484a[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Fri Nov 22 15:26:26 2024 -0300
+
+    refactor: dialogs forms
+
+[33mcommit 37daca1b3a826d71be290bb885fa27d40bed99ed[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Fri Nov 22 15:24:44 2024 -0300
+
+    feat(medicines): fetch
+
+[33mcommit 2ea1631cca17f8b8b2b65aa2676287c542909b1f[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Nov 14 15:06:18 2024 -0300
+
+    feat(pathology): fetch & register
+
+[33mcommit fc0a2f7a134fb0562edd560b439d61c80d7e3074[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Wed Nov 13 20:59:31 2024 -0300
+
+    feat(unit measure): register & fetch
+
+[33mcommit 6fa2aa480cb5d099ea332550a5bc10d915cf0d4b[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Wed Nov 13 20:00:33 2024 -0300
+
+    feat(manufacturer): create &  fetch
+
+[33mcommit 5c14ffe2ade07e639069f2f5d02811a75c8c1c8c[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Tue Nov 12 22:07:44 2024 -0300
+
+    feat(pharmaceutical-form): fetch & create
+
+[33mcommit a11882e48c666f442f430dd213379d4f47ea5c9a[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Nov 9 23:50:40 2024 -0300
+
+    feat(operator): get operator details
+
+[33mcommit 782b0d279dba0522bcefea67cc8177b237a3496c[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Nov 9 22:57:57 2024 -0300
+
+    refactor(role): update roles
+
+[33mcommit 223d79b05b32053797bca4803f20989e80863c2a[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Nov 9 22:05:03 2024 -0300
+
+    chore(stock): join institution
+
+[33mcommit 85524a0760ac0836fd937484acde3749172754b2[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Nov 7 21:54:53 2024 -0300
+
+    feat(therapeutic-class): register & fetch
+
+[33mcommit 98283429743b3df64056110be1a26dcf8f0f0262[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Nov 7 21:05:43 2024 -0300
+
+    refactor(structure): folders panel
+
+[33mcommit ac8753dec9ba22b897b2c70cfad4fac530a2c921[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Nov 7 21:00:48 2024 -0300
+
+    feat(stocks): create & fetch
+
+[33mcommit d568bde7340bfa0d895da0aaf84c4fbdc3b8c2af[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sat Nov 2 09:27:41 2024 -0300
+
+    chore: component select ROLE
+
+[33mcommit 5ab6ce367a432816f89df088221c1e94a3699b56[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Fri Nov 1 19:21:49 2024 -0300
+
+    feat: register institution
+
+[33mcommit 3516fb30058dc8357991bc9ecd06ffbe5aadb911[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Thu Oct 31 21:50:46 2024 -0300
+
+    feat: view institutions
+
+[33mcommit a57e6f023984d1b913b0537fad8218fadad1e359[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Wed Oct 30 14:27:09 2024 -0300
+
+    feat: register operator
+
+[33mcommit 48bc0b18d79feb7d2e8330e1b3ce05fc98a41aa2[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Oct 27 21:56:29 2024 -0300
+
+    initial commit
+
+[33mcommit da5cb3656582fb8830fb6a170289e0bbded38f64[m
+Author: yuri <yurisousaenfer@gmail.com>
+Date:   Sun Oct 27 21:56:15 2024 -0300
+
+    initial commit
