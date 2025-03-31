@@ -25,9 +25,17 @@ export function MedicinesVariants() {
 
   const [searchParams, setSearchParams] = useSearchParams()
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
+
+  const medicineId = searchParams.get('medicineId')
+  const name = searchParams.get('name')
+
   const { data: medicinesVariants } = useQuery({
-    queryKey: ['medicines-variants', pageIndex],
-    queryFn: () => fetchMedicinesVariants({ page: pageIndex }, token ?? ''),
+    queryKey: ['medicines-variants', pageIndex, name, medicineId],
+    queryFn: () =>
+      fetchMedicinesVariants(
+        { page: pageIndex, query: name, medicineId },
+        token ?? '',
+      ),
   })
 
   function handlePagination(pageIndex: number) {
