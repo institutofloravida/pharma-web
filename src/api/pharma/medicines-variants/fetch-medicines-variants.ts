@@ -2,6 +2,7 @@ import { apiPharma } from '@/lib/axios'
 export interface FetchMedicinesVariantsQuery {
   page?: number | null
   query?: string | null
+  medicineId?: string | null
 }
 
 export interface MedicineVariant {
@@ -24,7 +25,7 @@ export interface FetchMedicinesVariantsResponse {
 }
 
 export async function fetchMedicinesVariants(
-  { page, query }: FetchMedicinesVariantsQuery,
+  { page, query, medicineId }: FetchMedicinesVariantsQuery,
   token: string,
 ) {
   const response = await apiPharma.get<FetchMedicinesVariantsResponse>(
@@ -36,6 +37,7 @@ export async function fetchMedicinesVariants(
       params: {
         page,
         query,
+        medicineId,
       },
     },
   )
