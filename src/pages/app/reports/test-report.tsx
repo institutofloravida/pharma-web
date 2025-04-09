@@ -47,7 +47,7 @@ const generateMockData = (): MedicineWithBatches[] => {
   return meds
 }
 
-export const Test = () => {
+export const ReportTest = () => {
   const [loading, setLoading] = useState(false)
 
   const generatePDF = async () => {

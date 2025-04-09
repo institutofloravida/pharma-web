@@ -7,10 +7,7 @@ import { PrivateRoute } from './pages/_private/private-route'
 import { SignIn } from './pages/app/auth/sign-in'
 import { Institutions } from './pages/app/panel/auxiliary-records/institutions/institutions'
 import { Manufacturers } from './pages/app/panel/auxiliary-records/manufacturers/manufacturers'
-import {
-  MovementType,
-  MovementTypes,
-} from './pages/app/panel/auxiliary-records/movement-type/movement-types'
+import { MovementTypes } from './pages/app/panel/auxiliary-records/movement-type/movement-types'
 import { Pathologies } from './pages/app/panel/auxiliary-records/pathology/pathologies'
 import { PharmaceuticalForms } from './pages/app/panel/auxiliary-records/pharmaceutical-form/pharmaceutical-forms'
 import { Stocks } from './pages/app/panel/auxiliary-records/stocks/stocks'
@@ -23,9 +20,9 @@ import { MedicinesVariants } from './pages/app/panel/medicine-variant/medicines-
 import { Medicines } from './pages/app/panel/medicines/medicines'
 import { MedicinesEntries } from './pages/app/panel/movement/entry/medicines-entries'
 import { Operators } from './pages/app/panel/operators/operators'
-import { Test } from './pages/app/panel/test/test'
 import { NewUser } from './pages/app/panel/users/new-user'
 import { Users } from './pages/app/panel/users/users'
+import { ReportTest } from './pages/app/reports/test-report'
 
 export const router = createBrowserRouter([
   {
@@ -63,7 +60,7 @@ export const router = createBrowserRouter([
         path: 'test',
         element: (
           <PrivateRoute>
-            <Test />
+            <ReportTest />
           </PrivateRoute>
         ),
       },
