@@ -9,18 +9,21 @@ export interface FetchInventoryQuery {
   therapeuticClassesIds?: string[] | null
 }
 
-interface FetchInventoryResponse {
-  inventory: {
-    medicineStockId: string
-    stockId: string
-    medicineVariantId: string
-    pharmaceuticalForm: string
-    unitMeasure: string
-    dosage: string
-    quantity: number
-    bacthesStocks: number
-    isLowStock: boolean
-  }[]
+export interface InventorySingle {
+  medicineStockId: string
+  stockId: string
+  medicineVariantId: string
+  medicine: string
+  pharmaceuticalForm: string
+  unitMeasure: string
+  dosage: string
+  quantity: number
+  bacthesStocks: number
+  isLowStock: boolean
+}
+
+export interface FetchInventoryResponse {
+  inventory: InventorySingle[]
 }
 
 export async function fetchInventory(

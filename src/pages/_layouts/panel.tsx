@@ -219,6 +219,14 @@ const data = {
     },
   ],
 
+  inventoryAreaSingleItem: [
+    {
+      name: 'Inventário',
+      url: '/inventory',
+      icon: FlaskConical,
+    },
+  ],
+
   projects: [
     {
       name: 'Configurações',
@@ -416,6 +424,23 @@ export default function PanelLayout() {
                     </Collapsible>
                   ))}
                 </SidebarMenu>
+              </SidebarGroup>
+              <SidebarGroup>
+                <SidebarGroupLabel>Inventário</SidebarGroupLabel>
+                {data.inventoryAreaSingleItem.map((item) => {
+                  return (
+                    <SidebarMenuButton
+                      tooltip={item.name}
+                      asChild
+                      key={item.name}
+                    >
+                      <Link to={item.url}>
+                        <item.icon />
+                        <span>{item.name}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  )
+                })}
               </SidebarGroup>
               <SidebarGroup className="">
                 <SidebarGroupLabel>Mais</SidebarGroupLabel>
