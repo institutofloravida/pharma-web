@@ -59,7 +59,7 @@ export function Inventory() {
         {
           page: pageIndex,
           institutionId: institutionId ?? '',
-          isLowStock: isLowStock?.toLowerCase() === 'true',
+          isLowStock: isLowStock !== null ? isLowStock === 'true' : undefined,
           medicineName,
           stockId,
           therapeuticClassesIds,
