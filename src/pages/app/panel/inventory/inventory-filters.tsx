@@ -75,12 +75,12 @@ export function InventoryTableFilters() {
     staleTime: 1000,
     refetchOnMount: true,
   });
-
+  console.log(isLowStock)
   const form = useForm<InventoryFiltersSchema>({
     resolver: zodResolver(inventoryFiltersSchema),
     defaultValues: {
       medicineName: medicineName ?? "",
-      isLowStock: Boolean(isLowStock),
+      isLowStock: isLowStock !== null ? (isLowStock === 'true') : undefined,
       stockId: stockId ?? "",
       therapeuticClassesIds: therapeuticClassesIds ?? "",
     },
