@@ -12,6 +12,7 @@ import {
   Folder,
   Forward,
   GalleryVerticalEnd,
+  Layers,
   Layers2,
   Loader2,
   LogOut,
@@ -223,7 +224,7 @@ const data = {
     {
       name: 'Inventário',
       url: '/inventory',
-      icon: FlaskConical,
+      icon: Layers,
     },
   ],
 

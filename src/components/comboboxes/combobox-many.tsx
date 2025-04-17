@@ -76,7 +76,7 @@ export function ComboboxMany<T extends Record<string, any>>({
               variant="outline"
               role="combobox"
               className={cn(
-                'w-[250px] justify-between',
+                'w-[250px] justify-between bg-transparent',
                 !selectedItems.length && 'text-muted-foreground',
               )}
             >

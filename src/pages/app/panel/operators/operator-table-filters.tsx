@@ -8,7 +8,7 @@ import { z } from 'zod'
 
 import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
 import { OperatorRole } from '@/api/pharma/operators/register-operator'
-import { Combobox } from '@/components/comboboxes/pharmaceutical-form-combobox'
+import { Combobox } from '@/components/comboboxes/combobox'
 import { SelectRole } from '@/components/selects/select-role'
 import { Button } from '@/components/ui/button'
 import {

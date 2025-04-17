@@ -12,7 +12,7 @@ import {
   registerMedicineVariant,
   type RegisterMedicineVariantBody,
 } from '@/api/pharma/medicines-variants/register-medicine-variant'
-import { Combobox } from '@/components/comboboxes/pharmaceutical-form-combobox'
+import { Combobox } from '@/components/comboboxes/combobox'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,

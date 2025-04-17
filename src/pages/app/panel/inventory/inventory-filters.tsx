@@ -7,7 +7,7 @@ import { useSearchParams } from "react-router-dom";
 import { z } from "zod";
 
 import { fetchMedicines } from "@/api/pharma/medicines/fetch-medicines";
-import { Combobox } from "@/components/comboboxes/pharmaceutical-form-combobox";
+import { Combobox } from "@/components/comboboxes/combobox";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -75,7 +75,6 @@ export function InventoryTableFilters() {
     staleTime: 1000,
     refetchOnMount: true,
   });
-  console.log(isLowStock)
   const form = useForm<InventoryFiltersSchema>({
     resolver: zodResolver(inventoryFiltersSchema),
     defaultValues: {

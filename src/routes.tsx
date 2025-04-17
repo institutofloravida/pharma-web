@@ -15,6 +15,7 @@ import { UnitMeasure } from './pages/app/panel/auxiliary-records/unit-measure/un
 import { Dashboard } from './pages/app/panel/dashboard/dashboard'
 import { Dispensations } from './pages/app/panel/dispensation/dispensation'
 import { NewDispensation } from './pages/app/panel/dispensation/new-dispensation'
+import { InventoryMedicineDetails } from './pages/app/panel/inventory/inventory-medicine-details'
 import { Inventory } from './pages/app/panel/inventory/list-inventory'
 import { MedicinesVariants } from './pages/app/panel/medicine-variant/medicines-variants'
 import { Medicines } from './pages/app/panel/medicines/medicines'
@@ -235,6 +236,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Inventory />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: ':id',
+        element: (
+          <PrivateRoute>
+            <InventoryMedicineDetails />
           </PrivateRoute>
         ),
       },

@@ -1,6 +1,7 @@
 'use client'
 
 import { Box, ChevronRight, Layers, Package } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 import type { InventorySingle } from '@/api/pharma/inventory/fetch-inventory'
 import { Badge } from '@/components/ui/badge'
@@ -49,6 +50,12 @@ interface MedicationCardProps {
 function MedicationCard({ medication }: MedicationCardProps) {
   // const categoryColor = getCategoryColor(medication.category)
   // const categoryIcon = getCategoryIcon(medication.category)
+
+  const navigate = useNavigate()
+
+  function redirect() {
+    navigate(`/inventory/${medication.medicineStockId}`)
+  }
 
   return (
     <Card
@@ -102,8 +109,8 @@ function MedicationCard({ medication }: MedicationCardProps) {
           variant="ghost"
           size="sm"
           className="h-8"
-          onClick={(e) => {
-            e.stopPropagation()
+          onClick={() => {
+            redirect()
           }}
         >
           Ver Lotes

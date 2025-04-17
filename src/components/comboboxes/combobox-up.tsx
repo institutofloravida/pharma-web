@@ -50,7 +50,7 @@ export function ComboboxUp<T extends Record<string, any>>({
             variant="outline"
             role="combobox"
             className={cn(
-              'justify-between',
+              'justify-between bg-transparent',
               !field.value && 'text-muted-foreground',
             )}
           >
