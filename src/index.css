@@ -92,7 +92,7 @@
 
 
 ::-webkit-scrollbar {
-  width: 8px; /* Largura da barra de rolagem */
+  width: 12px; /* Largura da barra de rolagem */
   height: 8px; /* Altura da barra de rolagem horizontal */
 }
 
