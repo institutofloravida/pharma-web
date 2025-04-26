@@ -30,6 +30,7 @@ export default [
       'simple-import-sort/imports': 'error',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-useless-constructor': 'off',
     },
   },
 ]

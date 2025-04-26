@@ -5,6 +5,7 @@ import { Dispensation } from '@/api/pharma/dispensation/fetch-dispensations'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { dateFormatter } from '@/lib/utils/formatter'
 
 export interface DispensationsTableRowProps {
   dispensation: Dispensation
@@ -27,19 +28,16 @@ export function DispensationTableRow({
         </Dialog>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        {dispensation.patientId}
+        {dispensation.patient}
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        Dipirona 500g CP
+        {dispensation.operator}
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        {dispensation.quantity}
+        {dateFormatter.format(new Date(dispensation.dispensationDate))}
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        {formatDate(new Date(dispensation.dispensationDate), 'mm/dd/yyyy')}
-      </TableCell>
-      <TableCell className="font-mono text-xs font-medium">
-        {dispensation.operatorId}
+        {dispensation.items}
       </TableCell>
 
       <TableCell>

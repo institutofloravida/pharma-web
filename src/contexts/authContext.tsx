@@ -37,23 +37,23 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.removeItem('token')
     localStorage.removeItem('institutionId')
     queryClient.invalidateQueries()
+    queryClient.removeQueries({ queryKey: ['me'] })
   }
+
+  const shouldFetch = Boolean(token)
 
   const { data: me, isLoading } = useQuery({
     queryKey: ['me', token],
     queryFn: async () => {
-      try {
-        const response = await apiPharma.get('/validate-token', {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (!response.data.isValid) throw new Error('Token inválido')
-        return getOperatorDetails(token ?? '')
-      } catch (error) {
-        clearAuth()
-        throw error
-      }
+      const response = await apiPharma.get('/validate-token', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      if (!response.data.isValid) throw new Error('Token inválido')
+      return getOperatorDetails(token ?? '')
     },
-    enabled: Boolean(token),
+    enabled: shouldFetch,
+    retry: false,
   })
 
   const isAuthenticated = Boolean(token) && !isLoading && !!me
@@ -74,7 +74,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } else {
       localStorage.removeItem('institutionId')
     }
-    // Invalida queries dependentes da instituição
   }
 
   return (

@@ -8,11 +8,11 @@ export interface FetchDispensationsQuery {
 export interface Dispensation {
   id: string
   dispensationDate: string
-  medicinesMovemented: number
   patientId: string
+  patient: string
   operatorId: string
-  createdAt: string
-  quantity: number
+  operator: string
+  items: number
 }
 
 interface FetchDispensationsResponse {

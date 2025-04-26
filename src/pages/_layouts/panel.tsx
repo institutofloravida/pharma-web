@@ -8,6 +8,7 @@ import {
   ChevronRight,
   ChevronsUpDown,
   Command,
+  FileCog,
   FlaskConical,
   Folder,
   Forward,
@@ -227,7 +228,20 @@ const data = {
       icon: Layers,
     },
   ],
-
+  reportsManyItems: [
+    {
+      title: 'Relatórios',
+      url: '/reports',
+      icon: FileCog,
+      isActive: true,
+      items: [
+        {
+          title: 'Teste',
+          url: '/reports',
+        },
+      ],
+    },
+  ],
   projects: [
     {
       name: 'Configurações',
@@ -442,6 +456,41 @@ export default function PanelLayout() {
                     </SidebarMenuButton>
                   )
                 })}
+              </SidebarGroup>
+              <SidebarGroup>
+                <SidebarGroupLabel>Relatórios</SidebarGroupLabel>
+                <SidebarMenu>
+                  {data.reportsManyItems.map((item) => (
+                    <Collapsible
+                      key={item.title}
+                      asChild
+                      className="group/collapsible"
+                    >
+                      <SidebarMenuItem>
+                        <CollapsibleTrigger asChild>
+                          <SidebarMenuButton tooltip={item.title}>
+                            {item.icon && <item.icon />}
+                            <span>{item.title}</span>
+                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                          </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent>
+                          <SidebarMenuSub>
+                            {item.items?.map((subItem) => (
+                              <SidebarMenuSubItem key={subItem.title}>
+                                <SidebarMenuSubButton asChild>
+                                  <Link to={subItem.url}>
+                                    <span>{subItem.title}</span>
+                                  </Link>
+                                </SidebarMenuSubButton>
+                              </SidebarMenuSubItem>
+                            ))}
+                          </SidebarMenuSub>
+                        </CollapsibleContent>
+                      </SidebarMenuItem>
+                    </Collapsible>
+                  ))}
+                </SidebarMenu>
               </SidebarGroup>
               <SidebarGroup className="">
                 <SidebarGroupLabel>Mais</SidebarGroupLabel>

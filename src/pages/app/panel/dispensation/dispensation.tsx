@@ -46,7 +46,7 @@ export function Dispensations() {
             <Button
               className=""
               variant={'default'}
-              onClick={() => navigate('/dispensations/new')}
+              onClick={() => navigate('/dispensation/new')}
             >
               Nova dispensa
             </Button>
@@ -57,11 +57,10 @@ export function Dispensations() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[64px]"></TableHead>
-                  <TableHead className="w-[180px]">Medicamento</TableHead>
-                  <TableHead className="w-[180px]">Quantidade</TableHead>
-                  <TableHead className="w-[180px]">Dispensado em</TableHead>
                   <TableHead>Usuário</TableHead>
-                  <TableHead className="w-[50px]">Operador</TableHead>
+                  <TableHead>Operador</TableHead>
+                  <TableHead className="w-[180px]">Dispensado em</TableHead>
+                  <TableHead className="w-[180px]">Items</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
