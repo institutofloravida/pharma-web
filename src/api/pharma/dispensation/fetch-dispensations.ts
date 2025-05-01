@@ -3,6 +3,7 @@ import { apiPharma } from '@/lib/axios'
 export interface FetchDispensationsQuery {
   page: number | null
   patientId?: string | null
+  dispensationDate?: Date | null
 }
 
 export interface Dispensation {
@@ -24,7 +25,7 @@ interface FetchDispensationsResponse {
 }
 
 export async function fetchDispensations(
-  { page, patientId }: FetchDispensationsQuery,
+  { page, patientId, dispensationDate }: FetchDispensationsQuery,
   token: string,
 ) {
   const response = await apiPharma.get<FetchDispensationsResponse>(
@@ -36,6 +37,7 @@ export async function fetchDispensations(
       params: {
         page,
         patientId,
+        dispensationDate,
       },
     },
   )

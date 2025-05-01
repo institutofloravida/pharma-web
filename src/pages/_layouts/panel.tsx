@@ -185,6 +185,10 @@ const data = {
           title: 'Entradas',
           url: '/movement/entries',
         },
+        {
+          title: 'Dispensas',
+          url: '/dispensation',
+        },
       ],
     },
     {
@@ -203,22 +207,18 @@ const data = {
         },
       ],
     },
-    {
-      title: 'Dispensas',
-      url: '#',
-      icon: BriefcaseMedical,
-      isActive: true,
-      items: [
-        {
-          title: 'Todas',
-          url: '/dispensation',
-        },
-        {
-          title: 'Nova',
-          url: '/dispensation/new',
-        },
-      ],
-    },
+    // {
+    //   title: 'Dispensas',
+    //   url: '#',
+    //   icon: BriefcaseMedical,
+    //   isActive: true,
+    //   items: [
+    //     {
+    //       title: 'Nova',
+    //       url: '/dispensation/new',
+    //     },
+    //   ],
+    // },
   ],
 
   inventoryAreaSingleItem: [

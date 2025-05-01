@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchDispensations } from '@/api/pharma/dispensation/fetch-dispensations'
+import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -14,6 +15,7 @@ import {
 } from '@/components/ui/table'
 import { useAuth } from '@/contexts/authContext'
 
+import { DispensationTableFilters } from './dispensation-table-filters'
 import { DispensationTableRow } from './dispensation-table-row'
 
 export function Dispensations() {
@@ -21,11 +23,24 @@ export function Dispensations() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: dispensationsResult } = useQuery({
-    queryKey: ['dispensations'],
-    queryFn: () => fetchDispensations({ page }, token ?? ''),
-  })
 
+  const patientId = searchParams.get('patientId')
+  const dispensationDate = searchParams.get('dispensationDate')
+
+  const { data: dispensationsResult } = useQuery({
+    queryKey: ['dispensations', patientId, dispensationDate],
+    queryFn: () =>
+      fetchDispensations(
+        {
+          page,
+          patientId,
+          dispensationDate: dispensationDate
+            ? new Date(dispensationDate)
+            : undefined,
+        },
+        token ?? '',
+      ),
+  })
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
       state.set('page', pageIndex.toString())
@@ -42,7 +57,7 @@ export function Dispensations() {
         </h1>
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
-            {/* <UserTableFilters /> */}
+            <DispensationTableFilters />
             <Button
               className=""
               variant={'default'}
@@ -79,14 +94,14 @@ export function Dispensations() {
             </Table>
           </div>
 
-          {/* {dispensationsResult && (
+          {dispensationsResult && (
             <Pagination
               pageIndex={dispensationsResult.meta.page}
               totalCount={dispensationsResult.meta.totalCount}
               perPage={10}
               onPageChange={handlePagination}
             />
-          )} */}
+          )}
         </div>
       </div>
     </>
