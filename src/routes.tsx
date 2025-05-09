@@ -20,6 +20,7 @@ import { Inventory } from './pages/app/panel/inventory/list-inventory'
 import { MedicinesVariants } from './pages/app/panel/medicine-variant/medicines-variants'
 import { Medicines } from './pages/app/panel/medicines/medicines'
 import { MedicinesEntries } from './pages/app/panel/movement/entry/medicines-entries'
+import { MedicinesExits } from './pages/app/panel/movement/exit/medicines-exits'
 import { Operators } from './pages/app/panel/operators/operators'
 import { NewUser } from './pages/app/panel/users/new-user'
 import { Users } from './pages/app/panel/users/users'
@@ -178,6 +179,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <MedicinesEntries />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'exits',
+        element: (
+          <PrivateRoute>
+            <MedicinesExits />
           </PrivateRoute>
         ),
       },

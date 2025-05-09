@@ -186,6 +186,10 @@ const data = {
           url: '/movement/entries',
         },
         {
+          title: 'Saídas',
+          url: '/movement/exits',
+        },
+        {
           title: 'Dispensas',
           url: '/dispensation',
         },
