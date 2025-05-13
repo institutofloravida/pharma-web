@@ -32,6 +32,7 @@ interface InventoryMedicineDetailsResponse {
     }
     batchesStock: batchStockInventory[]
     isLowStock: boolean
+    isZero: boolean
   }
 }
 

@@ -59,7 +59,7 @@ function MedicationCard({ medication }: MedicationCardProps) {
 
   return (
     <Card
-      className={`cursor-pointer overflow-hidden transition-all duration-200 hover:shadow-md dark:border-border dark:bg-opacity-10`}
+      className={`flex cursor-pointer flex-col justify-between overflow-hidden transition-all duration-200 hover:shadow-md dark:border-border dark:bg-opacity-10`}
     >
       <CardHeader className="flex flex-row items-start justify-between px-4 pb-2 pt-4">
         <div>
@@ -94,6 +94,12 @@ function MedicationCard({ medication }: MedicationCardProps) {
           {hasLowStock(medication) && (
             <Badge variant="destructive" className="text-xs">
               Estoque Baixo
+            </Badge>
+          )}
+
+          {medication.isZero && (
+            <Badge variant="destructive" className="text-xs">
+              Estoque útil zerado
             </Badge>
           )}
           {/* <Badge

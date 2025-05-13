@@ -24,6 +24,7 @@ export interface InventorySingle {
   }
   bacthesStocks: number
   isLowStock: boolean
+  isZero: boolean
 }
 
 export interface FetchInventoryResponse {
