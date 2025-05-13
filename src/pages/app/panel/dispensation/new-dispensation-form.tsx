@@ -346,6 +346,9 @@ export function NewDispensationForm() {
                     formatItem={(item) =>
                       `${Formatter.cpf(item.cpf)} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
                     }
+                    getItemText={(item) =>
+                      `${Formatter.cpf(item.cpf)} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
+                    }
                     placeholder="Pesquise por um usuário"
                     onSelect={(item) => {
                       form.setValue('patientId', item)
@@ -430,6 +433,9 @@ export function NewDispensationForm() {
                     }}
                     itemKey="id"
                     formatItem={(item) => {
+                      return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
+                    }}
+                    getItemText={(item) => {
                       return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
                     }}
                   />

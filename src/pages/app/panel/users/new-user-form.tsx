@@ -435,6 +435,7 @@ export function NewUserForm() {
                     query={queryState}
                     isFetching={isFetchingStates}
                     formatItem={(item) => `${item.sigla} - ${item.nome}`}
+                    getItemText={(item) => `${item.sigla} - ${item.nome}`}
                     placeholder="Selecione um estado"
                     onSelect={(item) => {
                       form.setValue('addressPatient.state', item)
@@ -459,6 +460,7 @@ export function NewUserForm() {
                     onQueryChange={setQueryCity}
                     query={queryCity}
                     isFetching={isFetchingCities}
+                    getItemText={(item) => `${item.nome}`}
                     formatItem={(item) => `${item.nome}`}
                     placeholder="Selecione uma cidade"
                     onSelect={(item) =>

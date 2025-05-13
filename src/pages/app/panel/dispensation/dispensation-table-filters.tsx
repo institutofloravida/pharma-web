@@ -122,6 +122,9 @@ export function DispensationTableFilters() {
                 formatItem={(item) =>
                   `${Formatter.cpf(item.cpf)} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
                 }
+                getItemText={(item) =>
+                  `${Formatter.cpf(item.cpf)} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
+                }
                 placeholder="Pesquise por um usuário"
                 onSelect={(item) => {
                   form.setValue('patientId', item)

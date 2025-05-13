@@ -215,6 +215,9 @@ export function NewMedicineEntryDialog() {
                   formatItem={(item) => {
                     return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
                   }}
+                  getItemText={(item) => {
+                    return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
+                  }}
                 />
                 <FormMessage />
               </FormItem>
@@ -233,6 +236,9 @@ export function NewMedicineEntryDialog() {
                   placeholder="Selecione a variante"
                   isFetching={isFetchingMedicinesVariants}
                   onQueryChange={setQueryMedicineVariant}
+                  getItemText={(item) =>
+                    `${item.medicine} ${item.pharmaceuticalForm} ${item.unitMeasure}`
+                  }
                   onSelect={(id, _) => {
                     form.setValue('medicineVariantId', id)
                   }}
@@ -258,6 +264,7 @@ export function NewMedicineEntryDialog() {
                   placeholder="Selecione a variante"
                   isFetching={isFetchingManufacturers}
                   onQueryChange={setQueryManufacturer}
+                  getItemText={(item) => item.name}
                   onSelect={(id, _) => {
                     form.setValue('newBatches.manufacturerId', id)
                   }}
@@ -288,6 +295,9 @@ export function NewMedicineEntryDialog() {
                     form.setValue('movementTypeId', id)
                   }}
                   itemKey="id"
+                  getItemText={(item) => {
+                    return `${item.name}`
+                  }}
                   formatItem={(item) => {
                     return `${item.name}`
                   }}
