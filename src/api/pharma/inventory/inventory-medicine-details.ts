@@ -25,6 +25,11 @@ interface InventoryMedicineDetailsResponse {
     stockId: string
     totalQuantity: number
     unitMeasure: string
+    quantity: {
+      totalCurrent: number
+      available: number
+      unavailable: number
+    }
     batchesStock: batchStockInventory[]
     isLowStock: boolean
   }

@@ -1,9 +1,11 @@
+import { formatters } from 'date-fns'
 import { PenLine, Search, Trash } from 'lucide-react'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
+import { Formatter } from '@/lib/utils/formaters/formaters'
 
 import { UpdateInstitutionDialog } from './update-instituion-dialog'
 
@@ -36,7 +38,7 @@ export function InstitutionTableRow({ institution }: InstitutionTableRowProps) {
         {institution.name}
       </TableCell>
       <TableCell className="text-muted-foreground">
-        {institution.cnpj}
+        {Formatter.cnpj(institution.cnpj)}
       </TableCell>
       <TableCell>{institution.description}</TableCell>
 

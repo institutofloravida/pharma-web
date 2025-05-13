@@ -67,7 +67,7 @@ export function MedicationList({ inventory }: MedicationListProps) {
                   <span
                     className={`font-medium ${hasLowStock(medication) ? 'text-destructive' : ''}`}
                   >
-                    {medication.quantity}
+                    {medication.quantity.current}
                   </span>
                 </TableCell>
                 <TableCell className="text-center">

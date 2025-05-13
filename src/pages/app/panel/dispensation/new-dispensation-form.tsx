@@ -9,12 +9,16 @@ import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
+import { dispensationPreview } from '@/api/pharma/dispensation/dispensation-preview'
 import {
   registerDispensation,
   type RegisterDispensationBody,
 } from '@/api/pharma/dispensation/register-dispensation'
 import { fetchBatchesOnStock } from '@/api/pharma/stock/bacth-stock/fetch-batches-stock'
-import { fetchMedicinesOnStock } from '@/api/pharma/stock/medicine-stock/fetch-medicines-stock'
+import {
+  fetchMedicinesOnStock,
+  type MedicineStockDetails,
+} from '@/api/pharma/stock/medicine-stock/fetch-medicines-stock'
 import { fetchUsers } from '@/api/pharma/users/fetch-users'
 import { ComboboxUp } from '@/components/comboboxes/combobox-up'
 import { Button } from '@/components/ui/button'
@@ -34,6 +38,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
@@ -49,6 +61,9 @@ export const newDispensationSchema = z.object({
   stockId: z.string({
     required_error: 'O estoque é obrigatório.',
   }),
+  quantityToDispensation: z
+    .number({ required_error: 'Campo obrigatório' })
+    .min(1, 'A quantidade deve ser pelo menos 1.'),
   patientId: z.string({
     required_error: 'O paciente é obrigatório.',
   }),
@@ -80,6 +95,8 @@ export function NewDispensationForm() {
   const [queryStock, setQueryStock] = useState('')
   const [queryMedicineStock, setQueryMedicineStock] = useState('')
   const [activeTab, setActiveTab] = useState('patient')
+  const [selectedMedicine, setSelectedMedicine] =
+    useState<MedicineStockDetails | null>(null)
 
   const navigate = useNavigate()
 
@@ -118,22 +135,40 @@ export function NewDispensationForm() {
       refetchOnMount: true,
     })
 
-  const { data: batchesStockResult, isFetching: isFetchingBatchesStock } =
-    useQuery({
-      queryKey: ['batches-stock', form.watch('medicineStockId')],
-      queryFn: () =>
-        fetchBatchesOnStock(
-          {
-            page: 1,
-            stockId: form.watch('stockId'),
-            medicineStockId: form.watch('medicineStockId'),
-          },
-          token ?? '',
-        ),
-      staleTime: 1000,
-      enabled: !!form.watch('medicineStockId'),
-      refetchOnMount: true,
-    })
+  // const { data: batchesStockResult, isFetching: isFetchingBatchesStock } =
+  //   useQuery({
+  //     queryKey: ['batches-stock', form.watch('medicineStockId')],
+  //     queryFn: () =>
+  //       fetchBatchesOnStock(
+  //         {
+  //           page: 1,
+  //           stockId: form.watch('stockId'),
+  //           medicineStockId: form.watch('medicineStockId'),
+  //         },
+  //         token ?? '',
+  //       ),
+  //     staleTime: 1000,
+  //     enabled: !!form.watch('medicineStockId'),
+  //     refetchOnMount: true,
+  //   })
+
+  const {
+    data: dispensationPreviewResult,
+    isFetching: isFetchingDispensationPreview,
+    refetch: refetchDispensationPreview,
+  } = useQuery({
+    queryKey: ['dispensation-preview'],
+    queryFn: () => {
+      const medicineStockId = form.getValues('medicineStockId')
+      const quantityRequired = form.getValues('quantityToDispensation')
+      return dispensationPreview(
+        { medicineStockId, quantityRequired },
+        token ?? '',
+      )
+    },
+    enabled: false,
+    staleTime: 1000,
+  })
 
   const {
     mutateAsync: registerDispensationFn,
@@ -149,22 +184,66 @@ export function NewDispensationForm() {
   })
 
   const handleNext = async () => {
-    let isValid = false
-
-    if (activeTab === 'patient') {
-      isValid = await form.trigger(['patientId'])
-    } else if (activeTab === 'medicine') {
-      isValid = await form.trigger(['stockId', 'medicineStockId'])
-    }
-
-    if (isValid) {
+    try {
       if (activeTab === 'patient') {
-        setActiveTab('medicine')
+        // Valida apenas os campos da aba paciente
+        const isValid = await form.trigger(['patientId', 'dispensationDate'])
+        if (isValid) {
+          setActiveTab('medicine')
+        }
       } else if (activeTab === 'medicine') {
-        setActiveTab('batches')
+        // Valida os campos da aba medicamento
+        const isValid = await form.trigger([
+          'stockId',
+          'medicineStockId',
+          'quantityToDispensation',
+        ])
+
+        if (isValid) {
+          const quantity = Number(form.getValues('quantityToDispensation'))
+          const availableQuantity = Number(
+            selectedMedicine?.quantity.available ?? 0,
+          )
+
+          // Validações adicionais específicas
+          if (quantity <= 0) {
+            form.setError('quantityToDispensation', {
+              type: 'manual',
+              message: 'A quantidade deve ser maior que zero',
+            })
+            return
+          }
+
+          if (quantity > availableQuantity) {
+            form.setError('quantityToDispensation', {
+              type: 'manual',
+              message: `Quantidade indisponível. Estoque: ${availableQuantity}`,
+            })
+            return
+          }
+
+          // Se passou todas as validações, busca os lotes e muda de aba
+          const previewResponse = await refetchDispensationPreview()
+          const batches = previewResponse.data ?? []
+
+          form.setValue(
+            'batchesStocks',
+            batches.map((batch) => ({
+              batchStockId: batch.batchStockId,
+              quantity: batch.quantity.toDispensation,
+            })),
+          )
+
+          setActiveTab('batches')
+        }
       }
-    } else {
-      console.log('Por favor, preencha os campos obrigatórios.')
+    } catch (error) {
+      console.error('Erro ao avançar:', error)
+      toast({
+        title: 'Erro',
+        description: 'Ocorreu um erro ao tentar avançar',
+        variant: 'destructive',
+      })
     }
   }
   const handlePrevious = () => {
@@ -177,6 +256,19 @@ export function NewDispensationForm() {
 
   async function handleRegisterDispensation(data: NewDispensationSchema) {
     try {
+      const availableQuantity = Number(
+        selectedMedicine?.quantity.available ?? 0,
+      )
+      const requestedQuantity = Number(data.quantityToDispensation)
+
+      if (requestedQuantity > availableQuantity) {
+        toast({
+          title: 'Erro na dispensa',
+          description: 'A quantidade solicitada excede o estoque disponível',
+          variant: 'destructive',
+        })
+        return
+      }
       await registerDispensationFn({
         batchesStocks: data.batchesStocks,
         dispensationDate: data.dispensationDate,
@@ -277,6 +369,7 @@ export function NewDispensationForm() {
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
+                          type="button"
                           variant={'outline'}
                           className={cn(
                             'w-[240px] pl-3 text-left font-normal',
@@ -310,20 +403,20 @@ export function NewDispensationForm() {
             />
 
             <div className="col-span-6 grid justify-end">
-              <Button type="submit" onClick={handleNext}>
+              <Button type="button" onClick={handleNext}>
                 Próximo
               </Button>
             </div>
           </TabsContent>
           <TabsContent
             value="medicine"
-            className="grid w-full gap-2 space-y-2 pl-2"
+            className="grid w-full grid-cols-6 gap-2 space-y-2 pl-2"
           >
             <FormField
               control={form.control}
               name="stockId"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className="col-span-3 flex flex-col">
                   <FormLabel>Stock</FormLabel>
                   <ComboboxUp
                     items={stocksResult?.stocks ?? []}
@@ -348,7 +441,7 @@ export function NewDispensationForm() {
               control={form.control}
               name="medicineStockId"
               render={({ field }) => (
-                <FormItem className="flex flex-col">
+                <FormItem className="col-span-6 flex flex-col">
                   <FormLabel>Medicamento</FormLabel>
                   <ComboboxUp
                     items={medicinesStockResult?.medicines_stock ?? []}
@@ -357,25 +450,89 @@ export function NewDispensationForm() {
                     placeholder="Selecione um medicamento"
                     isFetching={isFetchingMedicinesStock}
                     onQueryChange={setQueryMedicineStock}
-                    onSelect={(id, _) => {
+                    onSelect={(id, item) => {
                       form.setValue('medicineStockId', id)
+                      form.setValue('quantityToDispensation', 0)
+                      setSelectedMedicine(item)
                     }}
                     itemKey="id"
-                    formatItem={(item) => {
-                      return `${item.medicine} - ${item.dosage}${item.unitMeasure} - ${item.pharmaceuticalForm} - [${item.quantity}] uni.`
-                    }}
+                    getItemText={(item) =>
+                      `${item.medicine} ${item.pharmaceuticalForm} ${item.unitMeasure}`
+                    }
+                    formatItem={(item) => (
+                      <div className="flex gap-2">
+                        <span>
+                          {item.medicine} - {item.pharmaceuticalForm} -{' '}
+                          {item.dosage}
+                          {item.unitMeasure}
+                        </span>
+                        <div className="text-sm">
+                          <span className="text-green-600">
+                            {item.quantity.available} disp.
+                          </span>
+                          {item.quantity.unavailable > 0 && (
+                            <span className="ml-2 text-red-500">
+                              {item.quantity.unavailable} indis.
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   />
+                  {selectedMedicine &&
+                    selectedMedicine.quantity.available <= 0 && (
+                      <FormDescription>
+                        Não existem quantidades válidas para este medicamento
+                      </FormDescription>
+                    )}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name={`quantityToDispensation`}
+              render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>Quantidade</FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={
+                        !selectedMedicine ||
+                        selectedMedicine.quantity.available <= 0
+                      }
+                      {...field}
+                      type="number"
+                      max={selectedMedicine?.quantity.available || undefined}
+                      placeholder="Quantidade"
+                      onChange={(e) => field.onChange(Number(e.target.value))}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <div className="col-span-6 grid justify-end">
               <div className="flex gap-2">
-                <Button variant="ghost" className="" onClick={handlePrevious}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className=""
+                  onClick={handlePrevious}
+                >
                   Voltar
                 </Button>
 
-                <Button className="" onClick={handleNext}>
+                <Button
+                  type="button"
+                  onClick={handleNext}
+                  disabled={
+                    !selectedMedicine ||
+                    selectedMedicine.quantity.available <= 0 ||
+                    isFetchingDispensationPreview
+                  }
+                >
                   Próximo
                 </Button>
               </div>
@@ -383,43 +540,121 @@ export function NewDispensationForm() {
           </TabsContent>
           <TabsContent
             value="batches"
-            className="grid w-full max-w-[300px] gap-2 space-y-2 pl-2"
+            className="grid w-full max-w-[400px] gap-2 space-y-2 pl-2"
           >
             <div className="col-span-6 grid justify-end">
-              {batchesStockResult?.batches_stock.map((batch, index) => (
+              {dispensationPreviewResult ? (
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Lote</TableHead>
+                        <TableHead>Validade</TableHead>
+                        <TableHead>Quantidade</TableHead>
+                        <TableHead className="w-[180px]">
+                          Quantidade p/ Disp.
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {dispensationPreviewResult?.map((batch, index) => (
+                        <TableRow key={batch.batchStockId}>
+                          {/* Lote (código) */}
+                          <TableCell className="font-mono text-xs font-medium">
+                            {batch.code}
+                          </TableCell>
+
+                          {/* Data de validade */}
+                          <TableCell className="font-mono text-xs font-medium">
+                            {dateFormatter.format(
+                              new Date(batch.expirationDate),
+                            )}
+                          </TableCell>
+
+                          <TableCell className="font-mono text-xs font-medium">
+                            {batch.quantity.totalCurrent}
+                          </TableCell>
+
+                          {/* Input de quantidade */}
+                          <TableCell className="font-mono text-xs font-medium">
+                            <input
+                              type="hidden"
+                              {...form.register(
+                                `batchesStocks.${index}.batchStockId`,
+                              )}
+                              value={batch.batchStockId}
+                            />
+
+                            <FormField
+                              control={form.control}
+                              name={`batchesStocks.${index}.quantity`}
+                              render={({ field }) => (
+                                <FormControl>
+                                  <Input
+                                    {...field}
+                                    type="number"
+                                    className="w-24"
+                                    value={
+                                      field.value ??
+                                      batch.quantity.toDispensation
+                                    }
+                                    onChange={(e) =>
+                                      field.onChange(Number(e.target.value))
+                                    }
+                                  />
+                                </FormControl>
+                              )}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                // dispensationPreviewResult.map((batch, index) => (
+                //   <div key={batch.batchStockId}>
+                //     <input
+                //       type="hidden"
+                //       {...form.register(`batchesStocks.${index}.batchStockId`)}
+                //       value={batch.batchStockId}
+                //     />
+
+                //     <FormField
+                //       control={form.control}
+                //       name={`batchesStocks.${index}.quantity`}
+                //       render={({ field }) => (
+                //         <FormItem className="col-span-2">
+                //           <FormLabel>
+                //             Lote {batch.code} — vence em{' '}
+                //             {new Date(
+                //               batch.expirationDate,
+                //             ).toLocaleDateString()}
+                //           </FormLabel>
+                //           <FormControl>
+                //             <Input
+                //               {...field}
+                //               type="number"
+                //               value={field.value ?? batch.quantity} // valor inicial preenchido com a sugestão do preview
+                //               onChange={(e) =>
+                //                 field.onChange(Number(e.target.value))
+                //               }
+                //             />
+                //           </FormControl>
+                //           <FormMessage />
+                //         </FormItem>
+                //       )}
+                //     />
+                //   </div>
+                // ))
                 <>
-                  <input
-                    type="hidden"
-                    {...form.register(`batchesStocks.${index}.batchStockId`)}
-                    value={batch.id}
-                  />
-                  <FormField
-                    key={batch.id}
-                    control={form.control}
-                    name={`batchesStocks.${index}.quantity`}
-                    render={({ field }) => (
-                      <FormItem className="col-span-2">
-                        <FormLabel>Lote {batch.batch}</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="number"
-                            max={batch.quantity}
-                            placeholder="Quantidade"
-                            onChange={(e) =>
-                              field.onChange(Number(e.target.value))
-                            }
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <h1>nada</h1>
                 </>
-              ))}
+              )}
 
               <div className="mt-4 flex gap-2">
                 <Button
+                  type="button"
                   variant="ghost"
                   disabled={form.formState.isSubmitting}
                   onClick={handlePrevious}

@@ -17,7 +17,11 @@ export interface InventorySingle {
   pharmaceuticalForm: string
   unitMeasure: string
   dosage: string
-  quantity: number
+  quantity: {
+    current: number
+    available: number
+    unavailable: number
+  }
   bacthesStocks: number
   isLowStock: boolean
 }

@@ -82,7 +82,7 @@ function MedicationCard({ medication }: MedicationCardProps) {
             <span
               className={`font-medium ${hasLowStock(medication) ? 'text-destructive' : ''}`}
             >
-              {medication.quantity} unidades
+              {medication.quantity.available} unidades
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">

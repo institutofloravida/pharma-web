@@ -8,7 +8,7 @@ export interface FetchMedicinesOnStockParams {
   medicineName?: string | null
 }
 
-interface MedicineStockDetails {
+export interface MedicineStockDetails {
   id: string
   stockId: string
   stock: string
@@ -17,7 +17,11 @@ interface MedicineStockDetails {
   pharmaceuticalForm: string
   unitMeasure: string
   dosage: string
-  quantity: number
+  quantity: {
+    totalCurrent: number
+    unavailable: number
+    available: number
+  }
 }
 
 interface FetchMedicinesOnStockReponse {

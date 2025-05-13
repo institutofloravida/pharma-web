@@ -1,4 +1,5 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
+import { ReactNode } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -26,9 +27,10 @@ interface ComboboxProps<T> {
   placeholder?: string
   isFetching: boolean
   onQueryChange: (query: string) => void
-  onSelect: (id: string, formattedValue: string) => void
+  onSelect: (id: string, item: T) => void
   itemKey: keyof T
-  formatItem: (item: T) => string
+  formatItem: (item: T) => ReactNode // Alterado para aceitar JSX
+  getItemText?: (item: T) => string // Usado internamente como texto para search e value
 }
 
 export function ComboboxUp<T extends Record<string, any>>({
@@ -41,6 +43,7 @@ export function ComboboxUp<T extends Record<string, any>>({
   onSelect,
   itemKey,
   formatItem,
+  getItemText = (item) => String(item[itemKey]), // fallback para texto
 }: ComboboxProps<T>) {
   return (
     <Popover>
@@ -63,7 +66,7 @@ export function ComboboxUp<T extends Record<string, any>>({
                   if (!selectedItem) {
                     return 'Item não encontrado'
                   }
-                  return formatItem(selectedItem as T)
+                  return formatItem(selectedItem)
                 })()
               : placeholder}
             <ChevronsUpDown className="opacity-50" />
@@ -85,16 +88,14 @@ export function ComboboxUp<T extends Record<string, any>>({
                 {items.length ? (
                   <CommandGroup>
                     {items.map((item) => {
-                      const formattedValue = formatItem(item)
+                      const itemText = getItemText(item)
                       return (
                         <CommandItem
-                          value={formattedValue}
                           key={item[itemKey]}
-                          onSelect={() =>
-                            onSelect(item[itemKey], formattedValue)
-                          }
+                          value={itemText}
+                          onSelect={() => onSelect(item[itemKey], item)}
                         >
-                          {formattedValue}
+                          {formatItem(item)}
                           <Check
                             className={cn(
                               'ml-auto',
