@@ -1,4 +1,3 @@
-import type { Address } from '@/api/viacep/get-address-by-cep'
 import { apiPharma } from '@/lib/axios'
 import type { Race } from '@/lib/utils/race'
 
@@ -7,7 +6,7 @@ import type { Gender } from './fetch-users'
 export interface RegisterUserBody {
   name: string
   sus: string
-  cpf: string
+  cpf?: string
   birthDate: Date
   gender: Gender
   race: Race
@@ -16,10 +15,10 @@ export interface RegisterUserBody {
   addressPatient: {
     city: string
     neighborhood: string
-    number: string
+    number?: string
     state: string
-    street: string
-    zipCode: string
+    street?: string
+    zipCode?: string
     complement?: string
   }
 }

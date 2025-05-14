@@ -18,11 +18,11 @@ export interface User {
   id: string
   name: string
   sus: string
-  cpf: string
+  cpf?: string
   birthDate: string
   gender: Gender
   race: Race
-  generalRegistration: string
+  generalRegistration?: string
 }
 
 interface FetchUsersResponse {

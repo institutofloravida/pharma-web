@@ -43,24 +43,23 @@ export const newUserSchema = z.object({
     .max(100, { message: 'O nome pode ter no máximo 100 caracteres.' }),
   cpf: z
     .string()
-    .regex(/^\d{11}$/, { message: 'O CPF deve conter exatamente 11 dígitos.' }),
+    .regex(/^\d{11}$/, { message: 'O CPF deve conter exatamente 11 dígitos.' })
+    .optional(),
   sus: z
     .string()
     .regex(/^\d{15}$/, { message: 'O SUS deve conter exatamente 15 dígitos.' }),
-  birthDate: z.date(),
+  birthDate: z.date({ required_error: 'Campo obrigatório' }),
   gender: z.enum(['M', 'F', 'O'], {
-    errorMap: () => ({ message: 'Gênero inválido. Deve ser M, F ou O.' }),
+    errorMap: () => ({ message: 'Campo obrigatório' }),
   }),
   race: z.enum([BLACK, INDIGENOUS, MIXED, UNDECLARED, WHITE, YELLOW], {
-    errorMap: () => ({ message: 'Raça inválida.' }),
+    errorMap: () => ({ message: 'Campo obrigatório' }),
   }),
   generalRegistration: z.string().optional(),
 
   addressPatient: z.object({
-    street: z
-      .string()
-      .min(3, { message: 'O nome da rua deve ter pelo menos 3 caracteres.' }),
-    number: z.string().min(1, { message: 'O número é obrigatório.' }),
+    street: z.string().optional(),
+    number: z.string().optional(),
     complement: z.string().optional(),
     neighborhood: z
       .string()
@@ -71,9 +70,16 @@ export const newUserSchema = z.object({
     state: z
       .string()
       .length(2, { message: 'O estado deve conter exatamente 2 caracteres.' }),
-    zipCode: z.string().regex(/^\d{5}-?\d{3}$/, {
-      message: 'CEP inválido. Formato esperado: 00000-000.',
-    }),
+    zipCode: z
+      .string()
+      .optional()
+      .refine(
+        (value) =>
+          value === undefined || value === '' || /^\d{5}-?\d{3}$/.test(value),
+        {
+          message: 'CEP inválido. Formato esperado: 00000-000.',
+        },
+      ),
   }),
   pathologiesIds: z
     .array(
@@ -81,7 +87,7 @@ export const newUserSchema = z.object({
         id: z
           .string()
           .min(1, { message: 'O ID da patologia não pode estar vazio.' }),
-        value: z.string(), // Inclui o valor para validar o formato dos objetos
+        value: z.string(),
       }),
     )
     .min(1, { message: 'Selecione pelo menos uma patologia.' })
@@ -554,7 +560,7 @@ export function NewUserForm() {
                     field={field}
                     items={pathologiesResult?.pathologies ?? []}
                     itemKey="id"
-                    onChange={(selectedItems) => field.onChange(selectedItems)} // Recebe objetos diretamente
+                    onChange={(selectedItems) => field.onChange(selectedItems)}
                     onQueryChange={setQueryPathology}
                     query={queryPathology}
                     isFetching={isFetchingPathology}

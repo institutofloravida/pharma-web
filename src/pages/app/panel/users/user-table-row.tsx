@@ -30,7 +30,7 @@ export function UserTableRow({ user }: UserTableRowProps) {
         {user.name}
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        {Formatter.cpf(user.cpf)}
+        {user.cpf ? Formatter.cpf(user.cpf) : '-------------'}
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
         {user.sus}
