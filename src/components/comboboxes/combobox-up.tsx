@@ -1,5 +1,5 @@
 import { Check, ChevronsUpDown } from 'lucide-react'
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -10,7 +10,6 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
-import { FormControl } from '@/components/ui/form'
 import {
   Popover,
   PopoverContent,
@@ -22,6 +21,7 @@ interface ComboboxProps<T> {
   items: T[]
   field: {
     value: string
+    onChange: (value: string) => void
   }
   query: string
   placeholder?: string
@@ -29,60 +29,61 @@ interface ComboboxProps<T> {
   onQueryChange: (query: string) => void
   onSelect: (id: string, item: T) => void
   itemKey: keyof T
-  formatItem: (item: T) => ReactNode // Alterado para aceitar JSX
-  getItemText?: (item: T) => string // Usado internamente como texto para search e value
+  itemValue?: keyof T
+  formatItem: (item: T) => ReactNode
+  getItemText?: (item: T) => string
 }
 
-export function ComboboxUp<T extends Record<string, any>>({
+export function Combobox<T extends Record<string, any>>({
   items,
   field,
   query,
-  placeholder = 'Select an item...',
+  placeholder = 'Selecione...',
   isFetching,
   onQueryChange,
   onSelect,
   itemKey,
+  itemValue,
   formatItem,
-  getItemText = (item) => String(item[itemKey]), // fallback para texto
+  getItemText = (item) => String(item[itemKey]),
 }: ComboboxProps<T>) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <FormControl>
-          <Button
-            variant="outline"
-            role="combobox"
-            className={cn(
-              'justify-between bg-transparent',
-              !field.value && 'text-muted-foreground',
-            )}
-          >
-            {field.value
-              ? (() => {
-                  const selectedItem = items.find((item) => {
-                    return item[itemKey] === field.value
-                  })
+  const [open, setOpen] = useState(false)
 
-                  if (!selectedItem) {
-                    return 'Item não encontrado'
-                  }
-                  return formatItem(selectedItem)
-                })()
-              : placeholder}
-            <ChevronsUpDown className="opacity-50" />
-          </Button>
-        </FormControl>
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          className={cn(
+            'justify-between bg-transparent',
+            !field.value && 'text-muted-foreground',
+          )}
+        >
+          {field.value
+            ? (() => {
+                const selectedItem = items.find(
+                  (item) => item[itemKey] === field.value,
+                )
+                return selectedItem
+                  ? formatItem(selectedItem)
+                  : 'Item não encontrado'
+              })()
+            : placeholder}
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
-        <Command className="w-full">
+        <Command>
           <CommandInput
-            placeholder="Search..."
+            placeholder="Buscar..."
             className="h-9"
             value={query}
             onValueChange={onQueryChange}
           />
           <CommandList>
-            {isFetching && <CommandEmpty>Loading...</CommandEmpty>}
+            {isFetching && <CommandEmpty>Carregando...</CommandEmpty>}
             {!isFetching && (
               <>
                 {items.length ? (
@@ -93,12 +94,16 @@ export function ComboboxUp<T extends Record<string, any>>({
                         <CommandItem
                           key={item[itemKey]}
                           value={itemText}
-                          onSelect={() => onSelect(item[itemKey], item)}
+                          onSelect={() => {
+                            field.onChange(item[itemKey]) // atualiza valor do formulário
+                            onSelect(item[itemKey], item) // callback externo
+                            setOpen(false) // fecha o popover
+                          }}
                         >
                           {formatItem(item)}
                           <Check
                             className={cn(
-                              'ml-auto',
+                              'ml-auto h-4 w-4',
                               item[itemKey] === field.value
                                 ? 'opacity-100'
                                 : 'opacity-0',
@@ -109,7 +114,7 @@ export function ComboboxUp<T extends Record<string, any>>({
                     })}
                   </CommandGroup>
                 ) : (
-                  <CommandEmpty>No results found.</CommandEmpty>
+                  <CommandEmpty>Nenhum resultado.</CommandEmpty>
                 )}
               </>
             )}
