@@ -34,7 +34,7 @@ interface ComboboxProps<T> {
   getItemText?: (item: T) => string
 }
 
-export function Combobox<T extends Record<string, any>>({
+export function ComboboxUp<T extends Record<string, any>>({
   items,
   field,
   query,
