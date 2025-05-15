@@ -1,8 +1,10 @@
 import { createBrowserRouter } from 'react-router-dom'
 
+import { OperatorRole } from './api/pharma/operators/register-operator'
 import { AuthLayout } from './pages/_layouts/auth'
 import PanelLayout from './pages/_layouts/panel'
 import { PrivateRoute } from './pages/_private/private-route'
+import Unauthorized from './pages/_private/unauthorized'
 import { SignIn } from './pages/app/auth/sign-in'
 import { Institutions } from './pages/app/panel/auxiliary-records/institutions/institutions'
 import { Manufacturers } from './pages/app/panel/auxiliary-records/manufacturers/manufacturers'
@@ -59,6 +61,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: '/dashboard',
+        element: (
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        ),
+      },
+      {
         path: 'reports',
         element: (
           <PrivateRoute>
@@ -77,7 +87,9 @@ export const router = createBrowserRouter([
       {
         path: 'operators',
         element: (
-          <PrivateRoute>
+          <PrivateRoute
+            allowedRoles={[OperatorRole.MANAGER, OperatorRole.SUPER_ADMIN]}
+          >
             <Operators />
           </PrivateRoute>
         ),
@@ -257,5 +269,9 @@ export const router = createBrowserRouter([
         ),
       },
     ],
+  },
+  {
+    path: '/unauthorized',
+    element: <Unauthorized />,
   },
 ])

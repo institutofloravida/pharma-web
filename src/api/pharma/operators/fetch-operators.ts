@@ -13,7 +13,7 @@ export interface Operator {
   id: string
   name: string
   email: string
-  role: string
+  role: OperatorRole
   institutions: {
     id: string
     name: string

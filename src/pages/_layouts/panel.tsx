@@ -29,6 +29,7 @@ import { useState } from 'react'
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 import { getOperatorDetails } from '@/api/pharma/auth/get-operator-details'
+import { OperatorRole } from '@/api/pharma/operators/register-operator'
 import { SelectInstitutionGlobal } from '@/components/selects/select-institution-global'
 import { ModeToggle } from '@/components/theme/mode-toggle'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -75,6 +76,35 @@ import {
 } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/contexts/authContext'
+import { useDynamicBreadcrumbTrail } from '@/hooks/use-dynamic-breadcrumb-title'
+import { NAV_ITEMS, sidebarSections } from '@/lib/data/sidebar-config'
+import { hasAccess, type NavItem, type SidebarSection } from '@/lib/sidebar'
+
+// utils/breadcrumb.ts
+export function getBreadcrumbTrail(
+  navItems: NavItem[],
+  pathname: string,
+): NavItem[] {
+  const trail: NavItem[] = []
+
+  const traverse = (
+    items: NavItem[],
+    path: string,
+    parents: NavItem[] = [],
+  ): NavItem[] => {
+    for (const item of items) {
+      const currentTrail = [...parents, item]
+      if (item.url === path) return currentTrail
+      if (item.children) {
+        const result = traverse(item.children, path, currentTrail)
+        if (result.length > 0) return result
+      }
+    }
+    return []
+  }
+
+  return traverse(navItems, pathname)
+}
 
 const data = {
   user: {
@@ -260,12 +290,64 @@ const data = {
   ],
 }
 
+// export const NAV_ITEMS: NavItem[] = [
+//   {
+//     title: 'Dashboard',
+//     url: '/panel',
+//     icon: MonitorCog,
+//   },
+//   {
+//     title: 'Instituições',
+//     url: '/institutions',
+//     icon: Building2,
+//     roles: ['admin'],
+//   },
+//   {
+//     title: 'Operadores',
+//     url: '/operators',
+//     icon: UserRoundCog,
+//     roles: ['admin'],
+//   },
+//   {
+//     title: 'Cadastros Gerais',
+//     url: '#',
+//     icon: Layers2,
+//     roles: ['admin'],
+//     children: [
+//       { title: 'Classes Terapêuticas', url: '/therapeutic-class' },
+//       { title: 'Formas Farmacêuticas', url: '/pharmaceutical-form' },
+//       { title: 'Fabricantes', url: '/manufacturer' },
+//     ],
+//   },
+//   {
+//     title: 'Movimentações',
+//     url: '#',
+//     icon: MonitorCog,
+//     roles: ['operator'],
+//     children: [
+//       { title: 'Entradas', url: '/movement/entries' },
+//       { title: 'Saídas', url: '/movement/exits' },
+//     ],
+//   },
+//   {
+//     title: 'Inventário',
+//     url: '/inventory',
+//     icon: Layers,
+//     roles: ['inventory'],
+//   },
+//   {
+//     title: 'Relatórios',
+//     url: '/reports',
+//     icon: FileCog,
+//   },
+// ]
+
 export default function PanelLayout() {
   const [activeTeam, setActiveTeam] = useState(data.teams[0])
-  const { pathname } = useLocation()
   const navigate = useNavigate()
-  const breadCrumpItems = pathname.split('/').filter((item) => item.length > 0)
-  const { token, logout, isAuthenticated, loading } = useAuth()
+  const { token, logout, isAuthenticated, loading, me } = useAuth()
+  const location = useLocation()
+  const currentPath = location.pathname
 
   const { data: operatorResult, isLoading } = useQuery({
     queryKey: ['me', token],
@@ -291,259 +373,106 @@ export default function PanelLayout() {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SelectInstitutionGlobal />
-                  {/* <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton
-                    size="lg"
-                    className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                  >
-                    <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                      <activeTeam.logo className="size-4" />
-                    </div>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-semibold">
-                        {activeTeam.name}
-                      </span>
-                      <span className="truncate text-xs">
-                        {activeTeam.plan}
-                      </span>
-                    </div>
-                    <ChevronsUpDown className="ml-auto" />
-                  </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-                  align="start"
-                  side="bottom"
-                  sideOffset={4}
-                >
-                  <DropdownMenuLabel className="text-xs text-muted-foreground">
-                    Instituições
-                  </DropdownMenuLabel>
-                  {data.teams.map((team, index) => (
-                    <DropdownMenuItem
-                      key={team.name}
-                      onClick={() => setActiveTeam(team)}
-                      className="gap-2 p-2"
-                    >
-                      <div className="flex size-6 items-center justify-center rounded-sm border">
-                        <team.logo className="size-4 shrink-0" />
-                      </div>
-                      {team.name}
-                      <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="gap-2 p-2">
-                    <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                      <Plus className="size-4" />
-                    </div>
-                    <div className="font-medium text-muted-foreground"></div>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu> */}
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-              <SidebarGroup>
-                <SidebarGroupLabel>Área Administrativa</SidebarGroupLabel>
-                {data.admAreaSingleItems.map((item) => {
-                  return (
-                    <SidebarMenuButton
-                      tooltip={item.name}
-                      asChild
-                      key={item.name}
-                    >
-                      <Link to={item.url}>
-                        <item.icon />
-                        <span>{item.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  )
-                })}
-                <SidebarMenu>
-                  {data.admAreaManyItems.map((item) => (
-                    <Collapsible
-                      key={item.title}
-                      asChild
-                      className="group/collapsible"
-                    >
-                      <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuButton tooltip={item.title}>
-                            {item.icon && <item.icon />}
-                            <span>{item.title}</span>
-                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+              {sidebarSections
+                .filter((section) =>
+                  hasAccess(me ? me.role : OperatorRole.COMMON, section.role),
+                )
+                .map((section) => (
+                  <SidebarGroup key={section.label}>
+                    <SidebarGroupLabel>{section.label}</SidebarGroupLabel>
+
+                    {section.singleItems
+                      ?.filter((item) =>
+                        hasAccess(
+                          me ? me.role : OperatorRole.COMMON,
+                          item.role,
+                        ),
+                      )
+                      .map((item) => {
+                        const isActive = currentPath === item.url
+
+                        return (
+                          <SidebarMenuButton
+                            tooltip={item.name}
+                            asChild
+                            key={item.name}
+                            className={
+                              isActive
+                                ? 'bg-muted font-semibold text-primary'
+                                : ''
+                            }
+                          >
+                            <Link to={item.url}>
+                              {item.icon && <item.icon />}
+                              <span>{item.name}</span>
+                            </Link>
                           </SidebarMenuButton>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <SidebarMenuSub>
-                            {item.items?.map((subItem) => (
-                              <SidebarMenuSubItem key={subItem.title}>
-                                <SidebarMenuSubButton asChild>
-                                  <Link to={subItem.url}>
-                                    <span>{subItem.title}</span>
-                                  </Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            ))}
-                          </SidebarMenuSub>
-                        </CollapsibleContent>
-                      </SidebarMenuItem>
-                    </Collapsible>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroup>
-              <SidebarGroup>
-                <SidebarGroupLabel>Área do Operador</SidebarGroupLabel>
-                {data.operatorAreaSingleItem.map((item) => {
-                  return (
-                    <SidebarMenuButton
-                      tooltip={item.name}
-                      asChild
-                      key={item.name}
-                    >
-                      <Link to={item.url}>
-                        <item.icon />
-                        <span>{item.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  )
-                })}
-                <SidebarMenu>
-                  {data.operatorAreaManyItems.map((item) => (
-                    <Collapsible
-                      key={item.title}
-                      asChild
-                      className="group/collapsible"
-                    >
-                      <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuButton tooltip={item.title}>
-                            {item.icon && <item.icon />}
-                            <span>{item.title}</span>
-                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                          </SidebarMenuButton>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <SidebarMenuSub>
-                            {item.items?.map((subItem) => (
-                              <SidebarMenuSubItem key={subItem.title}>
-                                <SidebarMenuSubButton asChild>
-                                  <Link to={subItem.url}>
-                                    <span>{subItem.title}</span>
-                                  </Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            ))}
-                          </SidebarMenuSub>
-                        </CollapsibleContent>
-                      </SidebarMenuItem>
-                    </Collapsible>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroup>
-              <SidebarGroup>
-                <SidebarGroupLabel>Inventário</SidebarGroupLabel>
-                {data.inventoryAreaSingleItem.map((item) => {
-                  return (
-                    <SidebarMenuButton
-                      tooltip={item.name}
-                      asChild
-                      key={item.name}
-                    >
-                      <Link to={item.url}>
-                        <item.icon />
-                        <span>{item.name}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  )
-                })}
-              </SidebarGroup>
-              <SidebarGroup>
-                <SidebarGroupLabel>Relatórios</SidebarGroupLabel>
-                <SidebarMenu>
-                  {data.reportsManyItems.map((item) => (
-                    <Collapsible
-                      key={item.title}
-                      asChild
-                      className="group/collapsible"
-                    >
-                      <SidebarMenuItem>
-                        <CollapsibleTrigger asChild>
-                          <SidebarMenuButton tooltip={item.title}>
-                            {item.icon && <item.icon />}
-                            <span>{item.title}</span>
-                            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                          </SidebarMenuButton>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent>
-                          <SidebarMenuSub>
-                            {item.items?.map((subItem) => (
-                              <SidebarMenuSubItem key={subItem.title}>
-                                <SidebarMenuSubButton asChild>
-                                  <Link to={subItem.url}>
-                                    <span>{subItem.title}</span>
-                                  </Link>
-                                </SidebarMenuSubButton>
-                              </SidebarMenuSubItem>
-                            ))}
-                          </SidebarMenuSub>
-                        </CollapsibleContent>
-                      </SidebarMenuItem>
-                    </Collapsible>
-                  ))}
-                </SidebarMenu>
-              </SidebarGroup>
-              <SidebarGroup className="">
-                <SidebarGroupLabel>Mais</SidebarGroupLabel>
-                <SidebarMenu>
-                  {data.projects.map((item) => (
-                    <SidebarMenuItem key={item.name}>
-                      <SidebarMenuButton asChild>
-                        <Link to={item.url}>
-                          <item.icon />
-                          <span>{item.name}</span>
-                        </Link>
-                      </SidebarMenuButton>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <SidebarMenuAction showOnHover>
-                            <MoreHorizontal />
-                            <span className="sr-only">More</span>
-                          </SidebarMenuAction>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          className="w-48 rounded-lg"
-                          side="bottom"
-                          align="end"
-                        >
-                          <DropdownMenuItem>
-                            <Folder className="text-muted-foreground" />
-                            <span>View Project</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Forward className="text-muted-foreground" />
-                            <span>Share Project</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>
-                            <Trash2 className="text-muted-foreground" />
-                            <span>Delete Project</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </SidebarMenuItem>
-                  ))}
-                  <SidebarMenuItem>
-                    <SidebarMenuButton className="text-sidebar-foreground/70">
-                      <MoreHorizontal className="text-sidebar-foreground/70" />
-                      <span>More</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                </SidebarMenu>
-              </SidebarGroup>
+                        )
+                      })}
+
+                    <SidebarMenu>
+                      {section.groupedItems
+                        ?.filter((group) =>
+                          hasAccess(
+                            me ? me.role : OperatorRole.COMMON,
+                            group.role,
+                          ),
+                        )
+                        .map((group) => (
+                          <Collapsible
+                            key={group.title}
+                            asChild
+                            className="group/collapsible"
+                          >
+                            <SidebarMenuItem>
+                              <CollapsibleTrigger asChild>
+                                <SidebarMenuButton tooltip={group.title}>
+                                  {group.icon && <group.icon />}
+                                  <span>{group.title}</span>
+                                  <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                                </SidebarMenuButton>
+                              </CollapsibleTrigger>
+                              <CollapsibleContent>
+                                <SidebarMenuSub>
+                                  {group.items
+                                    .filter((sub) =>
+                                      hasAccess(
+                                        me ? me.role : OperatorRole.COMMON,
+                                        sub.role,
+                                      ),
+                                    )
+                                    .map((sub) => {
+                                      const isActive = currentPath === sub.url
+
+                                      return (
+                                        <SidebarMenuSubItem key={sub.name}>
+                                          <SidebarMenuSubButton
+                                            asChild
+                                            className={
+                                              isActive
+                                                ? 'bg-muted font-semibold text-primary'
+                                                : ''
+                                            }
+                                          >
+                                            <Link to={sub.url}>
+                                              <span>{sub.name}</span>
+                                            </Link>
+                                          </SidebarMenuSubButton>
+                                        </SidebarMenuSubItem>
+                                      )
+                                    })}
+                                </SidebarMenuSub>
+                              </CollapsibleContent>
+                            </SidebarMenuItem>
+                          </Collapsible>
+                        ))}
+                    </SidebarMenu>
+                  </SidebarGroup>
+                ))}
             </SidebarContent>
             <SidebarFooter>
               <SidebarMenu>
@@ -639,18 +568,8 @@ export default function PanelLayout() {
               <div className="flex items-center gap-2 px-4">
                 <SidebarTrigger className="-ml-1" />
                 <Separator orientation="vertical" className="mr-2 h-4" />
-                <Breadcrumb>
-                  <BreadcrumbList>
-                    {breadCrumpItems.map((item, index) => (
-                      <BreadcrumbItem key={`breadcrumb-${index}`}>
-                        <BreadcrumbPage>{item}</BreadcrumbPage>
-                        {index < breadCrumpItems.length - 1 && (
-                          <BreadcrumbSeparator className="hidden md:block" />
-                        )}
-                      </BreadcrumbItem>
-                    ))}
-                  </BreadcrumbList>
-                </Breadcrumb>
+
+                <AppBreadcrumb />
               </div>
               <ModeToggle />
             </header>
@@ -661,5 +580,25 @@ export default function PanelLayout() {
         </SidebarProvider>
       )}
     </>
+  )
+}
+
+const AppBreadcrumb = () => {
+  const { pathname } = useLocation()
+  const breadcrumbTrail = getBreadcrumbTrail(NAV_ITEMS, pathname)
+
+  return (
+    <Breadcrumb>
+      <BreadcrumbList>
+        {breadcrumbTrail.map((item, index) => (
+          <BreadcrumbItem key={`breadcrumb-${index}`}>
+            <BreadcrumbPage>{item.title}</BreadcrumbPage>
+            {index < breadcrumbTrail.length - 1 && (
+              <BreadcrumbSeparator className="hidden md:block" />
+            )}
+          </BreadcrumbItem>
+        ))}
+      </BreadcrumbList>
+    </Breadcrumb>
   )
 }

@@ -120,10 +120,10 @@ export function DispensationTableFilters() {
                 query={queryUsers}
                 isFetching={isFetchingUsers}
                 formatItem={(item) =>
-                  `${Formatter.cpf(item.cpf)} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
+                  `${Formatter.cpf(item.sus)} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
                 }
                 getItemText={(item) =>
-                  `${Formatter.cpf(item.cpf)} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
+                  `${Formatter.cpf(item.sus)} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
                 }
                 placeholder="Pesquise por um usuário"
                 onSelect={(item) => {
