@@ -3,7 +3,6 @@ import { apiPharma } from '@/lib/axios'
 import type { Meta } from '../../_types/meta'
 
 export interface FetchBatchesOnStockParams {
-  stockId: string
   medicineStockId: string
   page?: number | null
   code?: string | null
@@ -22,6 +21,10 @@ interface BatchestockDetails {
   unitMeasure: string
   dosage: string
   quantity: number
+  expirationDate: Date
+  isAvailable: boolean
+  isCloseToExpiration: boolean
+  isExpired: boolean
 }
 
 interface FetchBatchesOnStockReponse {
@@ -30,7 +33,7 @@ interface FetchBatchesOnStockReponse {
 }
 
 export async function fetchBatchesOnStock(
-  { stockId, medicineStockId, code, page }: FetchBatchesOnStockParams,
+  { medicineStockId, code, page }: FetchBatchesOnStockParams,
   token: string,
 ) {
   const response = await apiPharma.get<FetchBatchesOnStockReponse>(
@@ -41,7 +44,6 @@ export async function fetchBatchesOnStock(
       },
       params: {
         page,
-        stockId,
         medicineStockId,
         code,
       },

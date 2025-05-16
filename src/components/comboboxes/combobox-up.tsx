@@ -95,9 +95,9 @@ export function ComboboxUp<T extends Record<string, any>>({
                           key={item[itemKey]}
                           value={itemText}
                           onSelect={() => {
-                            field.onChange(item[itemKey]) // atualiza valor do formulário
-                            onSelect(item[itemKey], item) // callback externo
-                            setOpen(false) // fecha o popover
+                            field.onChange(item[itemKey])
+                            onSelect(item[itemKey], item)
+                            setOpen(false)
                           }}
                         >
                           {formatItem(item)}

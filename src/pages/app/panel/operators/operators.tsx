@@ -55,7 +55,7 @@ export function Operators() {
   return (
     <>
       <Helmet title="Operadores" />
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 rounded-xl p-4">
         <h1 className="text-3xl font-bold tracking-tight">Operadores</h1>
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">

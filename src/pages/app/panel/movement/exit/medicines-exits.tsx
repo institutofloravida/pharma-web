@@ -17,6 +17,7 @@ import {
 import { useAuth } from '@/contexts/authContext'
 
 import { MedicineExitTableRow } from './medicine-exit-table-row'
+import { NewMedicineExitDialog } from './new-medicine-exit-dialog'
 
 export function MedicinesExits() {
   const { token, institutionId } = useAuth()
@@ -56,7 +57,7 @@ export function MedicinesExits() {
                   Nova Saída
                 </Button>
               </DialogTrigger>
-              {/* <NewMedicineExitDialog /> */}
+              <NewMedicineExitDialog />
             </Dialog>
           </div>
           <div className="rounded-md border">

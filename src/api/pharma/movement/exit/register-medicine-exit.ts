@@ -8,11 +8,10 @@ export enum ExitType {
 
 export interface RegisterMedicineExitBodyAndParams {
   medicineStockId: string;
-  operatorId: string;
   batcheStockId: string;
   quantity: number;
   exitType: ExitType;
-  movementTypeId: string;
+  movementTypeId?: string;
   exitDate?: Date;
 }
 
@@ -23,7 +22,6 @@ export async function registerMedicineExit(
     batcheStockId,
     exitType,
     medicineStockId,
-    operatorId,
     quantity,
   }: RegisterMedicineExitBodyAndParams,
   token: string,
@@ -36,7 +34,6 @@ export async function registerMedicineExit(
       batcheStockId,
       exitType,
       medicineStockId,
-      operatorId,
       quantity,
     },
     {
