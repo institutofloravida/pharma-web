@@ -16,8 +16,14 @@ import {
   registerMedicineExit,
   type RegisterMedicineExitBodyAndParams,
 } from '@/api/pharma/movement/exit/register-medicine-exit'
-import { fetchBatchesOnStock } from '@/api/pharma/stock/bacth-stock/fetch-batches-stock'
-import { fetchMedicinesOnStock } from '@/api/pharma/stock/medicine-stock/fetch-medicines-stock'
+import {
+  type BatchestockDetails,
+  fetchBatchesOnStock,
+} from '@/api/pharma/stock/bacth-stock/fetch-batches-stock'
+import {
+  fetchMedicinesOnStock,
+  type MedicineStockDetails,
+} from '@/api/pharma/stock/medicine-stock/fetch-medicines-stock'
 import { ComboboxUp } from '@/components/comboboxes/combobox-up'
 import { SelectExitType } from '@/components/selects/locate/select-exit-type'
 import { Button } from '@/components/ui/button'
@@ -71,7 +77,7 @@ const FormSchema = z
     movementTypeId: z.string().optional(),
     exitType: z.nativeEnum(ExitType),
     batchStockId: z.string({
-      required_error: 'Selecione um tipo de movimentação.',
+      required_error: 'Selecione um lote.',
     }),
     quantity: z.coerce
       .number({
@@ -96,8 +102,12 @@ export function NewMedicineExitDialog() {
   const [queryStock, setQueryStock] = useState('')
   const [queryMedicineStock, setQueryMedicineStock] = useState('')
   const [queryBatchesStock, setQueryBatchesStock] = useState('')
-
   const [queryMovementType, setQueryMovementType] = useState('')
+
+  const [selectedBatch, setSelectedBatch] = useState<BatchestockDetails | null>(
+    null,
+  )
+
   const { token } = useAuth()
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -182,17 +192,26 @@ export function NewMedicineExitDialog() {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      // await registerMedicineExitFn({
-      //   batcheStockId: data.batchStockId,
-      //   exitDate: data.exitDate,
-      //   exitType: data.exitType,
-      //   medicineStockId: data.medicineStockId,
-      //   quantity: data.quantity,
-      //   movementTypeId: data.movementTypeId,
-      // })
+      const quantity = Number(form.getValues('quantity'))
+      const availableQuantity = Number(selectedBatch?.quantity ?? 0)
+      if (quantity > availableQuantity) {
+        form.setError('quantity', {
+          type: 'manual',
+          message: `Quantidade indisponível. Estoque: ${availableQuantity}`,
+        })
+        return
+      }
+      await registerMedicineExitFn({
+        batcheStockId: data.batchStockId,
+        exitDate: data.exitDate,
+        exitType: data.exitType,
+        medicineStockId: data.medicineStockId,
+        quantity: data.quantity,
+        movementTypeId: data.movementTypeId,
+      })
 
       toast({
-        title: 'Entrada de Medicamento',
+        title: 'Saída de Medicamento',
         description: (
           <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
             <code className="text-white">{JSON.stringify(data, null, 2)}</code>
@@ -202,7 +221,7 @@ export function NewMedicineExitDialog() {
     } catch (error: any) {
       const errorMessage = handleApiError(error)
       toast({
-        title: 'Erro ao registrar entrada',
+        title: 'Erro ao registrar saída',
         description: errorMessage,
         variant: 'destructive',
       })
@@ -331,6 +350,7 @@ export function NewMedicineExitDialog() {
                   onSelect={(id, item) => {
                     form.setValue('batchStockId', id)
                     form.setValue('quantity', 0)
+                    setSelectedBatch(item)
                   }}
                   itemKey="id"
                   getItemText={(item) =>
@@ -404,7 +424,7 @@ export function NewMedicineExitDialog() {
                   <Input
                     type="number"
                     min={0}
-                    max={10000}
+                    // max={selectedBatch?.quantity ?? undefined}
                     placeholder="quantidade do lote"
                     {...field}
                   />
@@ -420,7 +440,7 @@ export function NewMedicineExitDialog() {
             defaultValue={new Date()}
             render={({ field }) => (
               <FormItem className="col-span-3 flex flex-col gap-1">
-                <FormLabel>Data de Entrada</FormLabel>
+                <FormLabel>Data de Saída</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
                     <FormControl>

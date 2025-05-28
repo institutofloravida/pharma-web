@@ -8,7 +8,7 @@ export interface FetchBatchesOnStockParams {
   code?: string | null
 }
 
-interface BatchestockDetails {
+export interface BatchestockDetails {
   id: string
   stockId: string
   stock: string

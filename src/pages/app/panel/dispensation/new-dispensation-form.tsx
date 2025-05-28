@@ -135,23 +135,6 @@ export function NewDispensationForm() {
       refetchOnMount: true,
     })
 
-  // const { data: batchesStockResult, isFetching: isFetchingBatchesStock } =
-  //   useQuery({
-  //     queryKey: ['batches-stock', form.watch('medicineStockId')],
-  //     queryFn: () =>
-  //       fetchBatchesOnStock(
-  //         {
-  //           page: 1,
-  //           stockId: form.watch('stockId'),
-  //           medicineStockId: form.watch('medicineStockId'),
-  //         },
-  //         token ?? '',
-  //       ),
-  //     staleTime: 1000,
-  //     enabled: !!form.watch('medicineStockId'),
-  //     refetchOnMount: true,
-  //   })
-
   const {
     data: dispensationPreviewResult,
     isFetching: isFetchingDispensationPreview,
@@ -186,13 +169,11 @@ export function NewDispensationForm() {
   const handleNext = async () => {
     try {
       if (activeTab === 'patient') {
-        // Valida apenas os campos da aba paciente
         const isValid = await form.trigger(['patientId', 'dispensationDate'])
         if (isValid) {
           setActiveTab('medicine')
         }
       } else if (activeTab === 'medicine') {
-        // Valida os campos da aba medicamento
         const isValid = await form.trigger([
           'stockId',
           'medicineStockId',
@@ -205,7 +186,6 @@ export function NewDispensationForm() {
             selectedMedicine?.quantity.available ?? 0,
           )
 
-          // Validações adicionais específicas
           if (quantity <= 0) {
             form.setError('quantityToDispensation', {
               type: 'manual',
@@ -222,7 +202,6 @@ export function NewDispensationForm() {
             return
           }
 
-          // Se passou todas as validações, busca os lotes e muda de aba
           const previewResponse = await refetchDispensationPreview()
           const batches = previewResponse.data ?? []
 
