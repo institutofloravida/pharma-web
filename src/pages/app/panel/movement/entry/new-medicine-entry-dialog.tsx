@@ -57,6 +57,9 @@ const FormSchema = z.object({
   movementTypeId: z.string({
     required_error: 'Selecione umtipo de movimentação.',
   }),
+  nfNumber: z.string({
+    required_error: 'Digite o número da nota fiscal.',
+  }),
   newBatches: z.object({
     code: z.string({
       required_error: 'Digite um código',
@@ -165,6 +168,7 @@ export function NewMedicineEntryDialog() {
           },
         ],
         movementTypeId: data.movementTypeId,
+        nfNumber: data.nfNumber,
       })
 
       toast({
@@ -419,6 +423,23 @@ export function NewMedicineEntryDialog() {
                   </PopoverContent>
                 </Popover>
 
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="nfNumber"
+            render={({ field }) => (
+              <FormItem className="col-span-3 flex flex-col gap-1">
+                <FormLabel>Número da Nota Fiscal</FormLabel>
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="número da nota fiscal"
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

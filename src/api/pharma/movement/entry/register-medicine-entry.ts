@@ -16,6 +16,7 @@ export interface RegisterMedicineEntryBodyAndParams {
   entryDate: Date
   medicineVariantId: string
   stockId: string
+  nfNumber: string
 }
 
 export async function registerMedicineEntry(
@@ -26,12 +27,13 @@ export async function registerMedicineEntry(
     batches,
     medicineVariantId,
     stockId,
+    nfNumber,
   }: RegisterMedicineEntryBodyAndParams,
   token: string,
 ) {
   await apiPharma.post(
     `/medicine-entry/stock/${stockId}/medicine-variant/${medicineVariantId}`,
-    { entryDate, movementTypeId, batches, newBatches },
+    { entryDate, movementTypeId, batches, newBatches, nfNumber },
     {
       headers: {
         Authorization: `Bearer ${token}`,
