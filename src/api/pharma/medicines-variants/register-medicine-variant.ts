@@ -5,6 +5,7 @@ export interface RegisterMedicineVariantBody {
   medicineId: string
   pharmaceuticalFormId: string
   unitMeasureId: string
+  complement?: string | null
 }
 
 export async function registerMedicineVariant(
@@ -13,12 +14,13 @@ export async function registerMedicineVariant(
     medicineId,
     pharmaceuticalFormId,
     unitMeasureId,
+    complement,
   }: RegisterMedicineVariantBody,
   token: string,
 ) {
   await apiPharma.post(
     '/medicine-variant',
-    { dosage, medicineId, pharmaceuticalFormId, unitMeasureId },
+    { dosage, medicineId, pharmaceuticalFormId, unitMeasureId, complement },
     {
       headers: {
         Authorization: `Bearer ${token}`,

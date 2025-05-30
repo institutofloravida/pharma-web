@@ -47,6 +47,7 @@ const FormSchema = z.object({
   unitMeasureId: z.string({
     required_error: 'Selecione uma unidade de medida',
   }),
+  complement: z.string().optional(),
 })
 
 export function NewMedicineVariantDialog() {
@@ -139,6 +140,7 @@ export function NewMedicineVariantDialog() {
         pharmaceuticalFormId: data.pharmaceuticalFormId,
         unitMeasureId: data.unitMeasureId,
         dosage: data.dosage,
+        complement: data.complement,
       })
 
       toast({
@@ -243,6 +245,20 @@ export function NewMedicineVariantDialog() {
                   itemKey="id"
                   itemValue="acronym"
                 />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="complement"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Complemento</FormLabel>
+                <FormControl>
+                  <Input placeholder="Complemento..." {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
