@@ -1,5 +1,9 @@
+import { useQuery } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
 
+import { useAuth } from '@/contexts/authContext'
+
+import { CardSkeleton } from './components/card-skeleton'
 import { DispensationsMonthCard } from './components/dispensation-month-card'
 import { DispensationsChart } from './components/dispensations-chart'
 import { DispensationsTodayCard } from './components/dispensations-today'
@@ -13,7 +17,6 @@ export function Dashboard() {
       <Helmet title="Dashboard" />
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-
         <div className="grid grid-cols-4 gap-4">
           <InventoryTodayCard />
           <DispensationsTodayCard />

@@ -1,37 +1,57 @@
+import { useQuery } from '@tanstack/react-query'
 import { Loader2, Pill } from 'lucide-react'
 
+import { GetDispenseMetrics } from '@/api/pharma/dashboard/get-dispense-metrics'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAuth } from '@/contexts/authContext'
 
 import { CardSkeleton } from './card-skeleton'
 
 export function DispensationsTodayCard() {
-  const isLoadingMonthReceipt = false
-  const monthReceipt = true
+  const { institutionId, token } = useAuth()
+
+  const { data: dispenseMetrics, isLoading } = useQuery({
+    queryFn: () =>
+      GetDispenseMetrics({ institutionId: institutionId ?? '' }, token ?? ''),
+    queryKey: ['metrics', 'dispense', institutionId],
+    enabled: !!institutionId && !!token,
+  })
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-base font-semibold">
           Dispensas (Hoje)
         </CardTitle>
-        {isLoadingMonthReceipt ? (
+        {isLoading ? (
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
         ) : (
           <Pill className="h-4 w-4 text-muted-foreground" />
         )}
       </CardHeader>
       <CardContent className="space-y-1">
-        {monthReceipt ? (
+        {dispenseMetrics ? (
           <>
-            <span className="text-2xl font-bold">{Number(5)}</span>
+            <span className="text-2xl font-bold">
+              {dispenseMetrics.today.total}
+            </span>
             <p className="text-xs text-muted-foreground">
               <span
                 className={
-                  Number(2.4) > 0 ? 'text-emerald-500' : 'text-red-500'
+                  dispenseMetrics.today.percentageAboveAverage > 0
+                    ? 'text-emerald-500'
+                    : dispenseMetrics.today.percentageAboveAverage < 0
+                      ? 'text-red-500'
+                      : 'text-muted-foreground'
                 }
               >
-                {Number(2.4) > 0 ? `+${Number(2.4)}` : Number(2.4)}%
+                {dispenseMetrics.today.percentageAboveAverage > 0
+                  ? `+${dispenseMetrics.today.percentageAboveAverage}`
+                  : dispenseMetrics.today.percentageAboveAverage}
+                %
               </span>{' '}
-              acima da média
+              {dispenseMetrics.today.percentageAboveAverage >= 0
+                ? 'acima da média'
+                : 'abaixo da média'}
             </p>
           </>
         ) : (

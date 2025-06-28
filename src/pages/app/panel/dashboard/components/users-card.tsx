@@ -1,31 +1,47 @@
+import { useQuery } from '@tanstack/react-query'
 import { Loader2, Pill, UserPlus } from 'lucide-react'
 
+import { GetUserMetrics } from '@/api/pharma/dashboard/get-users-metrics'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAuth } from '@/contexts/authContext'
 
 import { CardSkeleton } from './card-skeleton'
 
 export function UsersCard() {
-  const isLoadingMonthReceipt = false
-  const monthReceipt = true
+  const { institutionId, token } = useAuth()
+
+  const { data: usersMetrics, isLoading } = useQuery({
+    queryFn: () =>
+      GetUserMetrics({ institutionId: institutionId ?? '' }, token ?? ''),
+    queryKey: ['metrics', 'users', institutionId],
+    enabled: !!institutionId && !!token,
+  })
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-base font-semibold">Usuários</CardTitle>
-        {isLoadingMonthReceipt ? (
+        {isLoading ? (
           <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
         ) : (
           <UserPlus className="h-4 w-4 text-muted-foreground" />
         )}
       </CardHeader>
       <CardContent className="space-y-1">
-        {monthReceipt ? (
+        {usersMetrics ? (
           <>
-            <span className="text-2xl font-bold">{Number(189)}</span>
+            <span className="text-2xl font-bold">{usersMetrics.total}</span>
             <p className="text-xs text-muted-foreground">
               <span
-                className={Number(55) > 0 ? 'text-emerald-500' : 'text-red-500'}
+                className={
+                  usersMetrics.receiveMonth > 0
+                    ? 'text-emerald-500'
+                    : 'text-red-500'
+                }
               >
-                {Number(55) > 0 ? `${Number(55)}` : Number(55)}
+                {usersMetrics.receiveMonth > 0
+                  ? `${usersMetrics.receiveMonth}`
+                  : usersMetrics.receiveMonth}
               </span>{' '}
               receberam esse mês.
             </p>
