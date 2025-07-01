@@ -2,6 +2,7 @@
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { CalendarIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -25,6 +26,47 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
     { length: currentYear - 1919 },
     (_, i) => currentYear - i,
   )
+
+  // Estados locais para inputs controlados
+  const [day, setDay] = useState<string>(value ? String(value.getDate()) : '')
+  const [month, setMonth] = useState<string>(
+    value ? String(value.getMonth()) : '',
+  )
+  const [year, setYear] = useState<string>(
+    value ? String(value.getFullYear()) : '',
+  )
+
+  // Sincroniza os campos quando value muda externamente
+  useEffect(() => {
+    setDay(value ? String(value.getDate()) : '')
+    setMonth(value ? String(value.getMonth()) : '')
+    setYear(value ? String(value.getFullYear()) : '')
+  }, [value])
+
+  // Atualiza a data ao alterar qualquer campo
+  useEffect(() => {
+    if (day && month && year) {
+      const d = parseInt(day, 10)
+      const m = parseInt(month, 10)
+      const y = parseInt(year, 10)
+      if (!isNaN(d) && !isNaN(m) && !isNaN(y)) {
+        // Valida se a data é válida
+        const newDate = new Date(y, m, d)
+        if (
+          newDate.getFullYear() === y &&
+          newDate.getMonth() === m &&
+          newDate.getDate() === d
+        ) {
+          onChange(newDate)
+        }
+      }
+    }
+    // Se todos vazios, limpa a data
+    if (!day && !month && !year) {
+      onChange(undefined)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [day, month, year])
 
   return (
     <Popover>
@@ -51,15 +93,16 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
               max={31}
               placeholder="Dia"
               className="w-full"
+              value={day}
               onChange={(e) => {
-                const day = Number.parseInt(e.target.value)
-                if (!isNaN(day)) {
-                  const newDate = new Date(value || new Date())
-                  newDate.setDate(day)
-                  onChange(newDate)
+                const val = e.target.value
+                if (
+                  val === '' ||
+                  (/^\d+$/.test(val) && +val >= 1 && +val <= 31)
+                ) {
+                  setDay(val)
                 }
               }}
-              value={value ? value.getDate() : ''}
             />
           </div>
           <div>
@@ -67,19 +110,10 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
             <select
               id="month"
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              onChange={(e) => {
-                const month = Number.parseInt(e.target.value)
-                if (!isNaN(month)) {
-                  const newDate = new Date(value || new Date())
-                  newDate.setMonth(month)
-                  onChange(newDate)
-                }
-              }}
-              value={value ? value.getMonth() : ''}
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
             >
-              <option value="" disabled>
-                Mês
-              </option>
+              <option value="">Mês</option>
               <option value="0">Janeiro</option>
               <option value="1">Fevereiro</option>
               <option value="2">Março</option>
@@ -99,22 +133,13 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
             <select
               id="year"
               className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              onChange={(e) => {
-                const year = Number.parseInt(e.target.value)
-                if (!isNaN(year)) {
-                  const newDate = new Date(value || new Date())
-                  newDate.setFullYear(year)
-                  onChange(newDate)
-                }
-              }}
-              value={value ? value.getFullYear() : ''}
+              value={year}
+              onChange={(e) => setYear(e.target.value)}
             >
-              <option value="" disabled>
-                Ano
-              </option>
-              {years.map((year) => (
-                <option key={year} value={year}>
-                  {year}
+              <option value="">Ano</option>
+              {years.map((yearOption) => (
+                <option key={yearOption} value={yearOption}>
+                  {yearOption}
                 </option>
               ))}
             </select>
@@ -125,7 +150,14 @@ export function DatePicker({ value, onChange }: DatePickerProps) {
           <Calendar
             mode="single"
             selected={value || undefined}
-            onSelect={(date) => onChange(date || undefined)}
+            onSelect={(date) => {
+              if (date) {
+                setDay(String(date.getDate()))
+                setMonth(String(date.getMonth()))
+                setYear(String(date.getFullYear()))
+                onChange(date)
+              }
+            }}
             locale={ptBR}
             disabled={(date) => date > new Date()}
             initialFocus

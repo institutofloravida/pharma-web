@@ -172,8 +172,8 @@ export const sidebarSections: SidebarSection[] = [
         icon: FileCog,
         items: [
           {
-            name: 'Teste',
-            url: '/reports',
+            name: 'Dispensas no período',
+            url: '/reports/dispenses-in-a-period',
           },
         ],
       },

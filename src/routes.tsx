@@ -26,7 +26,7 @@ import { MedicinesExits } from './pages/app/panel/movement/exit/medicines-exits'
 import { Operators } from './pages/app/panel/operators/operators'
 import { NewUser } from './pages/app/panel/users/new-user'
 import { Users } from './pages/app/panel/users/users'
-import { ReportTest } from './pages/app/reports/test-report'
+import { DispensesReport } from './pages/app/reports/dispenses-report'
 
 export const router = createBrowserRouter([
   {
@@ -70,11 +70,16 @@ export const router = createBrowserRouter([
       },
       {
         path: 'reports',
-        element: (
-          <PrivateRoute>
-            <ReportTest />
-          </PrivateRoute>
-        ),
+        children: [
+          {
+            path: 'dispenses-in-a-period',
+            element: (
+              <PrivateRoute>
+                <DispensesReport />
+              </PrivateRoute>
+            ),
+          },
+        ],
       },
       {
         path: 'panel',

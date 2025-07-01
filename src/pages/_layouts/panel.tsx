@@ -3,25 +3,20 @@ import {
   AudioWaveform,
   BadgeCheck,
   Bell,
-  BriefcaseMedical,
   Building2,
   ChevronRight,
   ChevronsUpDown,
   Command,
   FileCog,
   FlaskConical,
-  Folder,
-  Forward,
   GalleryVerticalEnd,
   Layers,
   Layers2,
   Loader2,
   LogOut,
   MonitorCog,
-  MoreHorizontal,
   Pill,
   Settings,
-  Trash2,
   UserRoundCog,
   Users,
 } from 'lucide-react'
@@ -64,7 +59,6 @@ import {
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -76,9 +70,8 @@ import {
 } from '@/components/ui/sidebar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useAuth } from '@/contexts/authContext'
-import { useDynamicBreadcrumbTrail } from '@/hooks/use-dynamic-breadcrumb-title'
 import { NAV_ITEMS, sidebarSections } from '@/lib/data/sidebar-config'
-import { hasAccess, type NavItem, type SidebarSection } from '@/lib/sidebar'
+import { hasAccess, type NavItem } from '@/lib/sidebar'
 
 // utils/breadcrumb.ts
 export function getBreadcrumbTrail(
