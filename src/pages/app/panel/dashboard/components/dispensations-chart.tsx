@@ -7,7 +7,6 @@ import { useSearchParams } from 'react-router-dom'
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 
 import { fetchDispensesPerDay } from '@/api/pharma/dashboard/fetch-dispenses-per-day'
-import { getDispensesInAPeriodReport } from '@/api/pharma/reports/dispenses-in-a-period-report'
 import {
   Card,
   CardContent,
