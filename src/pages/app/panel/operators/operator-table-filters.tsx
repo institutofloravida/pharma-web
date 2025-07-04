@@ -123,7 +123,7 @@ export function OperatorTableFilters() {
   return (
     <Form {...form}>
       <form
-        className="grid grid-cols-10 grid-rows-2 space-x-2 p-2"
+        className="grid grid-cols-10 grid-rows-2 gap-1 space-x-2 p-2"
         onSubmit={form.handleSubmit(handleFilter)}
       >
         <span className="col-span-1 text-sm font-semibold">Filtros:</span>

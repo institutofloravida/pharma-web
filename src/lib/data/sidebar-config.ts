@@ -25,7 +25,7 @@ export const ALL_ROLES = [
 
 export const sidebarSections: SidebarSection[] = [
   {
-    label: 'Dashboard',
+    label: 'Área Informativa',
     singleItems: [
       {
         name: 'Dashboard',

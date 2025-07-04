@@ -23,9 +23,26 @@ export function Users() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const name = searchParams.get('name')
+  const sus = searchParams.get('sus')
+  const cpf = searchParams.get('cpf')
+  const birthDate = searchParams.get('birthDate')
+  const generalRegistration = searchParams.get('generalRegistration')
+
   const { data: usersResult } = useQuery({
-    queryKey: ['users', page],
-    queryFn: () => fetchUsers({ page }, token ?? ''),
+    queryKey: ['users', page, name, sus, cpf, generalRegistration, birthDate],
+    queryFn: () =>
+      fetchUsers(
+        {
+          page,
+          birthDate: birthDate ? new Date(birthDate) : undefined,
+          cpf,
+          generalRegistration,
+          name,
+          sus,
+        },
+        token ?? '',
+      ),
   })
 
   function handlePagination(pageIndex: number) {
