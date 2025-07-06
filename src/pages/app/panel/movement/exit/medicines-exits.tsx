@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchMedicinesExits } from '@/api/pharma/movement/exit/fetch-medicines-exits'
+import { ExitType } from '@/api/pharma/movement/exit/register-medicine-exit'
 import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
@@ -17,6 +18,7 @@ import {
 import { useAuth } from '@/contexts/authContext'
 
 import { MedicineExitTableRow } from './medicine-exit-table-row'
+import { MedicineExitTableFilters } from './medicine-exits-table-filters'
 import { NewMedicineExitDialog } from './new-medicine-exit-dialog'
 
 export function MedicinesExits() {
@@ -24,11 +26,35 @@ export function MedicinesExits() {
 
   const [searchParams, setSearchParams] = useSearchParams()
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
+
+  const medicineId = searchParams.get('medicineId')
+  const operatorId = searchParams.get('operatorId')
+  const batch = searchParams.get('batch')
+  const movementTypeId = searchParams.get('movementTypeId')
+  const exitDate = searchParams.get('exitDate')
+
   const { data: medicinesExitsResult } = useQuery({
-    queryKey: ['medicines-exits', 'data-on-institution', pageIndex],
+    queryKey: [
+      'medicines-exits',
+      'data-on-institution',
+      pageIndex,
+      medicineId,
+      operatorId,
+      batch,
+      movementTypeId,
+      exitDate,
+    ],
     queryFn: () =>
       fetchMedicinesExits(
-        { page: pageIndex, institutionId: institutionId ?? '' },
+        {
+          page: pageIndex,
+          institutionId: institutionId ?? '',
+          batch,
+          exitDate: exitDate ? new Date(exitDate) : undefined,
+          medicineId,
+          movementTypeId,
+          operatorId,
+        },
         token ?? '',
       ),
     enabled: Boolean(institutionId),
@@ -49,8 +75,8 @@ export function MedicinesExits() {
           Saídas de Medicamentos
         </h1>
         <div className="space-y-2.5">
-          <div className="flex items-center justify-between">
-            {/* <MedicineVariantTableFilters /> */}
+          <div className="flex items-center justify-between gap-8">
+            <MedicineExitTableFilters />
             <Dialog>
               <DialogTrigger asChild>
                 <Button className="" variant={'default'}>
