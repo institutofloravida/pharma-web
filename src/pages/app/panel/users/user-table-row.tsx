@@ -1,4 +1,5 @@
 import { Search, UserMinus, UserPen } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 import { User } from '@/api/pharma/users/fetch-users'
 import { Button } from '@/components/ui/button'
@@ -13,6 +14,7 @@ export interface UserTableRowProps {
 }
 
 export function UserTableRow({ user }: UserTableRowProps) {
+  const navigate = useNavigate()
   return (
     <TableRow>
       <TableCell>
@@ -46,7 +48,11 @@ export function UserTableRow({ user }: UserTableRowProps) {
       </TableCell>
 
       <TableCell>
-        <Button variant={'outline'} size={'xs'}>
+        <Button
+          variant={'outline'}
+          size={'xs'}
+          onClick={() => navigate(`/users/edit/${user.id}`)}
+        >
           <UserPen className="h-3 w-3" />
         </Button>
       </TableCell>

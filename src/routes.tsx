@@ -25,6 +25,7 @@ import { MedicinesEntries } from './pages/app/panel/movement/entry/medicines-ent
 import { MedicinesExits } from './pages/app/panel/movement/exit/medicines-exits'
 import { Operators } from './pages/app/panel/operators/operators'
 import { NewUser } from './pages/app/panel/users/new-user'
+import { UpdateUser } from './pages/app/panel/users/update-user'
 import { Users } from './pages/app/panel/users/users'
 import { DispensesReport } from './pages/app/reports/dispenses-report'
 
@@ -226,6 +227,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <NewUser />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'edit/:id',
+        element: (
+          <PrivateRoute>
+            <UpdateUser />
           </PrivateRoute>
         ),
       },

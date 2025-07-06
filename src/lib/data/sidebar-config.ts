@@ -142,7 +142,7 @@ export const sidebarSections: SidebarSection[] = [
         title: 'Usuários',
         icon: Users,
         items: [
-          { name: 'Usuários', url: '/users' },
+          { name: 'Todos', url: '/users' },
           {
             name: 'Novo Usuário',
             url: '/users/new',

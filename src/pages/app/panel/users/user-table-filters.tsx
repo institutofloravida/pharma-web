@@ -37,9 +37,6 @@ type UnitsMeasureFiltersSchema = z.infer<typeof unitsmeasureFiltersSchema>
 
 export function UserTableFilters() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const [queryInstitution, setQueryInstitution] = useState('')
-
-  const { token } = useAuth()
 
   const name = searchParams.get('name')
   const sus = searchParams.get('sus')
@@ -140,7 +137,7 @@ export function UserTableFilters() {
         className="grid grid-cols-10 grid-rows-2 gap-1 space-x-2 p-2"
         onSubmit={form.handleSubmit(handleFilter)}
       >
-        <span className="col-span-1 text-sm font-semibold">Filtros:</span>
+        <span className="text-sm font-semibold">Filtros:</span>
         <FormField
           control={form.control}
           name="name"
@@ -214,7 +211,7 @@ export function UserTableFilters() {
           control={form.control}
           name="birthDate"
           render={({ field }) => (
-            <FormItem className="flex flex-col">
+            <FormItem className="col-span-2">
               <FormControl>
                 <DatePicker value={field.value} onChange={field.onChange} />
               </FormControl>
