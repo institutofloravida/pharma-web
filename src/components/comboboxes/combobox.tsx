@@ -29,6 +29,7 @@ interface ComboboxProps<T> {
   onSelect: (id: string, name: string) => void
   itemKey: keyof T
   itemValue: keyof T
+  isDisable?: boolean
 }
 
 export function Combobox<T extends Record<string, any>>({
@@ -41,12 +42,14 @@ export function Combobox<T extends Record<string, any>>({
   onSelect,
   itemKey,
   itemValue,
+  isDisable = false,
 }: ComboboxProps<T>) {
   return (
     <Popover>
-      <PopoverTrigger asChild>
+      <PopoverTrigger disabled={isDisable} asChild>
         <FormControl>
           <Button
+            disabled={isDisable}
             variant="outline"
             role="combobox"
             className={cn(
@@ -68,6 +71,7 @@ export function Combobox<T extends Record<string, any>>({
             className="h-9"
             value={query}
             onValueChange={onQueryChange}
+            disabled={isDisable}
           />
           <CommandList>
             {isFetching && <CommandEmpty>Loading...</CommandEmpty>}

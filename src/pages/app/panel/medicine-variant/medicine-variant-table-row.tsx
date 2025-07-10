@@ -1,8 +1,11 @@
 import { PenLine, Search, Trash } from 'lucide-react'
+import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
+
+import { UpdateMedicineVariantDialog } from './update-medicine-variant-dialog'
 
 export interface MedicinesVariantsTableRowProps {
   medicineVariant: {
@@ -17,6 +20,8 @@ export interface MedicinesVariantsTableRowProps {
 export function MedicineVariantTableRow({
   medicineVariant,
 }: MedicinesVariantsTableRowProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
   return (
     <TableRow>
       <TableCell>
@@ -41,9 +46,17 @@ export function MedicineVariantTableRow({
       </TableCell>
 
       <TableCell>
-        <Button variant={'outline'} size={'xs'}>
-          <PenLine className="h-3 w-3" />
-        </Button>
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogTrigger asChild>
+            <Button variant={'outline'} size={'xs'}>
+              <PenLine className="h-3 w-3" />
+            </Button>
+          </DialogTrigger>
+          <UpdateMedicineVariantDialog
+            open={isOpen}
+            medicineVariantId={medicineVariant.id}
+          />
+        </Dialog>
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>
