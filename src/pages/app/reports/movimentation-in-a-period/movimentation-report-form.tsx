@@ -5,8 +5,9 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
+import { ExitType } from '@/api/pharma/movement/exit/register-medicine-exit'
 import { fetchOperators } from '@/api/pharma/operators/fetch-operators'
-import { getDispensesInAPeriodReport } from '@/api/pharma/reports/dispenses-in-a-period-report'
+import { getMovimentationInAPeriodReport } from '@/api/pharma/reports/movimentation-in-a-period-report'
 import { fetchUsers } from '@/api/pharma/users/fetch-users'
 import { ComboboxUp } from '@/components/comboboxes/combobox-up'
 import { DatePicker } from '@/components/date-picker'
@@ -25,11 +26,23 @@ import { Formatter } from '@/lib/utils/formaters/formaters'
 import { dateFormatter } from '@/lib/utils/formatter'
 import { getOperatorRoleTranslation } from '@/lib/utils/translations-mappers/operator-role-translation'
 
-import { useDispensesReportPdf } from './use-dispenses-report-pdf'
+import { useMovimentationReportPdf } from './use-movimentation-report'
 
-export const dispensesReportFormSchema = z.object({
-  patientId: z.string().optional(),
-  patientName: z.string().optional(),
+export const movimentationReportFormSchema = z.object({
+  medicineId: z.string().optional(),
+  medicineName: z.string().optional(),
+  medicineVariantId: z.string().optional(),
+  medicineVariantName: z.string().optional(),
+  stockId: z.string().optional(),
+  stockName: z.string().optional(),
+  medicineStockId: z.string().optional(),
+  medicineStockName: z.string().optional(),
+  batchStockId: z.string().optional(),
+  batchStockName: z.string().optional(),
+  movementTypeId: z.string().optional(),
+  movementTypeName: z.string().optional(),
+  exitType: z.nativeEnum(ExitType).optional(),
+  quantity: z.number().optional(),
   operatorId: z.string().optional(),
   operatorName: z.string().optional(),
   startDate: z.date({
@@ -39,27 +52,22 @@ export const dispensesReportFormSchema = z.object({
     required_error: 'A data fim é obrigatória.',
   }),
 })
-type DispensesReportFormSchema = z.infer<typeof dispensesReportFormSchema>
+type MovimentationReportFormSchema = z.infer<
+  typeof movimentationReportFormSchema
+>
 
-export function DispensesReportForm() {
+export function MovimentationReportForm() {
   const [queryUsers, setQueryUsers] = useState('')
-  const [filters, setFilters] = useState<DispensesReportFormSchema | null>({
+  const [filters, setFilters] = useState<MovimentationReportFormSchema | null>({
     startDate: new Date(),
     endDate: new Date(),
   })
 
   const { token, institutionId } = useAuth()
-  const generatePdf = useDispensesReportPdf()
+  const generatePdf = useMovimentationReportPdf()
 
-  const form = useForm<DispensesReportFormSchema>({
-    resolver: zodResolver(dispensesReportFormSchema),
-  })
-
-  const { data: usersResult, isFetching: isFetchingUsers } = useQuery({
-    queryKey: ['users'],
-    queryFn: () => fetchUsers({ page: 1 }, token ?? ''),
-    staleTime: 1000,
-    refetchOnMount: true,
+  const form = useForm<MovimentationReportFormSchema>({
+    resolver: zodResolver(movimentationReportFormSchema),
   })
 
   const { data: operatorsResult, isFetching: isFetchingOperators } = useQuery({
@@ -71,23 +79,22 @@ export function DispensesReportForm() {
 
   const { data, refetch, isFetching } = useQuery({
     queryKey: [
-      'dispenses-report',
+      'movimentation-report',
       institutionId,
       filters?.operatorId ?? null,
-      filters?.patientId ?? null,
+      filters?.operatorName ?? null,
       filters?.startDate ?? null,
       filters?.endDate ?? null,
     ],
     queryFn: ({ queryKey }) => {
-      const [, institutionIdRaw, operatorId, patientId, startDate, endDate] =
+      const [, institutionIdRaw, operatorId, operatorName, startDate, endDate] =
         queryKey
       const institutionId =
         typeof institutionIdRaw === 'string' ? institutionIdRaw : ''
-      return getDispensesInAPeriodReport(
+      return getMovimentationInAPeriodReport(
         {
           institutionId,
           operatorId: operatorId as string | undefined,
-          patientId: patientId as string | undefined,
           startDate: (startDate as Date) ?? new Date(),
           endDate: (endDate as Date) ?? new Date(),
         },
@@ -99,17 +106,19 @@ export function DispensesReportForm() {
   const handleClick = async () => {
     const isValid = await form.trigger()
     if (!isValid) return
+    console.log('ge values: ', form.getValues())
     setFilters(form.getValues())
 
     setTimeout(async () => {
       const result = await refetch()
       console.log('filtros: ', filters)
-      if (result.data?.dispenses && filters) {
-        generatePdf(result.data.dispenses, {
+      console.log(result.data)
+      if (result.data?.movimentation && filters) {
+        generatePdf(result.data.movimentation, {
           startDate: filters.startDate ?? new Date(),
           endDate: filters.endDate ?? new Date(),
-          patientName: filters.patientName,
-          operatorName: filters.operatorName,
+          operator: filters.operatorName,
+          institutionId: institutionId ?? '',
         })
       }
     }, 0)
@@ -151,39 +160,6 @@ export function DispensesReportForm() {
             )}
           />
         </div>
-
-        <FormField
-          control={form.control}
-          name="patientId"
-          render={({ field }) => (
-            <FormItem className="col-span-3 flex flex-col gap-1">
-              <FormLabel>Usuário</FormLabel>
-              <ComboboxUp
-                field={field}
-                items={usersResult?.patients ?? []}
-                itemKey="id"
-                onQueryChange={setQueryUsers}
-                query={queryUsers}
-                isFetching={isFetchingUsers}
-                formatItem={(item) =>
-                  `${Formatter.cpf(item.cpf ?? '')} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
-                }
-                getItemText={(item) =>
-                  `${Formatter.cpf(item.cpf ?? '')} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
-                }
-                placeholder="Pesquise por um usuário"
-                onSelect={(id, item) => {
-                  form.setValue('patientId', id)
-                  form.setValue('patientName', item.name)
-                }}
-              />
-              <FormDescription>
-                Pesquise por cpf, nome ou data de nascimento{' '}
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <FormField
           control={form.control}

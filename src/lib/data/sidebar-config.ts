@@ -175,6 +175,10 @@ export const sidebarSections: SidebarSection[] = [
             name: 'Dispensas no período',
             url: '/reports/dispenses-in-a-period',
           },
+          {
+            name: 'Movimentação no período',
+            url: '/reports/movimentation-in-a-period',
+          },
         ],
       },
     ],

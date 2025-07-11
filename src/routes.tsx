@@ -27,7 +27,8 @@ import { Operators } from './pages/app/panel/operators/operators'
 import { NewUser } from './pages/app/panel/users/new-user'
 import { UpdateUser } from './pages/app/panel/users/update-user'
 import { Users } from './pages/app/panel/users/users'
-import { DispensesReport } from './pages/app/reports/dispenses-report'
+import { DispensesReport } from './pages/app/reports/dispenses-in-a-period/dispenses-report'
+import { MovimentationReport } from './pages/app/reports/movimentation-in-a-period/movimentation-report'
 
 export const router = createBrowserRouter([
   {
@@ -77,6 +78,14 @@ export const router = createBrowserRouter([
             element: (
               <PrivateRoute>
                 <DispensesReport />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: 'movimentation-in-a-period',
+            element: (
+              <PrivateRoute>
+                <MovimentationReport />
               </PrivateRoute>
             ),
           },
