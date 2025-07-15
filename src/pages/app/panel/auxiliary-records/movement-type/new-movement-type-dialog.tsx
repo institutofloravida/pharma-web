@@ -7,6 +7,7 @@ import {
   registerMovementType,
   type RegisterMovementTypeBody,
 } from '@/api/pharma/auxiliary-records/movement-type/register-movement-type'
+import { OptionDirection } from '@/components/options/direction-option'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,
@@ -120,24 +121,10 @@ export function NewMovementTypeDialog() {
               <FormItem className="space-y-3">
                 <FormLabel>Tipo</FormLabel>
                 <FormControl>
-                  <RadioGroup
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    className="flex flex-col space-y-1"
-                  >
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="ENTRY" />
-                      </FormControl>
-                      <FormLabel className="font-normal">ENTRADA</FormLabel>
-                    </FormItem>
-                    <FormItem className="flex items-center space-x-3 space-y-0">
-                      <FormControl>
-                        <RadioGroupItem value="EXIT" />
-                      </FormControl>
-                      <FormLabel className="font-normal">SAÍDA</FormLabel>
-                    </FormItem>
-                  </RadioGroup>
+                  <OptionDirection
+                    value={field.value}
+                    onChange={field.onChange}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

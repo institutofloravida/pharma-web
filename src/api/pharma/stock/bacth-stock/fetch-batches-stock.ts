@@ -6,6 +6,8 @@ export interface FetchBatchesOnStockParams {
   medicineStockId: string
   page?: number | null
   code?: string | null
+  includeExpired?: boolean
+  includeZero?: boolean
 }
 
 export interface BatchestockDetails {
@@ -33,7 +35,13 @@ interface FetchBatchesOnStockReponse {
 }
 
 export async function fetchBatchesOnStock(
-  { medicineStockId, code, page }: FetchBatchesOnStockParams,
+  {
+    medicineStockId,
+    code,
+    page,
+    includeExpired,
+    includeZero,
+  }: FetchBatchesOnStockParams,
   token: string,
 ) {
   const response = await apiPharma.get<FetchBatchesOnStockReponse>(
@@ -46,6 +54,8 @@ export async function fetchBatchesOnStock(
         page,
         medicineStockId,
         code,
+        includeExpired,
+        includeZero,
       },
     },
   )

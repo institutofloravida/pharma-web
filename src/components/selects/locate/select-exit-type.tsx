@@ -9,19 +9,27 @@ import {
 } from '@/components/ui/select'
 
 interface SelectExitTypeProps {
-  value: ExitType
+  value?: ExitType
+  includeDispensation?: boolean
   onChange: (value: ExitType) => void
 }
 
-export function SelectExitType({ value, onChange }: SelectExitTypeProps) {
+export function SelectExitType({
+  value,
+  onChange,
+  includeDispensation = false,
+}: SelectExitTypeProps) {
   return (
     <Select value={value} onValueChange={onChange}>
       <FormControl>
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Selecione um tipo de saída" />
+          <SelectValue placeholder="Selecione..." />
         </SelectTrigger>
       </FormControl>
       <SelectContent>
+        {includeDispensation && (
+          <SelectItem value={ExitType.DISPENSATION}>Dispensa</SelectItem>
+        )}
         <SelectItem value={ExitType.EXPIRATION}>Vencimento</SelectItem>
         <SelectItem value={ExitType.MOVEMENT_TYPE}>Outro</SelectItem>
       </SelectContent>

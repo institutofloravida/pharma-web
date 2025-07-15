@@ -2,14 +2,15 @@ import pdfMake from 'pdfmake/build/pdfmake'
 import pdfFonts from 'pdfmake/build/vfs_fonts'
 import type { TDocumentDefinitions } from 'pdfmake/interfaces'
 
-import type { ExitType } from '@/api/pharma/movement/exit/register-medicine-exit'
+import { ExitType } from '@/api/pharma/movement/exit/register-medicine-exit'
 import { Movimentation } from '@/api/pharma/reports/movimentation-in-a-period-report'
 import { useAuth } from '@/contexts/authContext'
+import { MovementTypeDirection } from '@/lib/utils/movement-type'
 
 pdfMake.vfs = (pdfFonts as any).vfs
-
 export function useMovimentationReportPdf() {
   const { me } = useAuth()
+
   return (
     movimentation: Movimentation[],
     filters: {
@@ -17,6 +18,7 @@ export function useMovimentationReportPdf() {
       startDate: Date
       endDate: Date
       operator?: string
+      direction?: MovementTypeDirection
       medicine?: string
       medicineVariant?: string
       stock?: string
@@ -27,46 +29,78 @@ export function useMovimentationReportPdf() {
       exitType?: ExitType
     },
   ) => {
-    console.log('aqui $$$$$$$$$$$$$$$')
-
     const currentDate = new Date()
     const formattedDate = currentDate.toLocaleDateString('pt-BR')
     const formattedTime = currentDate.toLocaleTimeString('pt-BR')
 
-    // Monta os filtros para exibir no PDF
-    const filtros: string[] = []
-    if (filters) {
-      filtros.push(
-        `Período: ${filters.startDate.toLocaleDateString('pt-BR')} até ${filters.endDate.toLocaleDateString('pt-BR')}`,
-      )
-      if (filters.operator) {
-        filtros.push(`Operador: ${filters.operator}`)
-      }
-      if (filters.stock) {
-        filtros.push(`Estoque: ${filters.stock}`)
-      }
-      if (filters.medicine) {
-        filtros.push(`Medicamento: ${filters.medicine}`)
-      }
-      if (filters.medicineVariant) {
-        filtros.push(`Variante: ${filters.medicineVariant}`)
-      }
-      if (filters.medicineStock) {
-        filtros.push(`Medicamento em Estoque: ${filters.medicineStock}`)
-      }
-      if (filters.batcheStock) {
-        filtros.push(`Lote: ${filters.batcheStock}`)
-      }
-      if (filters.quantity) {
-        filtros.push(`Quantidade: ${filters.quantity}`)
-      }
-      if (filters.movementType) {
-        filtros.push(`Tipo de Movimento: ${filters.movementType}`)
-      }
-      if (filters.exitType) {
-        filtros.push(`Tipo de Saída: ${filters.exitType}`)
+    const filtersReport: any[] = []
+
+    const formatLabelValue = (
+      label: string,
+      value?: string | number | boolean,
+    ) => {
+      if (!value) return null
+      return {
+        text: [{ text: `${label}: `, bold: true }, { text: String(value) }],
+        margin: [0, 2],
       }
     }
+
+    filtersReport.push({
+      text: [
+        { text: 'Período: ', bold: true },
+        {
+          text: `${filters.startDate.toLocaleDateString('pt-BR')} até ${filters.endDate.toLocaleDateString('pt-BR')}`,
+        },
+      ],
+      margin: [0, 2],
+    })
+
+    filtersReport.push(formatLabelValue('Operador', filters.operator))
+
+    filtersReport.push(
+      filters.direction && {
+        text: [
+          { text: 'Direção: ', bold: true },
+          {
+            text:
+              filters.direction === MovementTypeDirection.ENTRY
+                ? 'ENTRADA'
+                : 'SAÍDA',
+          },
+        ],
+        margin: [0, 2],
+      },
+    )
+
+    filtersReport.push(formatLabelValue('Estoque', filters.stock))
+    filtersReport.push(formatLabelValue('Medicamento', filters.medicine))
+    filtersReport.push(formatLabelValue('Variante', filters.medicineVariant))
+    filtersReport.push(
+      formatLabelValue('Medicamento em Estoque', filters.medicineStock),
+    )
+    filtersReport.push(formatLabelValue('Lote', filters.batcheStock))
+    filtersReport.push(formatLabelValue('Quantidade', filters.quantity))
+    filtersReport.push(
+      formatLabelValue('Tipo de Movimento', filters.movementType),
+    )
+
+    filtersReport.push(
+      filters.exitType && {
+        text: [
+          { text: 'Tipo de Saída: ', bold: true },
+          {
+            text:
+              filters.exitType === ExitType.MOVEMENT_TYPE
+                ? 'Outro'
+                : filters.exitType === ExitType.DISPENSATION
+                  ? 'Dispensa'
+                  : 'Vencimento',
+          },
+        ],
+        margin: [0, 2],
+      },
+    )
 
     const contentArr: any[] = [
       {
@@ -84,36 +118,43 @@ export function useMovimentationReportPdf() {
         text: 'Filtros',
         bold: true,
         alignment: 'left',
-        margin: [0, 0, 0, 10],
+        margin: [0, 0, 0, 6],
       },
     ]
-    if (filtros.length > 0) {
-      contentArr.push({ ul: filtros, margin: [0, 0, 0, 10] })
+
+    const filteredFilters = filtersReport.filter(Boolean)
+
+    if (filteredFilters.length > 0) {
+      contentArr.push({
+        stack: filteredFilters,
+        margin: [0, 0, 0, 10],
+      })
     }
+
     contentArr.push({
       table: {
         headerRows: 1,
         widths: ['auto', '*', 'auto', 'auto', 'auto', 'auto', 'auto', '*'],
         body: [
           [
-            'Estoque',
-            'Medicamento',
-            'Lote',
-            'quantidade',
-            'Data',
-            'Tipo de Movimentação',
-            'Movimento',
-            'operador',
+            { text: 'Estoque', style: 'tableHeader' },
+            { text: 'Medicamento', style: 'tableHeader' },
+            { text: 'Lote', style: 'tableHeader' },
+            { text: 'Quantidade', style: 'tableHeader' },
+            { text: 'Data', style: 'tableHeader' },
+            { text: 'Tipo de Movimentação', style: 'tableHeader' },
+            { text: 'Movimento', style: 'tableHeader' },
+            { text: 'Operador', style: 'tableHeader' },
           ],
-          ...movimentation.map((movimentation) => [
-            movimentation.stock,
-            `${movimentation.medicine} - ${movimentation.dosage}${movimentation.unitMeasure} - ${movimentation.pharmaceuticalForm}`,
-            movimentation.batchCode,
-            movimentation.quantity,
-            new Date(movimentation.movementDate).toLocaleDateString('pt-BR'),
-            movimentation.movementType,
-            movimentation.direction,
-            movimentation.operator,
+          ...movimentation.map((mov) => [
+            mov.stock,
+            `${mov.medicine} - ${mov.dosage}${mov.unitMeasure} - ${mov.pharmaceuticalForm}`,
+            mov.batchCode,
+            mov.quantity,
+            new Date(mov.movementDate).toLocaleDateString('pt-BR'),
+            mov.movementType,
+            mov.direction,
+            mov.operator,
           ]),
         ],
       },
@@ -127,6 +168,7 @@ export function useMovimentationReportPdf() {
         paddingBottom: () => 4,
       },
     })
+
     const docDefinition: TDocumentDefinitions = {
       pageOrientation: 'landscape',
       content: contentArr,
@@ -163,6 +205,7 @@ export function useMovimentationReportPdf() {
         fontSize: 9,
       },
     }
+
     pdfMake.createPdf(docDefinition).download('Relatorio Movimentação')
   }
 }

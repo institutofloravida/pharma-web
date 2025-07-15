@@ -11,7 +11,7 @@ export function MovimentationReport() {
           Relatório de Movimentações no Período
         </h1>
         <div className="space-y-2.5">
-          <div className="flex items-center justify-between">
+          <div className="flex max-w-[1000px] items-center justify-between">
             <MovimentationReportForm />
           </div>
           <div className="rounded-md border"></div>

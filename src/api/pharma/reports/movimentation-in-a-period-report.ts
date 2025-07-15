@@ -1,4 +1,5 @@
 import { apiPharma } from '@/lib/axios'
+import type { MovementTypeDirection } from '@/lib/utils/movement-type'
 
 import type { ExitType } from '../movement/exit/register-medicine-exit'
 
@@ -7,18 +8,19 @@ export interface GetMovimentationInAPeriodReportQuery {
   startDate: Date
   endDate: Date
   operatorId?: string
+  direction?: MovementTypeDirection
   medicineId?: string
   medicineVariantId?: string
   stockId?: string
   medicineStockId?: string
-  batcheStockId?: string
+  batchStockId?: string
   quantity?: number
   movementTypeId?: string
   exitType?: ExitType
 }
 
 export interface Movimentation {
-  direction: string
+  direction: MovementTypeDirection
   medicine: string
   batchCode: string
   complement: string | null | undefined
@@ -45,7 +47,8 @@ export async function getMovimentationInAPeriodReport(
     institutionId,
     startDate,
     operatorId,
-    batcheStockId,
+    direction,
+    batchStockId,
     exitType,
     medicineId,
     medicineStockId,
@@ -67,8 +70,9 @@ export async function getMovimentationInAPeriodReport(
         institutionId,
         startDate,
         operatorId,
-        batcheStockId,
+        batchStockId,
         exitType,
+        direction,
         medicineId,
         medicineStockId,
         medicineVariantId,

@@ -26,6 +26,7 @@ interface ComboboxProps<T> {
   query: string
   placeholder?: string
   isFetching: boolean
+  isDisable?: boolean
   onQueryChange: (query: string) => void
   onSelect: (id: string, item: T) => void
   itemKey: keyof T
@@ -43,6 +44,7 @@ export function ComboboxUp<T extends Record<string, any>>({
   onQueryChange,
   onSelect,
   itemKey,
+  isDisable,
   itemValue,
   formatItem,
   getItemText = (item) => String(item[itemKey]),
@@ -53,6 +55,7 @@ export function ComboboxUp<T extends Record<string, any>>({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          disabled={isDisable}
           variant="outline"
           role="combobox"
           aria-expanded={open}

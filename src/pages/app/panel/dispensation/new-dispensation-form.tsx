@@ -217,7 +217,6 @@ export function NewDispensationForm() {
         }
       }
     } catch (error) {
-      console.error('Erro ao avançar:', error)
       toast({
         title: 'Erro',
         description: 'Ocorreu um erro ao tentar avançar',

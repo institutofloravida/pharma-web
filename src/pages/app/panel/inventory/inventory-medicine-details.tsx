@@ -66,8 +66,6 @@ export function InventoryMedicineDetails() {
     )
   }
 
-  console.log('medicine', medicine)
-
   return (
     <div className="container mx-auto py-6">
       <Card className="border-none shadow-md">
