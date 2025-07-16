@@ -22,7 +22,6 @@ export function useDispensesReportPdf() {
     const formattedDate = currentDate.toLocaleDateString('pt-BR')
     const formattedTime = currentDate.toLocaleTimeString('pt-BR')
 
-    // Monta os filtros para exibir no PDF
     const filtros: string[] = []
     if (filters) {
       filtros.push(
@@ -55,22 +54,57 @@ export function useDispensesReportPdf() {
         margin: [0, 0, 0, 10],
       },
     ]
+
     if (filtros.length > 0) {
       contentArr.push({ ul: filtros, margin: [0, 0, 0, 10] })
     }
+
+    // Cabeçalho da tabela
+    const tableBody: any[] = [
+      [
+        { text: 'Data', style: 'tableHeader', color: 'white' },
+        { text: 'Paciente', style: 'tableHeader', color: 'white' },
+        { text: 'Operador', style: 'tableHeader', color: 'white' },
+        { text: 'Itens', style: 'tableHeader', color: 'white' },
+      ],
+    ]
+
+    // Linhas com dispensas e seus medicamentos
+    for (const d of dispenses) {
+      // Linha principal da dispensa
+      tableBody.push([
+        new Date(d.dispensationDate).toLocaleDateString('pt-BR'),
+        d.patient,
+        d.operator,
+        d.items.toString(),
+      ])
+
+      // Medicamentos como "sub-linhas" com indentação
+      if (d.medicines.length > 0) {
+        tableBody.push([
+          {
+            colSpan: 4,
+            margin: [10, 0, 0, 10],
+            stack: [
+              { text: 'Medicamentos:', bold: true, margin: [0, 5, 0, 2] },
+              ...d.medicines.map((m, idx) => ({
+                text: `• ${m.medicine} (${m.pharmaceuticalForm}, ${m.unitMeasure}) - Quantidade: ${m.quantity}${m.complement ? ` (${m.complement})` : ''}`,
+                margin: [10, 0, 0, 2],
+              })),
+            ],
+          },
+          {},
+          {},
+          {},
+        ])
+      }
+    }
+
     contentArr.push({
       table: {
         headerRows: 1,
         widths: ['auto', '*', '*', 'auto'],
-        body: [
-          ['Data', 'Paciente', 'Operador', 'Itens'],
-          ...dispenses.map((d) => [
-            new Date(d.dispensationDate).toLocaleDateString('pt-BR'),
-            d.patient,
-            d.operator,
-            d.items.toString(),
-          ]),
-        ],
+        body: tableBody,
       },
       layout: {
         fillColor: (rowIndex: number) => (rowIndex === 0 ? '#2980b9' : null),
@@ -91,7 +125,6 @@ export function useDispensesReportPdf() {
           bold: true,
         },
         tableHeader: {
-          color: 'white',
           bold: true,
         },
       },

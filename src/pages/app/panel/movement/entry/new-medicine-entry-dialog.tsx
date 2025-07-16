@@ -241,7 +241,7 @@ export function NewMedicineEntryDialog() {
                   isFetching={isFetchingMedicinesVariants}
                   onQueryChange={setQueryMedicineVariant}
                   getItemText={(item) =>
-                    `${item.medicine} ${item.pharmaceuticalForm} ${item.unitMeasure}`
+                    `${item.medicine} - ${item.dosage}${item.unitMeasure} - ${item.pharmaceuticalForm}`
                   }
                   onSelect={(id, _) => {
                     form.setValue('medicineVariantId', id)

@@ -11,7 +11,7 @@ interface SelectMonthProps {
   onChange: (value: string) => void
 }
 
-const MONTHS = [
+export const MONTHS = [
   { id: '0', label: 'Janeiro' },
   { id: '1', label: 'Fevereiro' },
   { id: '2', label: 'Março' },

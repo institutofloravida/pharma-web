@@ -3,6 +3,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts'
 import type { TDocumentDefinitions } from 'pdfmake/interfaces'
 
 import { UseMedicine } from '@/api/pharma/reports/monthly-medicine-utilization'
+import { MONTHS } from '@/components/selects/select-month'
 import { useAuth } from '@/contexts/authContext'
 
 pdfMake.vfs = (pdfFonts as any).vfs
@@ -37,8 +38,14 @@ export function useMonthlyMedicineUtilizationReportPdf() {
       }
     }
 
+    const monthDescription = MONTHS.find((item) => item.id === filters.month)
     filtersReport.push(formatLabelValue('Ano', filters.year))
-    filtersReport.push(formatLabelValue('Mês', filters.month))
+    filtersReport.push(
+      formatLabelValue(
+        'Mês',
+        monthDescription ? monthDescription.label : filters.month,
+      ),
+    )
     filtersReport.push(formatLabelValue('Estoque', filters.stock))
 
     const contentArr: any[] = [
@@ -84,7 +91,7 @@ export function useMonthlyMedicineUtilizationReportPdf() {
             ],
             ...useMedicines.map((useMedicine) => [
               // `${useMedicine.medicine ?? ''} ${useMedicine.dosage ?? ''}${useMedicine.unitMeasure ?? ''} ${useMedicine.pharmaceuticalForm ?? ''} ${useMedicine.complement ?? ''}`,
-              `${useMedicine.medicine ?? ''} `,
+              `${useMedicine.medicine ?? ''} ${useMedicine.dosage}${useMedicine.unitMeasure} ${useMedicine.pharmaceuticalForm} ${useMedicine.complement ?? ''}`,
               Number(useMedicine.previousBalance ?? 0),
               Number(useMedicine.currentBalance ?? 0),
               Number(useMedicine.used ?? 0),

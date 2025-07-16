@@ -16,6 +16,14 @@ export interface Dispensation {
   operatorId: string
   operator: string
   items: number
+  medicines: {
+    medicine: string
+    pharmaceuticalForm: string
+    unitMeasure: string
+    complement: string | null
+    quantity: number
+    medicineStockId: string
+  }[]
 }
 
 interface GetDispensesInAPeriodReportResponse {
