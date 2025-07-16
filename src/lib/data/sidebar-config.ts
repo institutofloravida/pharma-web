@@ -179,6 +179,10 @@ export const sidebarSections: SidebarSection[] = [
             name: 'Movimentação no período',
             url: '/reports/movimentation-in-a-period',
           },
+          {
+            name: 'Utilização',
+            url: '/reports/monthly-utilization',
+          },
         ],
       },
     ],
