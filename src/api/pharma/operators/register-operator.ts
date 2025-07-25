@@ -1,6 +1,7 @@
 import { apiPharma } from '@/lib/axios'
 
 export enum OperatorRole{
+  NULL='',
   COMMON='COMMON',
   MANAGER='MANAGER',
   SUPER_ADMIN='SUPER_ADMIN'

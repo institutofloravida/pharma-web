@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Outlet } from 'react-router-dom'
 
 import { OperatorRole } from './api/pharma/operators/register-operator'
 import { AuthLayout } from './pages/_layouts/auth'
@@ -22,6 +22,8 @@ import { Inventory } from './pages/app/panel/inventory/list-inventory'
 import { MedicinesVariants } from './pages/app/panel/medicine-variant/medicines-variants'
 import { Medicines } from './pages/app/panel/medicines/medicines'
 import { MedicinesEntries } from './pages/app/panel/movement/entry/medicines-entries'
+import NewMedicineEntryPage from './pages/app/panel/movement/entry/new-medicine-entry'
+import MedicationEntryPage from './pages/app/panel/movement/entry/teste'
 import { MedicinesExits } from './pages/app/panel/movement/exit/medicines-exits'
 import { Operators } from './pages/app/panel/operators/operators'
 import { NewUser } from './pages/app/panel/users/new-user'
@@ -61,6 +63,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Dashboard />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: 'test',
+        element: (
+          <PrivateRoute>
+            <MedicationEntryPage />
           </PrivateRoute>
         ),
       },
@@ -213,12 +223,28 @@ export const router = createBrowserRouter([
     children: [
       {
         path: 'entries',
-        element: (
-          <PrivateRoute>
-            <MedicinesEntries />
-          </PrivateRoute>
-        ),
+        element: <Outlet />, // ou remova se não precisa de um componente wrapper
+        children: [
+          {
+            path: '',
+            element: (
+              <PrivateRoute>
+                <MedicinesEntries />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: 'new',
+            element: (
+              <PrivateRoute>
+                <NewMedicineEntryPage />
+              </PrivateRoute>
+            ),
+          },
+        ],
       },
+      // ... outros filhos
+
       {
         path: 'exits',
         element: (

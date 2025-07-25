@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { FileText, Save } from 'lucide-react'
 import { useState } from 'react'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchMovementTypes } from '@/api/pharma/auxiliary-records/movement-type/fetch-movement-types'
@@ -12,6 +13,7 @@ import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
 import type { MedicineVariant } from '@/api/pharma/medicines-variants/fetch-medicines-variants'
 import { registerMedicineEntry } from '@/api/pharma/movement/entry/register-medicine-entry'
 import { ComboboxUp } from '@/components/comboboxes/combobox-up'
+import { DatePickerFormItem } from '@/components/date/date-picker-form-item'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -65,9 +67,10 @@ const newMedicineEntrySchema = z.object({
 
 type NewMedicineEntrySchema = z.infer<typeof newMedicineEntrySchema>
 
-export default function MedicationEntryPage() {
+export default function NewMedicineEntryPage() {
   const [queryStock, setQueryStock] = useState('')
   const [queryMovementType, setQueryMovementType] = useState('')
+  const navigate = useNavigate()
 
   const { toast } = useToast()
   const { token } = useAuth()
@@ -87,6 +90,7 @@ export default function MedicationEntryPage() {
     fields: medicinesFields,
     append: appendMedicine,
     remove: removeMedicine,
+    insert: insertMedicine,
   } = useFieldArray({
     control: form.control,
     name: 'medicines',
@@ -120,7 +124,7 @@ export default function MedicationEntryPage() {
     })
 
   const addMedication = (medication: MedicineVariant) => {
-    appendMedicine({
+    insertMedicine(0, {
       medicineVariantId: medication.id,
       variant: medication,
       batches: [
@@ -207,8 +211,16 @@ export default function MedicationEntryPage() {
       <form onSubmit={form.handleSubmit(handleSave)}>
         <div className="container mx-auto max-w-7xl p-4">
           <div className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
+            {/* Botão de voltar */}
+            <div className="mb-2 flex items-center">
+              <Button
+                type="button"
+                variant="outline"
+                className="mr-4"
+                onClick={() => navigate('/movement/entries')}
+              >
+                Voltar
+              </Button>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">
                   Entrada de Medicamentos
@@ -216,18 +228,6 @@ export default function MedicationEntryPage() {
                 <p className="text-muted-foreground">
                   Gerencie a entrada de medicamentos e seus respectivos lotes
                 </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="gap-1 px-2 py-1 text-xs">
-                  <FileText className="h-4 w-4" />
-                  {totalMedications} medicamento(s)
-                </Badge>
-                <Badge variant="outline" className="px-2 py-1 text-xs">
-                  {totalBatches} lote(s)
-                </Badge>
-                <Badge variant="outline" className="px-2 py-1 text-xs">
-                  {totalQuantity} unidade(s)
-                </Badge>
               </div>
             </div>
 
@@ -271,7 +271,7 @@ export default function MedicationEntryPage() {
                   control={form.control}
                   name="movementTypeId"
                   render={({ field }) => (
-                    <FormItem className="col-span-3 flex flex-col gap-1">
+                    <FormItem className="col-span-3 grid">
                       <FormLabel>Tipo de Movimentação</FormLabel>
                       <ComboboxUp
                         items={movementTypesResult?.movement_types ?? []}
@@ -300,28 +300,11 @@ export default function MedicationEntryPage() {
                   control={form.control}
                   name={`entryDate`}
                   render={({ field }) => (
-                    <FormItem className="col-span-2 grid">
-                      <FormLabel>Data de Entrada</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          {...field}
-                          value={(() => {
-                            if (typeof field.value === 'string') {
-                              return field.value
-                            }
-                            if (
-                              field.value instanceof Date &&
-                              !isNaN(field.value.getTime())
-                            ) {
-                              return field.value.toISOString().split('T')[0]
-                            }
-                            return ''
-                          })()}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                    <DatePickerFormItem
+                      className="col-span-2 grid"
+                      field={field}
+                      label="Data de Entrada"
+                    />
                   )}
                 />
 
@@ -329,7 +312,7 @@ export default function MedicationEntryPage() {
                   control={form.control}
                   name="nfNumber"
                   render={({ field }) => (
-                    <FormItem className="col-span-3 flex flex-col gap-1">
+                    <FormItem className="col-span-4 flex flex-col gap-1">
                       <FormLabel>Número da Nota Fiscal</FormLabel>
                       <FormControl>
                         <Input
@@ -379,6 +362,7 @@ export default function MedicationEntryPage() {
                       medicineField={medicine}
                       onRemove={() => removeMedicine(medicineIndex)}
                       medicineVariant={medicine.variant}
+                      batches={form.watch(`medicines.${medicineIndex}.batches`)}
                     />
                   ))}
                 </div>

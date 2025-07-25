@@ -127,6 +127,11 @@ export const sidebarSections: SidebarSection[] = [
             role: OperatorRole.MANAGER,
           },
           {
+            name: 'Nova entrada',
+            url: '/movement/entries/new',
+            role: [],
+          },
+          {
             name: 'Saídas',
             url: '/movement/exits',
             role: OperatorRole.MANAGER,

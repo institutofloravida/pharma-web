@@ -1,12 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import { Helmet } from 'react-helmet-async'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchMedicinesEntries } from '@/api/pharma/movement/entry/fetch-medicines-entries'
 import { Pagination } from '@/components/pagination'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import {
   Table,
   TableBody,
@@ -18,10 +17,11 @@ import { useAuth } from '@/contexts/authContext'
 
 import { MedicineEntryTableRow } from './medicine-entry-table-row'
 import { MedicineVariantTableFilters } from './medicine-variant-table-filters'
-import { NewMedicineEntryDialog } from './new-medicine-entry-dialog'
 
 export function MedicinesEntries() {
   const { token, institutionId } = useAuth()
+
+  const navigate = useNavigate()
 
   const [searchParams, setSearchParams] = useSearchParams()
   const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
@@ -52,14 +52,14 @@ export function MedicinesEntries() {
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <MedicineVariantTableFilters />
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="" variant={'default'}>
-                  Nova Entrada
-                </Button>
-              </DialogTrigger>
-              <NewMedicineEntryDialog />
-            </Dialog>
+
+            <Button
+              className=""
+              variant={'default'}
+              onClick={() => navigate('/movement/entries/new')}
+            >
+              Nova Entrada
+            </Button>
           </div>
           <div className="rounded-md border">
             <Table>
