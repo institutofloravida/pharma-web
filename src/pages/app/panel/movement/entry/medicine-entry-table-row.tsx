@@ -30,29 +30,15 @@ export function MedicineEntryTableRow({
       <TableCell className="font-mono text-xs font-medium">
         {medicineEntry.stock}
       </TableCell>
-      <TableCell className="items-center space-x-2 font-mono text-xs font-medium">
-        <Badge>{medicineEntry.medicine}</Badge>
-        <Badge variant={'secondary'}>
-          {medicineEntry.dosage}
-          {medicineEntry.unitMeasure}
-        </Badge>
-        <Badge variant={'outline'} className="">
-          {medicineEntry.pharmaceuticalForm}
-        </Badge>
-      </TableCell>
-      <TableCell className="font-mono text-xs font-medium">
-        <Badge variant={'outline'} className="">
-          {medicineEntry.batch}
-        </Badge>
-      </TableCell>
-      <TableCell className="font-mono text-xs font-medium">
-        {medicineEntry.quantityToEntry}
-      </TableCell>
+
       <TableCell className="font-mono text-xs font-medium">
         {medicineEntry.operator}
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        {dateFormatter.format(new Date(medicineEntry.createdAt))}
+        {medicineEntry.items}
+      </TableCell>
+      <TableCell className="font-mono text-xs font-medium">
+        {dateFormatter.format(new Date(medicineEntry.entryDate))}
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>

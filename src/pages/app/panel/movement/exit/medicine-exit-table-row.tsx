@@ -30,32 +30,15 @@ export function MedicineExitTableRow({
       <TableCell className="font-mono text-xs font-medium">
         {medicineExit.stock}
       </TableCell>
-      <TableCell className="items-center space-x-2 font-mono text-xs font-medium">
-        <Badge>{medicineExit.medicine}</Badge>
-        <Badge variant={'secondary'}>
-          {medicineExit.dosage}
-          {medicineExit.unitMeasure}
-        </Badge>
-        <Badge variant={'outline'} className="">
-          {medicineExit.pharmaceuticalForm}
-        </Badge>
-      </TableCell>
-      <TableCell className="font-mono text-xs font-medium">
-        <Badge variant={'outline'} className="">
-          {medicineExit.batch}
-        </Badge>
-      </TableCell>
-      <TableCell className="font-mono text-xs font-medium">
-        {medicineExit.quantity}
-      </TableCell>
-      <TableCell className="font-mono text-xs font-medium">
-        {medicineExit.movementType}
-      </TableCell>
       <TableCell className="font-mono text-xs font-medium">
         {medicineExit.operator}
       </TableCell>
+
       <TableCell className="font-mono text-xs font-medium">
-        {dateFormatter.format(new Date(medicineExit.createdAt))}
+        {medicineExit.items}
+      </TableCell>
+      <TableCell className="font-mono text-xs font-medium">
+        {dateFormatter.format(new Date(medicineExit.exitDate))}
       </TableCell>
       <TableCell>
         <Button variant={'outline'} size={'xs'}>

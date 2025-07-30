@@ -66,11 +66,9 @@ export function MedicinesEntries() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[64px]"></TableHead>
-                  <TableHead className="">Stock</TableHead>
-                  <TableHead>Medicamento</TableHead>
-                  <TableHead>Lote</TableHead>
-                  <TableHead className="w-[64px]">Quantidade</TableHead>
+                  <TableHead className="">Estoque</TableHead>
                   <TableHead className="">Operador</TableHead>
+                  <TableHead className="w-[64px]">Itens</TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
@@ -82,7 +80,7 @@ export function MedicinesEntries() {
                     return (
                       <MedicineEntryTableRow
                         medicineEntry={item}
-                        key={item.medicineEntryId}
+                        key={item.entryId}
                       />
                     )
                   })}

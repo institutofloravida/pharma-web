@@ -49,10 +49,7 @@ export function MedicinesExits() {
         {
           page: pageIndex,
           institutionId: institutionId ?? '',
-          batch,
           exitDate: exitDate ? new Date(exitDate) : undefined,
-          medicineId,
-          movementTypeId,
           operatorId,
         },
         token ?? '',
@@ -92,11 +89,8 @@ export function MedicinesExits() {
                 <TableRow>
                   <TableHead className="w-[64px]"></TableHead>
                   <TableHead className="">Estoque</TableHead>
-                  <TableHead>Medicamento</TableHead>
-                  <TableHead>Lote</TableHead>
-                  <TableHead className="w-[64px]">Quantidade</TableHead>
-                  <TableHead className="w-[180px]">Tipo de Movimento</TableHead>
                   <TableHead className="">Operador</TableHead>
+                  <TableHead className="w-[64px]">Items</TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
@@ -106,10 +100,7 @@ export function MedicinesExits() {
                 {medicinesExitsResult &&
                   medicinesExitsResult.medicines_exits.map((item) => {
                     return (
-                      <MedicineExitTableRow
-                        medicineExit={item}
-                        key={item.medicineExitId}
-                      />
+                      <MedicineExitTableRow medicineExit={item} key={item.id} />
                     )
                   })}
               </TableBody>

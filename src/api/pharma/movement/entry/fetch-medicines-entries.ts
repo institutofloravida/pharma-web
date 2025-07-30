@@ -2,31 +2,17 @@ import { apiPharma } from '@/lib/axios'
 export interface FetchMedicinesEntriesQuery {
   institutionId: string
   page?: number | null
-  medicineId?: string | null
-  medicineVariantId?: string | null
   operatorId?: string | null
   stockId?: string | null
 }
 
 export interface MedicineEntry {
-  medicineEntryId: string
-  medicineId: string
-  medicine: string
-  medicineVariantId: string
-  dosage: string
-  pharmaceuticalFormId: string
-  pharmaceuticalForm: string
-  unitMeasureId: string
-  unitMeasure: string
-  stockId: string
+  entryId: string
   stock: string
-  operatorId: string
+  entryDate: Date
+  nfNumber: string
   operator: string
-  batchId: string
-  batch: string
-  quantityToEntry: number
-  createdAt: Date
-  updatedAt?: Date | null
+  items: number
 }
 
 export interface FetchMedicinesEntriesResponse {
@@ -38,14 +24,7 @@ export interface FetchMedicinesEntriesResponse {
 }
 
 export async function fetchMedicinesEntries(
-  {
-    institutionId,
-    page,
-    medicineId,
-    medicineVariantId,
-    operatorId,
-    stockId,
-  }: FetchMedicinesEntriesQuery,
+  { institutionId, page, operatorId, stockId }: FetchMedicinesEntriesQuery,
   token: string,
 ) {
   const response = await apiPharma.get<FetchMedicinesEntriesResponse>(
@@ -57,8 +36,6 @@ export async function fetchMedicinesEntries(
       params: {
         institutionId,
         page,
-        medicineId,
-        medicineVariantId,
         operatorId,
         stockId,
       },
