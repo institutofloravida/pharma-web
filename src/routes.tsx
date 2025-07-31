@@ -26,6 +26,7 @@ import NewMedicineEntryPage from './pages/app/panel/movement/entry/new-medicine-
 import MedicationEntryPage from './pages/app/panel/movement/entry/teste'
 import { MedicinesExits } from './pages/app/panel/movement/exit/medicines-exits'
 import { Operators } from './pages/app/panel/operators/operators'
+import NewExitPage from './pages/app/panel/test/new-exit'
 import { NewUser } from './pages/app/panel/users/new-user'
 import { UpdateUser } from './pages/app/panel/users/update-user'
 import { Users } from './pages/app/panel/users/users'
@@ -70,7 +71,7 @@ export const router = createBrowserRouter([
         path: 'test',
         element: (
           <PrivateRoute>
-            <MedicationEntryPage />
+            <NewExitPage />
           </PrivateRoute>
         ),
       },
@@ -244,14 +245,27 @@ export const router = createBrowserRouter([
         ],
       },
       // ... outros filhos
-
       {
         path: 'exits',
-        element: (
-          <PrivateRoute>
-            <MedicinesExits />
-          </PrivateRoute>
-        ),
+        element: <Outlet />, // ou remova se não precisa de um componente wrapper
+        children: [
+          {
+            path: '',
+            element: (
+              <PrivateRoute>
+                <MedicinesExits />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: 'new',
+            element: (
+              <PrivateRoute>
+                <NewExitPage />
+              </PrivateRoute>
+            ),
+          },
+        ],
       },
     ],
   },
