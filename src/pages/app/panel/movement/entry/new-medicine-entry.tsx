@@ -301,6 +301,7 @@ export default function NewMedicineEntryPage() {
                   name={`entryDate`}
                   render={({ field }) => (
                     <DatePickerFormItem
+                      disabled={(date) => date > new Date()}
                       className="col-span-2 grid"
                       field={field}
                       label="Data de Entrada"
