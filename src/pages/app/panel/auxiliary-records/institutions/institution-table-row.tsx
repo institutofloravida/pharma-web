@@ -2,10 +2,13 @@ import { formatters } from 'date-fns'
 import { PenLine, Search, Trash } from 'lucide-react'
 import { useState } from 'react'
 
+import type { InstitutionType } from '@/api/pharma/auxiliary-records/institution/register-institution'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogTrigger } from '@/components/ui/dialog'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { Formatter } from '@/lib/utils/formaters/formaters'
+import { getInstitutionTypeTranslation } from '@/lib/utils/translations-mappers/institution-type-translation'
 
 import { UpdateInstitutionDialog } from './update-instituion-dialog'
 
@@ -15,6 +18,9 @@ export interface InstitutionTableRowProps {
     name: string
     cnpj: string
     description: string
+    responsible: string
+    type: InstitutionType
+    controlStock: boolean
   }
 }
 
@@ -31,7 +37,6 @@ export function InstitutionTableRow({ institution }: InstitutionTableRowProps) {
               <span className="sr-only">Detalhes do pedido</span>
             </Button>
           </DialogTrigger>
-          {/* <OrderDetails /> */}
         </Dialog>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
@@ -40,7 +45,14 @@ export function InstitutionTableRow({ institution }: InstitutionTableRowProps) {
       <TableCell className="text-muted-foreground">
         {Formatter.cnpj(institution.cnpj)}
       </TableCell>
-      <TableCell>{institution.description}</TableCell>
+      <TableCell className="text-muted-foreground">
+        {institution.responsible}
+      </TableCell>
+      <TableCell className="font-mediumtext-muted-foreground font-mono text-xs">
+        <Badge variant={'outline'} className="font-medium">
+          {getInstitutionTypeTranslation(institution.type)}
+        </Badge>
+      </TableCell>
 
       <TableCell>
         <Dialog open={isOpen} onOpenChange={setIsOpen}>

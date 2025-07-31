@@ -66,7 +66,8 @@ export function Institutions() {
                   <TableHead className="w-[64px]"></TableHead>
                   <TableHead>Nome</TableHead>
                   <TableHead className="w-[180px]">CNPJ</TableHead>
-                  <TableHead className="w-[550px]">Descrição</TableHead>
+                  <TableHead className="">Responsável</TableHead>
+                  <TableHead className="">Tipo</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>

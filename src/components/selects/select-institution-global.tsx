@@ -8,6 +8,7 @@ import {
   type Institution,
 } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
 import { useAuth } from '@/contexts/authContext'
+import { getInstitutionTypeTranslation } from '@/lib/utils/translations-mappers/institution-type-translation'
 
 import {
   DropdownMenu,
@@ -57,7 +58,9 @@ export function SelectInstitutionGlobal() {
               {activeInstitution?.name || 'Selecionar instituição'}
             </span>
             <span className="truncate text-xs">
-              {activeInstitution ? 'Pública' : 'Nenhuma selecionada'}
+              {activeInstitution
+                ? getInstitutionTypeTranslation(activeInstitution.type)
+                : 'Nenhuma selecionada'}
             </span>
           </div>
           <ChevronsUpDown className="ml-auto" />

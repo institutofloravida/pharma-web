@@ -6,9 +6,11 @@ import InputMask from 'react-input-mask'
 import { z } from 'zod'
 
 import {
+  InstitutionType,
   registerInstitution,
   type RegisterInstitutionBody,
 } from '@/api/pharma/auxiliary-records/institution/register-institution'
+import { SelectInstitutionType } from '@/components/selects/select-institution-type'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,
@@ -20,12 +22,14 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/contexts/authContext'
 import { toast } from '@/hooks/use-toast'
@@ -34,6 +38,13 @@ import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const newInstitutionSchema = z.object({
   name: z.string().min(3),
+  responsible: z.string().min(3, {
+    message: 'O nome do responsável deve ter pelo menos 3 caracteres',
+  }),
+  type: z.nativeEnum(InstitutionType, {
+    errorMap: () => ({ message: 'Selecione um tipo de instituição' }),
+  }),
+  controlStock: z.boolean(),
   cnpj: z
     .string()
     .min(14, { message: 'O CNPJ deve ter 14 caracteres' })
@@ -46,6 +57,9 @@ export function NewInstitutionDialog() {
   const { token } = useAuth()
   const form = useForm<NewInstitutionSchema>({
     resolver: zodResolver(newInstitutionSchema),
+    defaultValues: {
+      controlStock: false,
+    },
   })
 
   const { mutateAsync: registerInstitutionFn } = useMutation({
@@ -63,11 +77,19 @@ export function NewInstitutionDialog() {
       await registerInstitutionFn({
         name: data.name,
         cnpj: data.cnpj,
+        controlStock: data.controlStock,
+        type: data.type,
+        responsible: data.responsible,
         description: data.description,
       })
 
       toast({
         title: `Instituição ${data.name} registrada com sucesso!`,
+        description: (
+          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+          </pre>
+        ),
       })
     } catch (error) {
       const errorMessage = handleApiError(error)
@@ -98,11 +120,47 @@ export function NewInstitutionDialog() {
             name="name"
             render={({ field }) => (
               <FormItem className="col-span-3">
-                <FormLabel>Nome</FormLabel>
+                <FormLabel>Nome da Instituição</FormLabel>
                 <FormControl>
                   <Input placeholder="Nome da instituição..." {...field} />
                 </FormControl>
                 <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="responsible"
+            render={({ field }) => (
+              <FormItem className="col-span-3">
+                <FormLabel>Nome do Responsável pela instituição</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nome do responsável..." {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="controlStock"
+            render={({ field }) => (
+              <FormItem className="col-span-3 flex flex-row items-center justify-between rounded-lg border p-2 shadow-sm">
+                <div className="space-y-0.5">
+                  <FormLabel>Controla Estoque</FormLabel>
+                  <FormDescription>
+                    A instituição irá ter controle de estoque de medicamentos
+                    por esse sistema? sim/não
+                  </FormDescription>
+                </div>
+                <FormControl>
+                  <Switch
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    aria-readonly
+                  />
+                </FormControl>
               </FormItem>
             )}
           />
@@ -124,6 +182,20 @@ export function NewInstitutionDialog() {
                     {(inputProps: any) => <Input {...inputProps} />}
                   </InputMask>
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem className="col-span-2">
+                <FormLabel>Tipo de Instituição</FormLabel>
+                <SelectInstitutionType
+                  onChange={field.onChange}
+                  value={field.value}
+                />
                 <FormMessage />
               </FormItem>
             )}

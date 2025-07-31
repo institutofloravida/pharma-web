@@ -1,15 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DialogClose } from '@radix-ui/react-dialog'
+import { Switch } from '@radix-ui/react-switch'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useForm } from 'react-hook-form'
 import InputMask from 'react-input-mask'
 import { z } from 'zod'
 
 import { getInstitution } from '@/api/pharma/auxiliary-records/institution/get-institution'
+import { InstitutionType } from '@/api/pharma/auxiliary-records/institution/register-institution'
 import {
   updateInstitution,
   type UpdateInstitutionBody,
 } from '@/api/pharma/auxiliary-records/institution/update-institution'
+import { SelectInstitutionType } from '@/components/selects/select-institution-type'
 import { Button } from '@/components/ui/button'
 import {
   DialogContent,
@@ -20,6 +23,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -34,18 +38,18 @@ import { queryClient } from '@/lib/react-query'
 import { handleApiError } from '@/lib/utils/handle-api-error'
 
 const updateInstitutionSchema = z.object({
-  name: z.string().min(3).optional(),
+  name: z.string().min(3),
+  responsible: z.string().min(3, {
+    message: 'O nome do responsável deve ter pelo menos 3 caracteres',
+  }),
+  type: z.nativeEnum(InstitutionType, {
+    errorMap: () => ({ message: 'Selecione um tipo de instituição' }),
+  }),
+  controlStock: z.boolean(),
   cnpj: z
-    .string({
-      required_error: ' campos orbigatório',
-    })
-    .min(14, {
-      message: 'O campo deve conter 14 caracteres',
-    })
-    .max(14, {
-      message: 'O campo deve conter 14 caracteres',
-    })
-    .optional(),
+    .string()
+    .min(14, { message: 'O CNPJ deve ter 14 caracteres' })
+    .max(14, { message: 'O CNPJ deve ter 14 caracteres' }),
   description: z.string().optional(),
 })
 type UpdateInstitutionSchema = z.infer<typeof updateInstitutionSchema>
@@ -71,6 +75,9 @@ export function UpdateInstitutionDialog({
     resolver: zodResolver(updateInstitutionSchema),
     values: {
       cnpj: institution?.cnpj ?? '',
+      controlStock: institution?.controlStock ?? false,
+      responsible: institution?.responsible ?? '',
+      type: institution?.type ?? InstitutionType.PUBLIC,
       description: institution?.description ?? '',
       name: institution?.name ?? '',
     },
@@ -93,10 +100,21 @@ export function UpdateInstitutionDialog({
         name: data.name,
         cnpj: data.cnpj,
         description: data.description,
+        controlStock: data.controlStock,
+        responsible: data.responsible,
+        type: data.type,
       })
 
       toast({
         title: `Instituição atualizada com sucesso!`,
+      })
+      form.reset({
+        cnpj: '',
+        controlStock: false,
+        responsible: '',
+        type: undefined,
+        description: '',
+        name: '',
       })
     } catch (error) {
       const errorMessage = handleApiError(error)
@@ -136,6 +154,43 @@ export function UpdateInstitutionDialog({
 
               <FormField
                 control={form.control}
+                name="responsible"
+                render={({ field }) => (
+                  <FormItem className="col-span-3">
+                    <FormLabel>Nome do Responsável pela instituição</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nome do responsável..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="controlStock"
+                render={({ field }) => (
+                  <FormItem className="col-span-3 flex flex-row items-center justify-between rounded-lg border p-2 shadow-sm">
+                    <div className="space-y-0.5">
+                      <FormLabel>Controla Estoque</FormLabel>
+                      <FormDescription>
+                        A instituição irá ter controle de estoque de
+                        medicamentos por esse sistema? sim/não
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        aria-readonly
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
                 name="cnpj"
                 render={({ field }) => (
                   <FormItem className="col-span-3 grid">
@@ -152,6 +207,20 @@ export function UpdateInstitutionDialog({
                         {(inputProps: any) => <Input {...inputProps} />}
                       </InputMask>
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel>Tipo de Instituição</FormLabel>
+                    <SelectInstitutionType
+                      onChange={field.onChange}
+                      value={field.value}
+                    />
                     <FormMessage />
                   </FormItem>
                 )}

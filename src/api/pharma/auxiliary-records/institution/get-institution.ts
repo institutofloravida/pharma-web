@@ -1,5 +1,7 @@
 import { apiPharma } from '@/lib/axios'
 
+import type { InstitutionType } from './register-institution'
+
 interface GetInstitutionParams {
   id: string
 }
@@ -9,6 +11,9 @@ interface GetInstitutionResponse {
     id: string
     name: string
     cnpj: string
+    responsible: string
+    type: InstitutionType
+    controlStock: boolean
     description: string | null
     createdAt: Date
     updatedAt: Date | null
