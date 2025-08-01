@@ -21,7 +21,7 @@ export const medicineExitFormSchema = z
     medicines: z
       .array(medicineExitSchema)
       .min(1, 'Pelo menos um medicamento é obrigatório'),
-    exitDate: z.string().min(1, 'Data de saída é obrigatória'),
+    entryDate: z.coerce.date({ required_error: 'Selecione a data de entrada.' }),
   })
   .superRefine((data, ctx) => {
     if (data.exitType === ExitType.MOVEMENT_TYPE && !data.movementTypeId) {
