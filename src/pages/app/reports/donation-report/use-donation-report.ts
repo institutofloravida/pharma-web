@@ -23,7 +23,7 @@ export function useDonationReportPdf() {
       year: 'numeric',
     })
 
-    const logoBase64 = await getBase64Image('/public/logo.png')
+    const logoBase64 = await getBase64Image('logo.png')
     const bg = await getBase64Image('/public/bg.jpg')
     const contentArr: any[] = [
       {
