@@ -31,6 +31,7 @@ export function SelectExitType({
           <SelectItem value={ExitType.DISPENSATION}>Dispensa</SelectItem>
         )}
         <SelectItem value={ExitType.EXPIRATION}>Vencimento</SelectItem>
+        <SelectItem value={ExitType.DONATION}>Doação</SelectItem>
         <SelectItem value={ExitType.MOVEMENT_TYPE}>Outro</SelectItem>
       </SelectContent>
     </Select>

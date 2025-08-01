@@ -17,6 +17,7 @@ export const medicineExitFormSchema = z
     stockId: z.string().min(1, 'Estoque é obrigatório'),
     exitType: z.nativeEnum(ExitType),
     movementTypeId: z.string().optional(),
+    destinationInstitutionId: z.string().optional(),
     medicines: z
       .array(medicineExitSchema)
       .min(1, 'Pelo menos um medicamento é obrigatório'),
@@ -28,6 +29,13 @@ export const medicineExitFormSchema = z
         path: ['movementTypeId'],
         code: z.ZodIssueCode.custom,
         message: 'Selecione um tipo de movimentação.',
+      })
+    }
+    if (data.exitType === ExitType.DONATION && !data.destinationInstitutionId) {
+      ctx.addIssue({
+        path: ['destinationInstitutionId'],
+        code: z.ZodIssueCode.custom,
+        message: 'Selecione uma instituição de destino.',
       })
     }
   })

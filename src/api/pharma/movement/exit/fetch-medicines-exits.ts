@@ -13,7 +13,10 @@ export interface FetchMedicinesExitsQuery {
 export interface MedicineExit {
   id: string
   exitDate: Date
+  exitType: ExitType
   operator: string
+  destinationInstitution?: string
+  responsibleByInstitution?: string
   stock: string
   items: number
 }

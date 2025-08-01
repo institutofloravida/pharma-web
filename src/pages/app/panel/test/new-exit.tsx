@@ -2,10 +2,12 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { formatters } from 'date-fns'
 import { AlertCircle, FileText, Save } from 'lucide-react'
 import { useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 
+import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
 import { fetchMovementTypes } from '@/api/pharma/auxiliary-records/movement-type/fetch-movement-types'
 import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
 import {
@@ -13,6 +15,7 @@ import {
   registerMedicineExit,
   type RegisterMedicineExitBodyAndParams,
 } from '@/api/pharma/movement/exit/register-medicine-exit'
+import { Combobox } from '@/components/comboboxes/combobox'
 import { ComboboxUp } from '@/components/comboboxes/combobox-up'
 import { DatePickerFormItem } from '@/components/date/date-picker-form-item'
 import { SelectExitType } from '@/components/selects/locate/select-exit-type'
@@ -40,6 +43,7 @@ import { Separator } from '@/components/ui/separator'
 import { useAuth } from '@/contexts/authContext'
 import { useToast } from '@/hooks/use-toast'
 import { queryClient } from '@/lib/react-query'
+import { Formatter } from '@/lib/utils/formaters/formaters'
 import { handleApiError } from '@/lib/utils/handle-api-error'
 import { MovementTypeDirection } from '@/lib/utils/movement-type'
 
@@ -72,6 +76,7 @@ export default function MedicineExitPage() {
   const { token } = useAuth()
   const [queryStock, setQueryStock] = useState('')
   const [queryMovementType, setQueryMovementType] = useState('')
+  const [queryInstitution, setQueryInstitution] = useState('')
 
   const [selectedMedicines, setSelectedMedicines] = useState<MedicineStock[]>(
     [],
@@ -134,6 +139,16 @@ export default function MedicineExitPage() {
     },
   })
 
+  const { data: institutionsResult, isFetching: isFetchingInstitutions } =
+    useQuery({
+      queryKey: ['institutions', queryInstitution],
+      queryFn: () =>
+        fetchInstitutions({ page: 1, query: queryInstitution }, token ?? ''),
+      enabled: queryInstitution !== null,
+      staleTime: 1000,
+      refetchOnMount: true,
+    })
+
   const addMedicine = (medicine: MedicineStock) => {
     append({
       medicineStockId: medicine.id,
@@ -186,6 +201,7 @@ export default function MedicineExitPage() {
         stockId: data.stockId,
         exitDate: new Date(data.exitDate),
         batches,
+        destinationInstitutionId: data.destinationInstitutionId,
       })
       // amox 200 - 40
       // metf 180 - 30
@@ -326,7 +342,37 @@ export default function MedicineExitPage() {
                     </FormItem>
                   )}
                 />
-
+                {form.watch('exitType') === ExitType.DONATION && (
+                  <FormField
+                    control={form.control}
+                    name="destinationInstitutionId"
+                    render={({ field }) => (
+                      <FormItem className="col-span-3">
+                        <ComboboxUp
+                          items={institutionsResult?.institutions || []}
+                          field={field}
+                          query={queryInstitution}
+                          placeholder="Instituição de destino"
+                          isFetching={isFetchingInstitutions}
+                          onQueryChange={setQueryInstitution}
+                          onSelect={(id, item) => {
+                            form.setValue('destinationInstitutionId', id)
+                            setQueryInstitution(item.name)
+                          }}
+                          itemKey="id"
+                          itemValue="name"
+                          formatItem={(item) => {
+                            return `${item.name}`
+                          }}
+                          getItemText={(item) => {
+                            return `${item.name}`
+                          }}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 {form.watch('exitType') === ExitType.MOVEMENT_TYPE && (
                   <FormField
                     control={form.control}

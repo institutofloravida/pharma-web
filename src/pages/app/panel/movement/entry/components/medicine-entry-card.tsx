@@ -52,7 +52,7 @@ export function MedicationEntryCard({
   // Usa batches do form se vierem como prop, senão usa batchFields
   const batchesToSum = batches ?? batchFields
   const totalQuantity = batchesToSum.reduce(
-    (sum, batch) => sum + (batch.quantityToEntry || 0),
+    (sum, batch) => Number(sum) + (Number(batch.quantityToEntry) || 0),
     0,
   )
 
