@@ -77,7 +77,7 @@ export function UpdateManufacturerDialog({
 
   const form = useForm<UpdateManufacturerSchema>({
     resolver: zodResolver(updateManufacturerSchema),
-    defaultValues: {
+    values: {
       cnpj: manufacturer?.cnpj ?? '',
       description: manufacturer?.description ?? '',
       name: manufacturer?.name ?? '',
