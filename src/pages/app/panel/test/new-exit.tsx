@@ -92,7 +92,7 @@ export default function MedicineExitPage() {
       exitType: ExitType.MOVEMENT_TYPE,
       movementTypeId: '',
       medicines: [],
-      exitDate: new Date().toISOString().split('T')[0],
+      exitDate: new Date(),
     },
   })
 
@@ -190,7 +190,7 @@ export default function MedicineExitPage() {
         stockId: data.stockId,
         exitType: data.exitType,
         movementTypeId: data.movementTypeId,
-        exitDate: new Date(data.exitDate),
+        exitDate: data.exitDate,
         batches,
       }
 
