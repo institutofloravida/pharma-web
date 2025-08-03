@@ -1,32 +1,34 @@
-import { apiPharma } from '@/lib/axios'
+import { apiPharma } from "@/lib/axios";
 
-import type { Meta } from '../../_types/meta'
+import type { Meta } from "../../_types/meta";
 
 export interface FetchMedicinesOnStockParams {
-  stockId: string
-  page?: number | null
-  medicineName?: string | null
+  stockId: string;
+  page?: number | null;
+  medicineName?: string | null;
 }
 
 export interface MedicineStockDetails {
-  id: string
-  stockId: string
-  stock: string
-  medicineVariantId: string
-  medicine: string
-  pharmaceuticalForm: string
-  unitMeasure: string
-  dosage: string
+  id: string;
+  stockId: string;
+  stock: string;
+  medicineVariantId: string;
+  medicine: string;
+  pharmaceuticalForm: string;
+  unitMeasure: string;
+  manufacturer: string;
+  dosage: string;
+  complement?: string;
   quantity: {
-    totalCurrent: number
-    unavailable: number
-    available: number
-  }
+    totalCurrent: number;
+    unavailable: number;
+    available: number;
+  };
 }
 
 interface FetchMedicinesOnStockReponse {
-  medicines_stock: MedicineStockDetails[]
-  meta: Meta
+  medicines_stock: MedicineStockDetails[];
+  meta: Meta;
 }
 
 export async function fetchMedicinesOnStock(
@@ -34,7 +36,7 @@ export async function fetchMedicinesOnStock(
   token: string,
 ) {
   const response = await apiPharma.get<FetchMedicinesOnStockReponse>(
-    'medicine-stock',
+    "medicine-stock",
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -45,7 +47,7 @@ export async function fetchMedicinesOnStock(
         medicineName,
       },
     },
-  )
+  );
 
-  return response.data
+  return response.data;
 }

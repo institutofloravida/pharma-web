@@ -1,34 +1,34 @@
-import { useQuery } from '@tanstack/react-query'
-import { Helmet } from 'react-helmet-async'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchDispensations } from '@/api/pharma/dispensation/fetch-dispensations'
-import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
+import { fetchDispensations } from "@/api/pharma/dispensation/fetch-dispensations";
+import { Pagination } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/table";
+import { useAuth } from "@/contexts/authContext";
 
-import { DispensationTableFilters } from './dispensation-table-filters'
-import { DispensationTableRow } from './dispensation-table-row'
+import { DispensationTableFilters } from "./dispensation-table-filters";
+import { DispensationTableRow } from "./dispensation-table-row";
 
 export function Dispensations() {
-  const { token } = useAuth()
-  const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const { token } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = z.coerce.number().parse(searchParams.get("page") ?? "1");
 
-  const patientId = searchParams.get('patientId')
-  const dispensationDate = searchParams.get('dispensationDate')
+  const patientId = searchParams.get("patientId");
+  const dispensationDate = searchParams.get("dispensationDate");
 
   const { data: dispensationsResult } = useQuery({
-    queryKey: ['dispensations', patientId, dispensationDate],
+    queryKey: ["dispensations", patientId, dispensationDate],
     queryFn: () =>
       fetchDispensations(
         {
@@ -38,14 +38,14 @@ export function Dispensations() {
             ? new Date(dispensationDate)
             : undefined,
         },
-        token ?? '',
+        token ?? "",
       ),
-  })
+  });
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
-      state.set('page', pageIndex.toString())
-      return state
-    })
+      state.set("page", pageIndex.toString());
+      return state;
+    });
   }
 
   return (
@@ -60,8 +60,8 @@ export function Dispensations() {
             <DispensationTableFilters />
             <Button
               className=""
-              variant={'default'}
-              onClick={() => navigate('/dispensation/new')}
+              variant={"default"}
+              onClick={() => navigate("/dispensation/new")}
             >
               Nova dispensa
             </Button>
@@ -88,7 +88,7 @@ export function Dispensations() {
                         dispensation={dispensation}
                         key={dispensation.id}
                       />
-                    )
+                    );
                   })}
               </TableBody>
             </Table>
@@ -105,5 +105,5 @@ export function Dispensations() {
         </div>
       </div>
     </>
-  )
+  );
 }

@@ -1,36 +1,34 @@
-import { apiPharma } from '@/lib/axios'
+import { apiPharma } from "@/lib/axios";
 
 export interface RegisterDispensationBody {
-  medicineStockId: string
-  patientId: string
-  batchesStocks: {
-    batchStockId: string
-    quantity: number
-  }[]
-  dispensationDate: Date
+  patientId: string;
+  stockId: string;
+  medicines: {
+    medicineStockId: string;
+    batchesStocks: {
+      batchStockId: string;
+      quantity: number;
+    }[];
+  }[];
+  dispensationDate: Date;
 }
 
 export async function registerDispensation(
-  {
-    batchesStocks,
-    dispensationDate,
-    medicineStockId,
-    patientId,
-  }: RegisterDispensationBody,
+  { dispensationDate, medicines, stockId, patientId }: RegisterDispensationBody,
   token: string,
 ) {
   await apiPharma.post(
-    '/dispensation',
+    "/dispensation",
     {
-      batchesStocks,
       dispensationDate,
-      medicineStockId,
       patientId,
+      stockId,
+      medicines,
     },
     {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     },
-  )
+  );
 }

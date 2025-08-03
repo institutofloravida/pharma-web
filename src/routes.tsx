@@ -1,47 +1,49 @@
-import { createBrowserRouter, Outlet } from 'react-router-dom'
+import { createBrowserRouter, Outlet } from "react-router-dom";
 
-import { OperatorRole } from './api/pharma/operators/register-operator'
-import { AuthLayout } from './pages/_layouts/auth'
-import PanelLayout from './pages/_layouts/panel'
-import { PrivateRoute } from './pages/_private/private-route'
-import Unauthorized from './pages/_private/unauthorized'
-import { SignIn } from './pages/app/auth/sign-in'
-import { Institutions } from './pages/app/panel/auxiliary-records/institutions/institutions'
-import { Manufacturers } from './pages/app/panel/auxiliary-records/manufacturers/manufacturers'
-import { MovementTypes } from './pages/app/panel/auxiliary-records/movement-type/movement-types'
-import { Pathologies } from './pages/app/panel/auxiliary-records/pathology/pathologies'
-import { PharmaceuticalForms } from './pages/app/panel/auxiliary-records/pharmaceutical-form/pharmaceutical-forms'
-import { Stocks } from './pages/app/panel/auxiliary-records/stocks/stocks'
-import { TherapeuticClass } from './pages/app/panel/auxiliary-records/therapeutic-class/therapeutic-class'
-import { UnitMeasure } from './pages/app/panel/auxiliary-records/unit-measure/units-measure'
-import { Dashboard } from './pages/app/panel/dashboard/dashboard'
-import { Dispensations } from './pages/app/panel/dispensation/dispensation'
-import { NewDispensation } from './pages/app/panel/dispensation/new-dispensation'
-import { InventoryMedicineDetails } from './pages/app/panel/inventory/inventory-medicine-details'
-import { Inventory } from './pages/app/panel/inventory/list-inventory'
-import { MedicinesVariants } from './pages/app/panel/medicine-variant/medicines-variants'
-import { Medicines } from './pages/app/panel/medicines/medicines'
-import { MedicinesEntries } from './pages/app/panel/movement/entry/medicines-entries'
-import NewMedicineEntryPage from './pages/app/panel/movement/entry/new-medicine-entry'
-import MedicationEntryPage from './pages/app/panel/movement/entry/teste'
-import { MedicinesExits } from './pages/app/panel/movement/exit/medicines-exits'
-import { Operators } from './pages/app/panel/operators/operators'
-import NewExitPage from './pages/app/panel/test/new-exit'
-import { NewUser } from './pages/app/panel/users/new-user'
-import { UpdateUser } from './pages/app/panel/users/update-user'
-import { Users } from './pages/app/panel/users/users'
-import { DispensesReport } from './pages/app/reports/dispenses-in-a-period/dispenses-report'
-import { MonthlyMedicineUtilizationReport } from './pages/app/reports/monthly-medicine-utilization/monthly-medicine-utilization-report'
-import { MonthlyMedicineUtilizationReportForm } from './pages/app/reports/monthly-medicine-utilization/monthly-medicine-utilization-report-form'
-import { MovimentationReport } from './pages/app/reports/movimentation-in-a-period/movimentation-report'
+import { OperatorRole } from "./api/pharma/operators/register-operator";
+import { AuthLayout } from "./pages/_layouts/auth";
+import PanelLayout from "./pages/_layouts/panel";
+import { PrivateRoute } from "./pages/_private/private-route";
+import Unauthorized from "./pages/_private/unauthorized";
+import { SignIn } from "./pages/app/auth/sign-in";
+import { Institutions } from "./pages/app/panel/auxiliary-records/institutions/institutions";
+import { Manufacturers } from "./pages/app/panel/auxiliary-records/manufacturers/manufacturers";
+import { MovementTypes } from "./pages/app/panel/auxiliary-records/movement-type/movement-types";
+import { Pathologies } from "./pages/app/panel/auxiliary-records/pathology/pathologies";
+import { PharmaceuticalForms } from "./pages/app/panel/auxiliary-records/pharmaceutical-form/pharmaceutical-forms";
+import { Stocks } from "./pages/app/panel/auxiliary-records/stocks/stocks";
+import { TherapeuticClass } from "./pages/app/panel/auxiliary-records/therapeutic-class/therapeutic-class";
+import { UnitMeasure } from "./pages/app/panel/auxiliary-records/unit-measure/units-measure";
+import { Dashboard } from "./pages/app/panel/dashboard/dashboard";
+import { Dispensations } from "./pages/app/panel/dispensation/dispensation";
+import { NewDispensation } from "./pages/app/panel/dispensation/new-dispensation";
+import { InventoryMedicineDetails } from "./pages/app/panel/inventory/inventory-medicine-details";
+import { Inventory } from "./pages/app/panel/inventory/list-inventory";
+import { MedicinesVariants } from "./pages/app/panel/medicine-variant/medicines-variants";
+import { Medicines } from "./pages/app/panel/medicines/medicines";
+import { MedicinesEntries } from "./pages/app/panel/movement/entry/medicines-entries";
+import NewMedicineEntryPage from "./pages/app/panel/movement/entry/new-medicine-entry";
+import MedicationEntryPage from "./pages/app/panel/movement/entry/teste";
+import { MedicinesExits } from "./pages/app/panel/movement/exit/medicines-exits";
+import { Operators } from "./pages/app/panel/operators/operators";
+import NewExitPage from "./pages/app/panel/movement/exit/new-exit";
+import { NewUser } from "./pages/app/panel/users/new-user";
+import { UpdateUser } from "./pages/app/panel/users/update-user";
+import { Users } from "./pages/app/panel/users/users";
+import { DispensesReport } from "./pages/app/reports/dispenses-in-a-period/dispenses-report";
+import { MonthlyMedicineUtilizationReport } from "./pages/app/reports/monthly-medicine-utilization/monthly-medicine-utilization-report";
+import { MonthlyMedicineUtilizationReportForm } from "./pages/app/reports/monthly-medicine-utilization/monthly-medicine-utilization-report-form";
+import { MovimentationReport } from "./pages/app/reports/movimentation-in-a-period/movimentation-report";
+import DispensationPage from "./pages/app/panel/test/dispensation-page";
 
 export const router = createBrowserRouter([
   {
-    path: '/',
+    path: "/",
     element: <PanelLayout />,
+
     children: [
       {
-        path: '',
+        path: "",
         element: (
           <PrivateRoute>
             <Dashboard />
@@ -51,16 +53,32 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: '/',
+    path: "/",
     element: <AuthLayout />,
-    children: [{ path: 'sign-in', element: <SignIn /> }],
+    children: [{ path: "sign-in", element: <SignIn /> }],
   },
   {
-    path: '/',
+    path: "/",
     element: <PanelLayout />,
     children: [
       {
-        path: '',
+        path: "",
+        element: (
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        ),
+      },
+      // {
+      //   path: "test",
+      //   element: (
+      //     <PrivateRoute>
+      //       <Notf />
+      //     </PrivateRoute>
+      //   ),
+      // },
+      {
+        path: "/dashboard",
         element: (
           <PrivateRoute>
             <Dashboard />
@@ -68,26 +86,10 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'test',
-        element: (
-          <PrivateRoute>
-            <NewExitPage />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: '/dashboard',
-        element: (
-          <PrivateRoute>
-            <Dashboard />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: 'reports',
+        path: "reports",
         children: [
           {
-            path: 'dispenses-in-a-period',
+            path: "dispenses-in-a-period",
             element: (
               <PrivateRoute>
                 <DispensesReport />
@@ -95,7 +97,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: 'movimentation-in-a-period',
+            path: "movimentation-in-a-period",
             element: (
               <PrivateRoute>
                 <MovimentationReport />
@@ -103,7 +105,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: 'monthly-utilization',
+            path: "monthly-utilization",
             element: (
               <PrivateRoute>
                 <MonthlyMedicineUtilizationReport />
@@ -113,7 +115,7 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: 'panel',
+        path: "panel",
         element: (
           <PrivateRoute>
             <Dashboard />
@@ -121,7 +123,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'operators',
+        path: "operators",
         element: (
           <PrivateRoute
             allowedRoles={[OperatorRole.MANAGER, OperatorRole.SUPER_ADMIN]}
@@ -131,7 +133,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'institutions',
+        path: "institutions",
         element: (
           <PrivateRoute>
             <Institutions />
@@ -139,7 +141,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'stocks',
+        path: "stocks",
         element: (
           <PrivateRoute>
             <Stocks />
@@ -147,7 +149,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'therapeutic-class',
+        path: "therapeutic-class",
         element: (
           <PrivateRoute>
             <TherapeuticClass />
@@ -155,7 +157,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'pharmaceutical-form',
+        path: "pharmaceutical-form",
         element: (
           <PrivateRoute>
             <PharmaceuticalForms />
@@ -163,7 +165,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'manufacturer',
+        path: "manufacturer",
         element: (
           <PrivateRoute>
             <Manufacturers />
@@ -171,7 +173,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'unit-measure',
+        path: "unit-measure",
         element: (
           <PrivateRoute>
             <UnitMeasure />
@@ -179,7 +181,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'pathologies',
+        path: "pathologies",
         element: (
           <PrivateRoute>
             <Pathologies />
@@ -187,7 +189,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'movement-types',
+        path: "movement-types",
         element: (
           <PrivateRoute>
             <MovementTypes />
@@ -197,11 +199,11 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: '/medicines',
+    path: "/medicines",
     element: <PanelLayout />,
     children: [
       {
-        path: '',
+        path: "",
         element: (
           <PrivateRoute>
             <Medicines />
@@ -209,7 +211,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'variants',
+        path: "variants",
         element: (
           <PrivateRoute>
             <MedicinesVariants />
@@ -219,15 +221,15 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: '/movement',
+    path: "/movement",
     element: <PanelLayout />,
     children: [
       {
-        path: 'entries',
+        path: "entries",
         element: <Outlet />, // ou remova se não precisa de um componente wrapper
         children: [
           {
-            path: '',
+            path: "",
             element: (
               <PrivateRoute>
                 <MedicinesEntries />
@@ -235,7 +237,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: 'new',
+            path: "new",
             element: (
               <PrivateRoute>
                 <NewMedicineEntryPage />
@@ -246,11 +248,11 @@ export const router = createBrowserRouter([
       },
       // ... outros filhos
       {
-        path: 'exits',
+        path: "exits",
         element: <Outlet />, // ou remova se não precisa de um componente wrapper
         children: [
           {
-            path: '',
+            path: "",
             element: (
               <PrivateRoute>
                 <MedicinesExits />
@@ -258,7 +260,7 @@ export const router = createBrowserRouter([
             ),
           },
           {
-            path: 'new',
+            path: "new",
             element: (
               <PrivateRoute>
                 <NewExitPage />
@@ -270,11 +272,11 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: '/users',
+    path: "/users",
     element: <PanelLayout />,
     children: [
       {
-        path: '',
+        path: "",
         element: (
           <PrivateRoute>
             <Users />
@@ -282,7 +284,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'new',
+        path: "new",
         element: (
           <PrivateRoute>
             <NewUser />
@@ -290,7 +292,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'edit/:id',
+        path: "edit/:id",
         element: (
           <PrivateRoute>
             <UpdateUser />
@@ -300,11 +302,11 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: '/dispensation',
+    path: "/dispensation",
     element: <PanelLayout />,
     children: [
       {
-        path: '',
+        path: "",
         element: (
           <PrivateRoute>
             <Dispensations />
@@ -312,21 +314,21 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'new',
+        path: "new",
         element: (
           <PrivateRoute>
-            <NewDispensation />
+            <DispensationPage />
           </PrivateRoute>
         ),
       },
     ],
   },
   {
-    path: '/inventory',
+    path: "/inventory",
     element: <PanelLayout />,
     children: [
       {
-        path: '',
+        path: "",
         element: (
           <PrivateRoute>
             <Inventory />
@@ -334,7 +336,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: ':id',
+        path: ":id",
         element: (
           <PrivateRoute>
             <InventoryMedicineDetails />
@@ -344,7 +346,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    path: '/unauthorized',
+    path: "/unauthorized",
     element: <Unauthorized />,
   },
-])
+]);

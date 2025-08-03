@@ -1,20 +1,21 @@
-import { apiPharma } from '@/lib/axios'
+import { apiPharma } from "@/lib/axios";
 
 interface DispensationPreviewParams {
-  medicineStockId: string
-  quantityRequired: number
+  medicineStockId: string;
+  quantityRequired: number;
 }
 
 interface DispensationPreviewResponse {
   dispensationPreview: {
-    batchStockId: string
-    code: string
+    batchStockId: string;
+    code: string;
+    manufacturer: string;
     quantity: {
-      toDispensation: number
-      totalCurrent: number
-    }
-    expirationDate: Date
-  }[]
+      toDispensation: number;
+      totalCurrent: number;
+    };
+    expirationDate: Date;
+  }[];
 }
 
 export async function dispensationPreview(
@@ -32,9 +33,9 @@ export async function dispensationPreview(
         quantityRequired,
       },
     },
-  )
+  );
 
-  const { dispensationPreview } = response.data
+  const { dispensationPreview } = response.data;
 
-  return dispensationPreview
+  return dispensationPreview;
 }
