@@ -1,25 +1,25 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
-import { X } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
+import { X } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
-import { getMonthlyMedicineUtilization } from '@/api/pharma/reports/monthly-medicine-utilization'
-import { ComboboxUp } from '@/components/comboboxes/combobox-up'
-import { SelectMonth } from '@/components/selects/select-month'
-import { Button } from '@/components/ui/button'
+import { fetchStocks } from "@/api/pharma/auxiliary-records/stock/fetch-stocks";
+import { getMonthlyMedicineUtilization } from "@/api/pharma/reports/monthly-medicine-utilization";
+import { ComboboxUp } from "@/components/comboboxes/combobox-up";
+import { SelectMonth } from "@/components/selects/select-month";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/form";
+import { useAuth } from "@/contexts/authContext";
 
-import { useMonthlyMedicineUtilizationReportPdf } from './use-monthly-medicine-report-report'
+import { useMonthlyMedicineUtilizationReportPdf } from "./use-monthly-medicine-report-report";
 
 export const monthlymedicineutilizationReportFormSchema = z.object({
   institutionId: z.string(),
@@ -27,41 +27,41 @@ export const monthlymedicineutilizationReportFormSchema = z.object({
   month: z.coerce.number(),
   stockId: z.string().optional(),
   stockName: z.string().optional(),
-})
+});
 type MonthlyMedicineUtilizationReportFormSchema = z.infer<
   typeof monthlymedicineutilizationReportFormSchema
->
+>;
 
 export function MonthlyMedicineUtilizationReportForm() {
-  const { token, institutionId } = useAuth()
-  const [queryStock, setQueryStock] = useState('')
-  const [queryYear, setQueryYear] = useState('')
+  const { token, institutionId } = useAuth();
+  const [queryStock, setQueryStock] = useState("");
+  const [queryYear, setQueryYear] = useState("");
   const [filters, setFilters] =
     useState<MonthlyMedicineUtilizationReportFormSchema | null>({
-      institutionId: '',
+      institutionId: "",
       year: 0,
       month: 0,
-    })
+    });
 
-  const generatePdf = useMonthlyMedicineUtilizationReportPdf()
+  const generatePdf = useMonthlyMedicineUtilizationReportPdf();
 
   const form = useForm<MonthlyMedicineUtilizationReportFormSchema>({
     defaultValues: {
-      institutionId: institutionId ?? '',
+      institutionId: institutionId ?? "",
     },
     resolver: zodResolver(monthlymedicineutilizationReportFormSchema),
-  })
+  });
 
   const { data: stocksResult, isFetching: isFetchingStocks } = useQuery({
-    queryKey: ['stocks', queryStock],
-    queryFn: () => fetchStocks({ page: 1, query: queryStock }, token ?? ''),
+    queryKey: ["stocks", queryStock],
+    queryFn: () => fetchStocks({ page: 1, query: queryStock }, token ?? ""),
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
 
   const { data, refetch, isFetching } = useQuery({
     queryKey: [
-      'monthlymedicineutilization-report',
+      "monthlymedicineutilization-report",
       institutionId,
       filters?.stockId ?? null,
       filters?.stockName ?? null,
@@ -69,9 +69,9 @@ export function MonthlyMedicineUtilizationReportForm() {
       filters?.month ?? null,
     ],
     queryFn: ({ queryKey }) => {
-      const [, institutionIdRaw, stockId, ____, year, month] = queryKey
+      const [, institutionIdRaw, stockId, ____, year, month] = queryKey;
       const institutionId =
-        typeof institutionIdRaw === 'string' ? institutionIdRaw : ''
+        typeof institutionIdRaw === "string" ? institutionIdRaw : "";
       return getMonthlyMedicineUtilization(
         {
           institutionId,
@@ -79,38 +79,38 @@ export function MonthlyMedicineUtilizationReportForm() {
           month: Number(month),
           year: Number(year),
         },
-        token ?? '',
-      )
+        token ?? "",
+      );
     },
     enabled: false,
-  })
+  });
   const handleClick = async () => {
-    console.log(form.formState.errors)
-    const isValid = await form.trigger()
-    if (!isValid) return
+    console.log(form.formState.errors);
+    const isValid = await form.trigger();
+    if (!isValid) return;
 
-    const values = form.getValues()
+    const values = form.getValues();
 
-    setFilters(values)
+    setFilters(values);
 
     setTimeout(async () => {
-      const result = await refetch()
+      const result = await refetch();
 
       if (result.data?.utilization) {
         generatePdf(result.data.utilization, {
-          institutionId: institutionId ?? '',
+          institutionId: institutionId ?? "",
           stock: values.stockName,
           year: String(values.year),
           month: String(values.month),
-        })
+        });
       }
-    }, 0)
-  }
+    }, 0);
+  };
 
   const handleClearFilters = () => {
-    form.reset()
-    setFilters(null)
-  }
+    form.reset();
+    setFilters(null);
+  };
 
   return (
     <Form {...form}>
@@ -124,7 +124,7 @@ export function MonthlyMedicineUtilizationReportForm() {
                 <FormLabel>Ano</FormLabel>
                 <ComboboxUp
                   field={{
-                    value: String(field.value) ?? '',
+                    value: String(field.value) ?? "",
                     onChange: field.onChange,
                   }}
                   items={Array.from(
@@ -139,7 +139,7 @@ export function MonthlyMedicineUtilizationReportForm() {
                   formatItem={(item) => item.value}
                   placeholder="Selecione o ano"
                   onSelect={(id, item) => {
-                    form.setValue('year', Number(item.value))
+                    form.setValue("year", Number(item.value));
                   }}
                   itemValue="value"
                   query={queryYear}
@@ -171,11 +171,11 @@ export function MonthlyMedicineUtilizationReportForm() {
             name="stockId"
             render={({ field }) => (
               <FormItem className="col-span-3 grid">
-                <FormLabel>Stock</FormLabel>
+                <FormLabel>Estoque</FormLabel>
                 <ComboboxUp
                   items={stocksResult?.stocks ?? []}
                   field={{
-                    value: field.value ?? '',
+                    value: field.value ?? "",
                     onChange: field.onChange,
                   }}
                   query={queryStock}
@@ -183,15 +183,15 @@ export function MonthlyMedicineUtilizationReportForm() {
                   isFetching={isFetchingStocks}
                   onQueryChange={setQueryStock}
                   onSelect={(id, item) => {
-                    form.setValue('stockId', id)
-                    form.setValue('stockName', item.name)
+                    form.setValue("stockId", id);
+                    form.setValue("stockName", item.name);
                   }}
                   itemKey="id"
                   formatItem={(item) => {
-                    return `${item.name}`
+                    return `${item.name}`;
                   }}
                   getItemText={(item) => {
-                    return `${item.name}`
+                    return `${item.name}`;
                   }}
                 />
                 <FormMessage />
@@ -203,18 +203,18 @@ export function MonthlyMedicineUtilizationReportForm() {
             <Button
               onClick={handleClearFilters}
               type="button"
-              variant={'outline'}
-              size={'xs'}
+              variant={"outline"}
+              size={"xs"}
             >
               <X className="mr-2 h-4 w-4" />
               Limpar Campos
             </Button>
             <Button onClick={handleClick} disabled={isFetching} type="button">
-              {isFetching ? 'Gerando relatório...' : 'Gerar PDF'}{' '}
+              {isFetching ? "Gerando relatório..." : "Gerar PDF"}{" "}
             </Button>
           </div>
         </div>
       </form>
     </Form>
-  )
+  );
 }

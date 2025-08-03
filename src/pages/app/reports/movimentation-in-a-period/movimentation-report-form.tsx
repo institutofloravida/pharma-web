@@ -1,26 +1,26 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
-import { X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
+import { X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { fetchMovementTypes } from '@/api/pharma/auxiliary-records/movement-type/fetch-movement-types'
-import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
-import { fetchMedicines } from '@/api/pharma/medicines/fetch-medicines'
-import { fetchMedicinesVariants } from '@/api/pharma/medicines-variants/fetch-medicines-variants'
-import { ExitType } from '@/api/pharma/movement/exit/register-medicine-exit'
-import { fetchOperators } from '@/api/pharma/operators/fetch-operators'
-import { getMovimentationInAPeriodReport } from '@/api/pharma/reports/movimentation-in-a-period-report'
-import { fetchBatchesOnStock } from '@/api/pharma/stock/bacth-stock/fetch-batches-stock'
-import { fetchMedicinesOnStock } from '@/api/pharma/stock/medicine-stock/fetch-medicines-stock'
-import { fetchUsers } from '@/api/pharma/users/fetch-users'
-import { Combobox } from '@/components/comboboxes/combobox'
-import { ComboboxUp } from '@/components/comboboxes/combobox-up'
-import { DatePicker } from '@/components/date-picker'
-import { SelectDirection } from '@/components/selects/locate/select-direction'
-import { SelectExitType } from '@/components/selects/locate/select-exit-type'
-import { Button } from '@/components/ui/button'
+import { fetchMovementTypes } from "@/api/pharma/auxiliary-records/movement-type/fetch-movement-types";
+import { fetchStocks } from "@/api/pharma/auxiliary-records/stock/fetch-stocks";
+import { fetchMedicines } from "@/api/pharma/medicines/fetch-medicines";
+import { fetchMedicinesVariants } from "@/api/pharma/medicines-variants/fetch-medicines-variants";
+import { ExitType } from "@/api/pharma/movement/exit/register-medicine-exit";
+import { fetchOperators } from "@/api/pharma/operators/fetch-operators";
+import { getMovimentationInAPeriodReport } from "@/api/pharma/reports/movimentation-in-a-period-report";
+import { fetchBatchesOnStock } from "@/api/pharma/stock/bacth-stock/fetch-batches-stock";
+import { fetchMedicinesOnStock } from "@/api/pharma/stock/medicine-stock/fetch-medicines-stock";
+import { fetchUsers } from "@/api/pharma/users/fetch-users";
+import { Combobox } from "@/components/comboboxes/combobox";
+import { ComboboxUp } from "@/components/comboboxes/combobox-up";
+import { DatePicker } from "@/components/date-picker";
+import { SelectDirection } from "@/components/selects/locate/select-direction";
+import { SelectExitType } from "@/components/selects/locate/select-exit-type";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -29,14 +29,14 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { useAuth } from '@/contexts/authContext'
-import { Formatter } from '@/lib/utils/formaters/formaters'
-import { dateFormatter } from '@/lib/utils/formatter'
-import { MovementTypeDirection } from '@/lib/utils/movement-type'
-import { getOperatorRoleTranslation } from '@/lib/utils/translations-mappers/operator-role-translation'
+} from "@/components/ui/form";
+import { useAuth } from "@/contexts/authContext";
+import { Formatter } from "@/lib/utils/formaters/formaters";
+import { dateFormatter } from "@/lib/utils/formatter";
+import { MovementTypeDirection } from "@/lib/utils/movement-type";
+import { getOperatorRoleTranslation } from "@/lib/utils/translations-mappers/operator-role-translation";
 
-import { useMovimentationReportPdf } from './use-movimentation-report'
+import { useMovimentationReportPdf } from "./use-movimentation-report";
 
 export const movimentationReportFormSchema = z.object({
   direction: z.nativeEnum(MovementTypeDirection).optional(),
@@ -57,126 +57,126 @@ export const movimentationReportFormSchema = z.object({
   operatorId: z.string().optional(),
   operatorName: z.string().optional(),
   startDate: z.date({
-    required_error: 'A data início é obrigatória.',
+    required_error: "A data início é obrigatória.",
   }),
   endDate: z.date({
-    required_error: 'A data fim é obrigatória.',
+    required_error: "A data fim é obrigatória.",
   }),
-})
+});
 type MovimentationReportFormSchema = z.infer<
   typeof movimentationReportFormSchema
->
+>;
 
 export function MovimentationReportForm() {
-  const [queryUsers, setQueryUsers] = useState('')
-  const [queryMedicine, setQueryMedicine] = useState('')
-  const [queryMedicineVariant, setQueryMedicineVariant] = useState('')
-  const [queryStock, setQueryStock] = useState('')
-  const [queryMedicineStock, setQueryMedicineStock] = useState('')
-  const [queryBatchesStock, setQueryBatchesStock] = useState('')
-  const [queryMovementType, setQueryMovementType] = useState('')
+  const [queryUsers, setQueryUsers] = useState("");
+  const [queryMedicine, setQueryMedicine] = useState("");
+  const [queryMedicineVariant, setQueryMedicineVariant] = useState("");
+  const [queryStock, setQueryStock] = useState("");
+  const [queryMedicineStock, setQueryMedicineStock] = useState("");
+  const [queryBatchesStock, setQueryBatchesStock] = useState("");
+  const [queryMovementType, setQueryMovementType] = useState("");
 
   const [filters, setFilters] = useState<MovimentationReportFormSchema | null>({
     startDate: new Date(),
     endDate: new Date(),
-  })
+  });
 
-  const { token, institutionId } = useAuth()
-  const generatePdf = useMovimentationReportPdf()
+  const { token, institutionId } = useAuth();
+  const generatePdf = useMovimentationReportPdf();
 
   const form = useForm<MovimentationReportFormSchema>({
     defaultValues: {
       direction: undefined,
     },
     resolver: zodResolver(movimentationReportFormSchema),
-  })
+  });
 
   const { data: operatorsResult, isFetching: isFetchingOperators } = useQuery({
-    queryKey: ['operators'],
-    queryFn: () => fetchOperators({ page: 1 }, token ?? ''),
+    queryKey: ["operators"],
+    queryFn: () => fetchOperators({ page: 1 }, token ?? ""),
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
 
   const { data: medicinesResult, isFetching: isFetchingMedicines } = useQuery({
-    queryKey: ['medicines', queryMedicine],
+    queryKey: ["medicines", queryMedicine],
     queryFn: () =>
-      fetchMedicines({ page: 1, query: queryMedicine }, token ?? ''),
+      fetchMedicines({ page: 1, query: queryMedicine }, token ?? ""),
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
 
-  const selectedMedicineId = form.watch('medicineId')
+  const selectedMedicineId = form.watch("medicineId");
   const {
     data: medicinesVariantsResult,
     isFetching: isFetchingMedicinesVariants,
   } = useQuery({
-    queryKey: ['medicines-variants', queryMedicineVariant, selectedMedicineId],
+    queryKey: ["medicines-variants", queryMedicineVariant, selectedMedicineId],
     queryFn: () =>
       fetchMedicinesVariants(
         {
           page: 1,
           query: queryMedicineVariant,
-          medicineId: selectedMedicineId ?? '',
+          medicineId: selectedMedicineId ?? "",
         },
-        token ?? '',
+        token ?? "",
       ),
     enabled: !!selectedMedicineId && queryMedicineVariant !== null,
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
 
   const { data: stocksResult, isFetching: isFetchingStocks } = useQuery({
-    queryKey: ['stocks', queryStock],
-    queryFn: () => fetchStocks({ page: 1, query: queryStock }, token ?? ''),
+    queryKey: ["stocks", queryStock],
+    queryFn: () => fetchStocks({ page: 1, query: queryStock }, token ?? ""),
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
 
   const { data: medicinesStockResult, isFetching: isFetchingMedicinesStock } =
     useQuery({
-      queryKey: ['medicines-stock', form.watch('stockId'), queryMedicineStock],
+      queryKey: ["medicines-stock", form.watch("stockId"), queryMedicineStock],
       queryFn: () =>
         fetchMedicinesOnStock(
           {
             page: 1,
-            stockId: form.watch('stockId') ?? '',
+            stockId: form.watch("stockId") ?? "",
             medicineName: queryMedicineStock,
           },
-          token ?? '',
+          token ?? "",
         ),
       staleTime: 1000,
-      enabled: !!form.watch('stockId'),
+      enabled: !!form.watch("stockId"),
       refetchOnMount: true,
-    })
+    });
 
   const { data: batchesStockResult, isFetching: isFetchingBatchesStock } =
     useQuery({
       queryKey: [
-        'batches-stock',
-        form.watch('medicineStockId'),
+        "batches-stock",
+        form.watch("medicineStockId"),
         queryBatchesStock,
       ],
       queryFn: () =>
         fetchBatchesOnStock(
           {
             page: 1,
-            medicineStockId: form.watch('medicineStockId') ?? '',
+            medicineStockId: form.watch("medicineStockId") ?? "",
             code: queryBatchesStock,
             includeExpired: true,
             includeZero: true,
           },
-          token ?? '',
+          token ?? "",
         ),
       staleTime: 1000,
-      enabled: !!form.watch('medicineStockId'),
+      enabled: !!form.watch("medicineStockId"),
       refetchOnMount: true,
-    })
+    });
 
   const { data: movementTypesResult, isFetching: isFetchingMovementTypes } =
     useQuery({
       queryKey: [
-        'movement-types',
+        "movement-types",
         queryMovementType,
         MovementTypeDirection.EXIT,
       ],
@@ -187,16 +187,16 @@ export function MovimentationReportForm() {
             query: queryMovementType,
             direction: MovementTypeDirection.EXIT,
           },
-          token ?? '',
+          token ?? "",
         ),
       enabled: queryStock !== null,
       staleTime: 1000,
       refetchOnMount: true,
-    })
+    });
 
   const { data, refetch, isFetching } = useQuery({
     queryKey: [
-      'movimentation-report',
+      "movimentation-report",
       institutionId,
       filters?.operatorId ?? null,
       filters?.operatorName ?? null,
@@ -239,9 +239,9 @@ export function MovimentationReportForm() {
         movementTypeId,
         _______,
         direction,
-      ] = queryKey
+      ] = queryKey;
       const institutionId =
-        typeof institutionIdRaw === 'string' ? institutionIdRaw : ''
+        typeof institutionIdRaw === "string" ? institutionIdRaw : "";
       return getMovimentationInAPeriodReport(
         {
           institutionId,
@@ -257,21 +257,21 @@ export function MovimentationReportForm() {
           movementTypeId: movementTypeId as string | undefined,
           direction: direction as MovementTypeDirection | undefined,
         },
-        token ?? '',
-      )
+        token ?? "",
+      );
     },
     enabled: false,
-  })
+  });
   const handleClick = async () => {
-    const isValid = await form.trigger()
-    if (!isValid) return
+    const isValid = await form.trigger();
+    if (!isValid) return;
 
-    const values = form.getValues()
+    const values = form.getValues();
 
-    setFilters(values)
+    setFilters(values);
 
     setTimeout(async () => {
-      const result = await refetch()
+      const result = await refetch();
 
       if (result.data?.movimentation) {
         generatePdf(result.data.movimentation, {
@@ -279,22 +279,22 @@ export function MovimentationReportForm() {
           startDate: values.startDate ?? new Date(),
           endDate: values.endDate ?? new Date(),
           operator: values.operatorName,
-          institutionId: institutionId ?? '',
+          institutionId: institutionId ?? "",
           medicineVariant: values.medicineVariantName,
           stock: values.stockName,
           medicineStock: values.medicineStockName,
           batcheStock: values.batchStockName,
           exitType: values.exitType,
           direction: values.direction,
-        })
+        });
       }
-    }, 0)
-  }
+    }, 0);
+  };
 
   const handleClearFilters = () => {
-    form.reset()
-    setFilters(null)
-  }
+    form.reset();
+    setFilters(null);
+  };
 
   return (
     <Form {...form}>
@@ -303,7 +303,7 @@ export function MovimentationReportForm() {
           <FormField
             control={form.control}
             name="startDate"
-            defaultValue={new Date('07-01-2025')}
+            defaultValue={new Date("07-01-2025")}
             render={({ field }) => (
               <FormItem className="col-span-2 grid">
                 <FormLabel>Data de Início</FormLabel>
@@ -316,7 +316,7 @@ export function MovimentationReportForm() {
           />
 
           <FormField
-            defaultValue={new Date('07-11-2025')}
+            defaultValue={new Date("07-11-2025")}
             control={form.control}
             name="endDate"
             render={({ field }) => (
@@ -338,7 +338,7 @@ export function MovimentationReportForm() {
                 <FormLabel>Operador</FormLabel>
                 <ComboboxUp
                   field={{
-                    value: field.value ?? '',
+                    value: field.value ?? "",
                     onChange: field.onChange,
                   }}
                   items={operatorsResult?.operators ?? []}
@@ -347,15 +347,15 @@ export function MovimentationReportForm() {
                   query={queryUsers}
                   isFetching={isFetchingOperators}
                   formatItem={(item) =>
-                    `${item.name ?? ''} - ${getOperatorRoleTranslation(item.role) ?? ''} - ${item.email ?? ''}`
+                    `${item.name ?? ""} - ${getOperatorRoleTranslation(item.role) ?? ""} - ${item.email ?? ""}`
                   }
                   getItemText={(item) =>
-                    `${item.name ?? ''} - ${getOperatorRoleTranslation(item.role) ?? ''} - ${item.email ?? ''}`
+                    `${item.name ?? ""} - ${getOperatorRoleTranslation(item.role) ?? ""} - ${item.email ?? ""}`
                   }
                   placeholder="Pesquise por um Operador"
                   onSelect={(id, item) => {
-                    form.setValue('operatorId', id)
-                    form.setValue('operatorName', item.name)
+                    form.setValue("operatorId", id);
+                    form.setValue("operatorName", item.name);
                   }}
                 />
 
@@ -390,7 +390,7 @@ export function MovimentationReportForm() {
                 <ComboboxUp
                   items={medicinesResult?.medicines || []}
                   field={{
-                    value: field.value ?? '',
+                    value: field.value ?? "",
                     onChange: field.onChange,
                   }}
                   formatItem={(item) => item.name}
@@ -400,10 +400,10 @@ export function MovimentationReportForm() {
                   isFetching={isFetchingMedicines}
                   onQueryChange={setQueryMedicine}
                   onSelect={(id, item) => {
-                    form.setValue('medicineId', id)
-                    form.setValue('medicineName', item.name)
-                    form.setValue('medicineVariantId', undefined)
-                    form.setValue('medicineVariantName', undefined)
+                    form.setValue("medicineId", id);
+                    form.setValue("medicineName", item.name);
+                    form.setValue("medicineVariantId", undefined);
+                    form.setValue("medicineVariantName", undefined);
                   }}
                   itemKey="id"
                 />
@@ -423,7 +423,7 @@ export function MovimentationReportForm() {
                   isDisable={!selectedMedicineId}
                   items={medicinesVariantsResult?.medicines_variants ?? []}
                   field={{
-                    value: field.value ?? '',
+                    value: field.value ?? "",
                     onChange: field.onChange,
                   }}
                   query={queryMedicineVariant}
@@ -434,15 +434,15 @@ export function MovimentationReportForm() {
                     `${item.medicine} - ${item.dosage}${item.unitMeasure} - ${item.pharmaceuticalForm}`
                   }
                   onSelect={(id, item) => {
-                    form.setValue('medicineVariantId', id)
+                    form.setValue("medicineVariantId", id);
                     form.setValue(
-                      'medicineVariantName',
+                      "medicineVariantName",
                       `${item.dosage}${item.unitMeasure} ${item.pharmaceuticalForm}`,
-                    )
+                    );
                   }}
                   itemKey="id"
                   formatItem={(item) => {
-                    return `${item.medicine} - ${item.dosage}${item.unitMeasure} - ${item.pharmaceuticalForm}`
+                    return `${item.medicine} - ${item.dosage}${item.unitMeasure} - ${item.pharmaceuticalForm}`;
                   }}
                 />
                 <FormMessage />
@@ -455,11 +455,11 @@ export function MovimentationReportForm() {
             name="stockId"
             render={({ field }) => (
               <FormItem className="col-span-3 grid">
-                <FormLabel>Stock</FormLabel>
+                <FormLabel>Estoque</FormLabel>
                 <ComboboxUp
                   items={stocksResult?.stocks ?? []}
                   field={{
-                    value: field.value ?? '',
+                    value: field.value ?? "",
                     onChange: field.onChange,
                   }}
                   query={queryStock}
@@ -467,15 +467,15 @@ export function MovimentationReportForm() {
                   isFetching={isFetchingStocks}
                   onQueryChange={setQueryStock}
                   onSelect={(id, item) => {
-                    form.setValue('stockId', id)
-                    form.setValue('stockName', item.name)
+                    form.setValue("stockId", id);
+                    form.setValue("stockName", item.name);
                   }}
                   itemKey="id"
                   formatItem={(item) => {
-                    return `${item.name}`
+                    return `${item.name}`;
                   }}
                   getItemText={(item) => {
-                    return `${item.name}`
+                    return `${item.name}`;
                   }}
                 />
                 <FormMessage />
@@ -492,7 +492,7 @@ export function MovimentationReportForm() {
                 <ComboboxUp
                   items={medicinesStockResult?.medicines_stock ?? []}
                   field={{
-                    value: field.value ?? '',
+                    value: field.value ?? "",
                     onChange: field.onChange,
                   }}
                   query={queryMedicineStock}
@@ -500,12 +500,12 @@ export function MovimentationReportForm() {
                   isFetching={isFetchingMedicinesStock}
                   onQueryChange={setQueryMedicineStock}
                   onSelect={(id, item) => {
-                    form.setValue('medicineStockId', id)
-                    form.setValue('quantity', 0)
+                    form.setValue("medicineStockId", id);
+                    form.setValue("quantity", 0);
                     form.setValue(
-                      'medicineStockName',
+                      "medicineStockName",
                       `${item.medicine} - ${item.dosage}${item.unitMeasure} - ${item.pharmaceuticalForm}`,
-                    )
+                    );
                   }}
                   itemKey="id"
                   getItemText={(item) =>
@@ -514,7 +514,7 @@ export function MovimentationReportForm() {
                   formatItem={(item) => (
                     <div className="flex gap-2">
                       <span>
-                        {item.medicine} - {item.pharmaceuticalForm} -{' '}
+                        {item.medicine} - {item.pharmaceuticalForm} -{" "}
                         {item.dosage}
                         {item.unitMeasure}
                       </span>
@@ -546,7 +546,7 @@ export function MovimentationReportForm() {
                 <ComboboxUp
                   items={batchesStockResult?.batches_stock ?? []}
                   field={{
-                    value: field.value ?? '',
+                    value: field.value ?? "",
                     onChange: field.onChange,
                   }}
                   query={queryBatchesStock}
@@ -554,9 +554,9 @@ export function MovimentationReportForm() {
                   isFetching={isFetchingBatchesStock}
                   onQueryChange={setQueryBatchesStock}
                   onSelect={(id, item) => {
-                    form.setValue('batchStockId', id)
-                    form.setValue('batchStockName', item.batch)
-                    form.setValue('quantity', 0)
+                    form.setValue("batchStockId", id);
+                    form.setValue("batchStockName", item.batch);
+                    form.setValue("quantity", 0);
                   }}
                   itemKey="id"
                   getItemText={(item) =>
@@ -565,12 +565,12 @@ export function MovimentationReportForm() {
                   formatItem={(item) => (
                     <div className="flex gap-2">
                       <span>
-                        {item.batch} -{' '}
+                        {item.batch} -{" "}
                         {/* {dateFormatter.format(item.expirationDate)} -{' '} */}
                       </span>
                       <div className="text-sm">
                         <span
-                          className={`${item.isAvailable ? 'text-green-600' : 'text-red-600'}`}
+                          className={`${item.isAvailable ? "text-green-600" : "text-red-600"}`}
                         >
                           {item.quantity}
                         </span>
@@ -588,7 +588,7 @@ export function MovimentationReportForm() {
               </FormItem>
             )}
           />
-          {form.watch('direction') === MovementTypeDirection.EXIT && (
+          {form.watch("direction") === MovementTypeDirection.EXIT && (
             <FormField
               control={form.control}
               name="exitType"
@@ -605,7 +605,7 @@ export function MovimentationReportForm() {
               )}
             />
           )}
-          {form.watch('exitType') === ExitType.MOVEMENT_TYPE && (
+          {form.watch("exitType") === ExitType.MOVEMENT_TYPE && (
             <FormField
               control={form.control}
               name="movementTypeId"
@@ -615,7 +615,7 @@ export function MovimentationReportForm() {
                   <ComboboxUp
                     items={movementTypesResult?.movement_types ?? []}
                     field={{
-                      value: field.value ?? '',
+                      value: field.value ?? "",
                       onChange: field.onChange,
                     }}
                     query={queryMovementType}
@@ -623,15 +623,15 @@ export function MovimentationReportForm() {
                     isFetching={isFetchingMovementTypes}
                     onQueryChange={setQueryMovementType}
                     onSelect={(id, item) => {
-                      form.setValue('movementTypeId', id)
-                      form.setValue('movementTypeName', item.name)
+                      form.setValue("movementTypeId", id);
+                      form.setValue("movementTypeName", item.name);
                     }}
                     itemKey="id"
                     getItemText={(item) => {
-                      return `${item.name}`
+                      return `${item.name}`;
                     }}
                     formatItem={(item) => {
-                      return `${item.name}`
+                      return `${item.name}`;
                     }}
                   />
                   <FormMessage />
@@ -643,18 +643,18 @@ export function MovimentationReportForm() {
             <Button
               onClick={handleClearFilters}
               type="button"
-              variant={'outline'}
-              size={'xs'}
+              variant={"outline"}
+              size={"xs"}
             >
               <X className="mr-2 h-4 w-4" />
               Limpar Campos
             </Button>
             <Button onClick={handleClick} disabled={isFetching} type="button">
-              {isFetching ? 'Gerando relatório...' : 'Gerar PDF'}{' '}
+              {isFetching ? "Gerando relatório..." : "Gerar PDF"}{" "}
             </Button>
           </div>
         </div>
       </form>
     </Form>
-  )
+  );
 }

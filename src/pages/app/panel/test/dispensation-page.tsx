@@ -191,7 +191,6 @@ export default function DispensationPage() {
   };
 
   const handleConfirmClick = () => {
-    // Valida o formulário antes de abrir o modal
     form.handleSubmit(() => {
       setShowErrors(false);
       setShowConfirmationModal(true);
@@ -236,7 +235,6 @@ export default function DispensationPage() {
         description: `${totalMedicines} medicamento(s) dispensados totalizando ${totalQuantity} unidades para ${selectedPatient?.name}.`,
       });
 
-      // Reset form e fecha modal
       form.reset();
       setSelectedPatient(null);
       setSelectedMedicines([]);
@@ -359,7 +357,7 @@ export default function DispensationPage() {
                   name="stockId"
                   render={({ field }) => (
                     <FormItem className="col-span-3 grid flex-col">
-                      <FormLabel>Stock</FormLabel>
+                      <FormLabel>Estoque</FormLabel>
                       <ComboboxUp
                         isDisable={form.watch("medicines").length > 0}
                         items={stocksResult?.stocks ?? []}
