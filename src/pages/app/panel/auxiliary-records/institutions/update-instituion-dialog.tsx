@@ -1,25 +1,24 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { DialogClose } from '@radix-ui/react-dialog'
-import { Switch } from '@radix-ui/react-switch'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import InputMask from 'react-input-mask'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import InputMask from "react-input-mask";
+import { z } from "zod";
 
-import { getInstitution } from '@/api/pharma/auxiliary-records/institution/get-institution'
-import { InstitutionType } from '@/api/pharma/auxiliary-records/institution/register-institution'
+import { getInstitution } from "@/api/pharma/auxiliary-records/institution/get-institution";
+import { InstitutionType } from "@/api/pharma/auxiliary-records/institution/register-institution";
 import {
   updateInstitution,
   type UpdateInstitutionBody,
-} from '@/api/pharma/auxiliary-records/institution/update-institution'
-import { SelectInstitutionType } from '@/components/selects/select-institution-type'
-import { Button } from '@/components/ui/button'
+} from "@/api/pharma/auxiliary-records/institution/update-institution";
+import { SelectInstitutionType } from "@/components/selects/select-institution-type";
+import { Button } from "@/components/ui/button";
 import {
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -28,70 +27,71 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Textarea } from '@/components/ui/textarea'
-import { useAuth } from '@/contexts/authContext'
-import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/lib/react-query'
-import { handleApiError } from '@/lib/utils/handle-api-error'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/authContext";
+import { toast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/react-query";
+import { handleApiError } from "@/lib/utils/handle-api-error";
+import { Switch } from "@/components/ui/switch";
 
 const updateInstitutionSchema = z.object({
   name: z.string().min(3),
   responsible: z.string().min(3, {
-    message: 'O nome do responsável deve ter pelo menos 3 caracteres',
+    message: "O nome do responsável deve ter pelo menos 3 caracteres",
   }),
   type: z.nativeEnum(InstitutionType, {
-    errorMap: () => ({ message: 'Selecione um tipo de instituição' }),
+    errorMap: () => ({ message: "Selecione um tipo de instituição" }),
   }),
   controlStock: z.boolean(),
   cnpj: z
     .string()
-    .min(14, { message: 'O CNPJ deve ter 14 caracteres' })
-    .max(14, { message: 'O CNPJ deve ter 14 caracteres' }),
+    .min(14, { message: "O CNPJ deve ter 14 caracteres" })
+    .max(14, { message: "O CNPJ deve ter 14 caracteres" }),
   description: z.string().optional(),
-})
-type UpdateInstitutionSchema = z.infer<typeof updateInstitutionSchema>
+});
+type UpdateInstitutionSchema = z.infer<typeof updateInstitutionSchema>;
 
 interface UpdateInstitutionProps {
-  institutionId: string
-  open: boolean
+  institutionId: string;
+  open: boolean;
 }
 
 export function UpdateInstitutionDialog({
   institutionId,
   open,
 }: UpdateInstitutionProps) {
-  const { token } = useAuth()
+  const { token } = useAuth();
 
   const { data: institution } = useQuery({
-    queryKey: ['institution', institutionId],
-    queryFn: () => getInstitution({ id: institutionId }, token ?? ''),
+    queryKey: ["institution", institutionId],
+    queryFn: () => getInstitution({ id: institutionId }, token ?? ""),
     enabled: open,
-  })
+  });
 
   const form = useForm<UpdateInstitutionSchema>({
     resolver: zodResolver(updateInstitutionSchema),
     values: {
-      cnpj: institution?.cnpj ?? '',
+      cnpj: institution?.cnpj ?? "",
       controlStock: institution?.controlStock ?? false,
-      responsible: institution?.responsible ?? '',
+      responsible: institution?.responsible ?? "",
       type: institution?.type ?? InstitutionType.PUBLIC,
-      description: institution?.description ?? '',
-      name: institution?.name ?? '',
+      description: institution?.description ?? "",
+      name: institution?.name ?? "",
     },
-  })
+  });
 
   const { mutateAsync: updateInstitutionFn } = useMutation({
     mutationFn: (data: UpdateInstitutionBody) =>
-      updateInstitution(data, token ?? ''),
+      updateInstitution(data, token ?? ""),
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ['institutions'],
-      })
+        queryKey: ["institutions"],
+      });
     },
-  })
+  });
 
   async function handleUpdateInstitution(data: UpdateInstitutionSchema) {
     try {
@@ -103,26 +103,26 @@ export function UpdateInstitutionDialog({
         controlStock: data.controlStock,
         responsible: data.responsible,
         type: data.type,
-      })
+      });
 
       toast({
         title: `Instituição atualizada com sucesso!`,
-      })
+      });
       form.reset({
-        cnpj: '',
+        cnpj: "",
         controlStock: false,
-        responsible: '',
+        responsible: "",
         type: undefined,
-        description: '',
-        name: '',
-      })
+        description: "",
+        name: "",
+      });
     } catch (error) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Erro ao tentar atualizar a instiuição.',
+        title: "Erro ao tentar atualizar a instiuição.",
         description: errorMessage,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     }
   }
 
@@ -201,7 +201,7 @@ export function UpdateInstitutionDialog({
                         mask="99.999.999/9999-99"
                         placeholder="CNPJ..."
                         onChange={(e: any) =>
-                          field.onChange(e.target.value.replace(/\D/g, ''))
+                          field.onChange(e.target.value.replace(/\D/g, ""))
                         }
                       >
                         {(inputProps: any) => <Input {...inputProps} />}
@@ -251,7 +251,7 @@ export function UpdateInstitutionDialog({
           <DialogFooter className="col-span-3 grid justify-end">
             <div className="flex gap-2">
               <DialogClose asChild>
-                <Button variant={'ghost'}>Cancelar</Button>
+                <Button variant={"ghost"}>Cancelar</Button>
               </DialogClose>
               <Button type="submit" disabled={form.formState.isSubmitting}>
                 Atualizar
@@ -261,5 +261,5 @@ export function UpdateInstitutionDialog({
         </form>
       </Form>
     </DialogContent>
-  )
+  );
 }
