@@ -1,39 +1,41 @@
-import { apiPharma } from '@/lib/axios'
+import { apiPharma } from "@/lib/axios";
 
 interface InventoryMedicineDetailsParams {
-  medicineStockId: string
+  medicineStockId: string;
 }
 
 interface batchStockInventory {
-  id: string
-  code: string
-  quantity: number
-  expirationDate: Date
-  manufacturingDate?: Date | null
-  manufacturer: string
-  isCloseToExpiration: boolean
-  isExpired: boolean
+  id: string;
+  code: string;
+  quantity: number;
+  expirationDate: Date;
+  manufacturingDate?: Date | null;
+  manufacturer: string;
+  isCloseToExpiration: boolean;
+  isExpired: boolean;
 }
 
 interface InventoryMedicineDetailsResponse {
   inventory: {
-    medicineStockId: string
-    medicine: string
-    dosage: string
-    minimumLevel: number
-    pharmaceuticalForm: string
-    stockId: string
-    totalQuantity: number
-    unitMeasure: string
+    medicineStockId: string;
+    medicine: string;
+    dosage: string;
+    minimumLevel: number;
+    complement?: string;
+    pharmaceuticalForm: string;
+    stockId: string;
+    stock: string;
+    totalQuantity: number;
+    unitMeasure: string;
     quantity: {
-      totalCurrent: number
-      available: number
-      unavailable: number
-    }
-    batchesStock: batchStockInventory[]
-    isLowStock: boolean
-    isZero: boolean
-  }
+      totalCurrent: number;
+      available: number;
+      unavailable: number;
+    };
+    batchesStock: batchStockInventory[];
+    isLowStock: boolean;
+    isZero: boolean;
+  };
 }
 
 export async function inventoryMedicineDetails(
@@ -47,9 +49,9 @@ export async function inventoryMedicineDetails(
         Authorization: `Bearer ${token}`,
       },
     },
-  )
+  );
 
-  const { inventory } = response.data
+  const { inventory } = response.data;
 
-  return inventory
+  return inventory;
 }

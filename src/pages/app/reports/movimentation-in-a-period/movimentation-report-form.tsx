@@ -303,7 +303,6 @@ export function MovimentationReportForm() {
           <FormField
             control={form.control}
             name="startDate"
-            defaultValue={new Date("07-01-2025")}
             render={({ field }) => (
               <FormItem className="col-span-2 grid">
                 <FormLabel>Data de Início</FormLabel>
@@ -316,7 +315,6 @@ export function MovimentationReportForm() {
           />
 
           <FormField
-            defaultValue={new Date("07-11-2025")}
             control={form.control}
             name="endDate"
             render={({ field }) => (

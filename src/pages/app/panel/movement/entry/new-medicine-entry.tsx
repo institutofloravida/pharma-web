@@ -1,90 +1,95 @@
-'use client'
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
-import { FileText, Save } from 'lucide-react'
-import { useState } from 'react'
-import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
+import { FileText, Save } from "lucide-react";
+import { useState } from "react";
+import { FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchMovementTypes } from '@/api/pharma/auxiliary-records/movement-type/fetch-movement-types'
-import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
-import type { MedicineVariant } from '@/api/pharma/medicines-variants/fetch-medicines-variants'
-import { registerMedicineEntry } from '@/api/pharma/movement/entry/register-medicine-entry'
-import { ComboboxUp } from '@/components/comboboxes/combobox-up'
-import { DatePickerFormItem } from '@/components/date/date-picker-form-item'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { fetchMovementTypes } from "@/api/pharma/auxiliary-records/movement-type/fetch-movement-types";
+import { fetchStocks } from "@/api/pharma/auxiliary-records/stock/fetch-stocks";
+import type { MedicineVariant } from "@/api/pharma/medicines-variants/fetch-medicines-variants";
+import {
+  EntryType,
+  registerMedicineEntry,
+} from "@/api/pharma/movement/entry/register-medicine-entry";
+import { ComboboxUp } from "@/components/comboboxes/combobox-up";
+import { DatePickerFormItem } from "@/components/date/date-picker-form-item";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
-import { useAuth } from '@/contexts/authContext'
-import { useToast } from '@/hooks/use-toast'
-import { MovementTypeDirection } from '@/lib/utils/movement-type'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/contexts/authContext";
+import { useToast } from "@/hooks/use-toast";
+import { MovementTypeDirection } from "@/lib/utils/movement-type";
 
-import { MedicationEntryCard } from './components/medicine-entry-card'
-import { MedicationSearch } from './components/medicine-search'
+import { MedicationEntryCard } from "./components/medicine-entry-card";
+import { MedicationSearch } from "./components/medicine-search";
 
 const newMedicineEntrySchema = z.object({
   movementTypeId: z.string({
-    required_error: 'Selecione o tipo de movimentação.',
+    required_error: "Selecione o tipo de movimentação.",
   }),
   medicines: z
     .array(
       z.object({
-        medicineVariantId: z.string().min(1, 'Selecione o medicamento.'),
+        medicineVariantId: z.string().min(1, "Selecione o medicamento."),
         variant: z.custom<MedicineVariant>(),
         batches: z.array(
           z.object({
-            code: z.string().min(1, 'Digite o código do lote.'),
+            code: z.string().min(1, "Digite o código do lote."),
             expirationDate: z.coerce.date({
-              required_error: 'Selecione a data de validade.',
+              required_error: "Selecione a data de validade.",
+              invalid_type_error: "Data de validade inválida.",
+              message: "Data de validade inválida.",
             }),
-            manufacturerId: z.string().min(1, 'Selecione o fabricante.'),
+            manufacturerId: z.string().min(1, "Selecione o fabricante."),
             manufacturingDate: z.coerce.date().optional(),
             quantityToEntry: z.coerce
               .number()
-              .min(1, 'Informe uma quantidade válida.'),
+              .min(1, "Informe uma quantidade válida."),
           }),
         ),
       }),
     )
-    .min(1, { message: 'É necessário informar pelo menos um medicamento.' }),
-  entryDate: z.coerce.date({ required_error: 'Selecione a data de entrada.' }),
+    .min(1, { message: "É necessário informar pelo menos um medicamento." }),
+  entryDate: z.coerce.date({ required_error: "Selecione a data de entrada." }),
   stockId: z.string({
-    required_error: 'Selecione o estoque.',
+    required_error: "Selecione o estoque.",
   }),
-  nfNumber: z.string().min(1, 'Digite o número da nota fiscal.'),
-})
+  nfNumber: z.string().min(1, "Digite o número da nota fiscal."),
+});
 
-type NewMedicineEntrySchema = z.infer<typeof newMedicineEntrySchema>
+type NewMedicineEntrySchema = z.infer<typeof newMedicineEntrySchema>;
 
 export default function NewMedicineEntryPage() {
-  const [queryStock, setQueryStock] = useState('')
-  const [queryMovementType, setQueryMovementType] = useState('')
-  const navigate = useNavigate()
+  const [queryStock, setQueryStock] = useState("");
+  const [queryMovementType, setQueryMovementType] = useState("");
+  const navigate = useNavigate();
 
-  const { toast } = useToast()
-  const { token } = useAuth()
+  const { toast } = useToast();
+  const { token, institutionId } = useAuth();
 
   const form = useForm<NewMedicineEntrySchema>({
     resolver: zodResolver(newMedicineEntrySchema),
     defaultValues: {
       movementTypeId: undefined,
       medicines: [],
-      entryDate: undefined,
+      entryDate: new Date(),
       stockId: undefined,
       nfNumber: undefined,
     },
-  })
+  });
 
   const {
     fields: medicinesFields,
@@ -93,20 +98,24 @@ export default function NewMedicineEntryPage() {
     insert: insertMedicine,
   } = useFieldArray({
     control: form.control,
-    name: 'medicines',
-  })
+    name: "medicines",
+  });
 
   const { data: stocksResult, isFetching: isFetchingStocks } = useQuery({
-    queryKey: ['stocks', queryStock],
-    queryFn: () => fetchStocks({ page: 1, query: queryStock }, token ?? ''),
+    queryKey: ["stocks", queryStock],
+    queryFn: () =>
+      fetchStocks(
+        { page: 1, query: queryStock, institutionsIds: [institutionId ?? ""] },
+        token ?? "",
+      ),
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
 
   const { data: movementTypesResult, isFetching: isFetchingMovementTypes } =
     useQuery({
       queryKey: [
-        'movement-types',
+        "movement-types",
         queryMovementType,
         MovementTypeDirection.ENTRY,
       ],
@@ -117,11 +126,11 @@ export default function NewMedicineEntryPage() {
             query: queryMovementType,
             direction: MovementTypeDirection.ENTRY,
           },
-          token ?? '',
+          token ?? "",
         ),
       staleTime: 1000,
       refetchOnMount: true,
-    })
+    });
 
   const addMedication = (medication: MedicineVariant) => {
     insertMedicine(0, {
@@ -129,31 +138,32 @@ export default function NewMedicineEntryPage() {
       variant: medication,
       batches: [
         {
-          code: '',
+          code: "",
           expirationDate: undefined,
-          manufacturerId: '',
+          manufacturerId: "",
           manufacturingDate: undefined,
           quantityToEntry: 0,
         },
       ],
-    })
-  }
+    });
+  };
 
   const handleSave = async (data: NewMedicineEntrySchema) => {
-    console.log('Saving data:', data)
+    console.log("Saving data:", data);
     const apiPayload = {
       movementTypeId: data.movementTypeId,
       medicines: data.medicines,
       entryDate: data.entryDate,
       stockId: data.stockId,
       nfNumber: data.nfNumber,
-    }
+    };
 
     try {
       await registerMedicineEntry(
         {
           nfNumber: apiPayload.nfNumber,
           stockId: apiPayload.stockId,
+          entryType: EntryType.MOVEMENT_TYPE,
           entryDate: apiPayload.entryDate,
           movementTypeId: apiPayload.movementTypeId,
           medicines: apiPayload.medicines.map((med) => ({
@@ -167,31 +177,32 @@ export default function NewMedicineEntryPage() {
             })),
           })),
         },
-        token ?? '',
-      )
+        token ?? "",
+      );
 
       toast({
-        title: '✅ Entrada salva com sucesso!',
+        title: "✅ Entrada salva com sucesso!",
         description: `${data.medicines.length} medicamento(s) e ${data.medicines.reduce(
           (sum, m) => sum + m.batches.length,
           0,
         )} lote(s) foram registrados.`,
-      })
+      });
+      form.reset({});
     } catch (error) {
       toast({
-        title: 'Erro ao registrar entrada',
+        title: "Erro ao registrar entrada",
         description:
-          error instanceof Error ? error.message : 'Erro desconhecido',
-        variant: 'destructive',
-      })
+          error instanceof Error ? error.message : "Erro desconhecido",
+        variant: "destructive",
+      });
     }
-  }
+  };
 
-  const totalMedications = medicinesFields.length
+  const totalMedications = medicinesFields.length;
   const totalBatches = medicinesFields.reduce(
     (sum, entry) => sum + entry.batches.length,
     0,
-  )
+  );
   const totalQuantity = medicinesFields.reduce(
     (sum, entry) =>
       sum +
@@ -200,11 +211,11 @@ export default function NewMedicineEntryPage() {
         0,
       ),
     0,
-  )
+  );
 
   const selectedMedicineIds = medicinesFields.map(
     (entry) => entry.medicineVariantId,
-  )
+  );
 
   return (
     <FormProvider {...form}>
@@ -217,7 +228,7 @@ export default function NewMedicineEntryPage() {
                 type="button"
                 variant="outline"
                 className="mr-4"
-                onClick={() => navigate('/movement/entries')}
+                onClick={() => navigate("/movement/entries")}
               >
                 Voltar
               </Button>
@@ -251,19 +262,19 @@ export default function NewMedicineEntryPage() {
                           isFetching={isFetchingStocks}
                           onQueryChange={setQueryStock}
                           onSelect={(id, _) => {
-                            form.setValue('stockId', id)
+                            form.setValue("stockId", id);
                           }}
                           itemKey="id"
                           formatItem={(item) => {
-                            return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
+                            return `${item.name} - ${item.status ? "ATIVO" : "INATIVO"}`;
                           }}
                           getItemText={(item) => {
-                            return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
+                            return `${item.name} - ${item.status ? "ATIVO" : "INATIVO"}`;
                           }}
                         />
                         <FormMessage />
                       </FormItem>
-                    )
+                    );
                   }}
                 />
 
@@ -281,14 +292,14 @@ export default function NewMedicineEntryPage() {
                         isFetching={isFetchingMovementTypes}
                         onQueryChange={setQueryMovementType}
                         onSelect={(id, _) => {
-                          form.setValue('movementTypeId', id)
+                          form.setValue("movementTypeId", id);
                         }}
                         itemKey="id"
                         getItemText={(item) => {
-                          return `${item.name}`
+                          return `${item.name}`;
                         }}
                         formatItem={(item) => {
-                          return `${item.name}`
+                          return `${item.name}`;
                         }}
                       />
                       <FormMessage />
@@ -299,6 +310,7 @@ export default function NewMedicineEntryPage() {
                 <FormField
                   control={form.control}
                   name={`entryDate`}
+                  defaultValue={new Date()}
                   render={({ field }) => (
                     <DatePickerFormItem
                       disabled={(date) => date > new Date()}
@@ -388,5 +400,5 @@ export default function NewMedicineEntryPage() {
         </div>
       </form>
     </FormProvider>
-  )
+  );
 }

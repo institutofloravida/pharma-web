@@ -11,203 +11,213 @@ import {
   Settings,
   UserRoundCog,
   Users,
-} from 'lucide-react'
+} from "lucide-react";
 
-import { OperatorRole } from '@/api/pharma/operators/register-operator'
+import { OperatorRole } from "@/api/pharma/operators/register-operator";
 
-import type { NavItem, SidebarSection } from '../sidebar'
+import type { NavItem, SidebarSection } from "../sidebar";
 
 export const ALL_ROLES = [
   OperatorRole.COMMON,
   OperatorRole.MANAGER,
   OperatorRole.SUPER_ADMIN,
-]
+];
 
 export const sidebarSections: SidebarSection[] = [
   {
-    label: 'Área Informativa',
+    label: "Área Informativa",
     singleItems: [
       {
-        name: 'Dashboard',
-        url: '/dashboard',
+        name: "Dashboard",
+        url: "/dashboard",
         icon: ChartArea,
         role: OperatorRole.COMMON,
       },
     ],
   },
   {
-    label: 'Área Administrativa',
+    label: "Área Administrativa",
     role: [OperatorRole.MANAGER, OperatorRole.SUPER_ADMIN],
     singleItems: [
       {
-        name: 'Instituições',
-        url: '/institutions',
+        name: "Instituições",
+        url: "/institutions",
         icon: Building2,
         role: [OperatorRole.SUPER_ADMIN],
       },
       {
-        name: 'Operadores',
-        url: '/operators',
+        name: "Operadores",
+        url: "/operators",
         icon: UserRoundCog,
         role: OperatorRole.MANAGER,
       },
       {
-        name: 'Estoques',
-        url: '/stocks',
+        name: "Estoques",
+        url: "/stocks",
         icon: Layers2,
         role: [OperatorRole.MANAGER],
       },
     ],
     groupedItems: [
       {
-        title: 'Cadastros Gerais',
+        title: "Cadastros Gerais",
         icon: MonitorCog,
         role: OperatorRole.MANAGER,
         items: [
           {
-            name: 'Classes Terapêuticas',
-            url: '/therapeutic-class',
+            name: "Classes Terapêuticas",
+            url: "/therapeutic-class",
           },
           {
-            name: 'Formas Farmacêuticas',
-            url: '/pharmaceutical-form',
+            name: "Formas Farmacêuticas",
+            url: "/pharmaceutical-form",
           },
           {
-            name: 'Fabricantes',
-            url: '/manufacturer',
+            name: "Fabricantes",
+            url: "/manufacturer",
           },
           {
-            name: 'Unidades de medida',
-            url: '/unit-measure',
+            name: "Unidades de medida",
+            url: "/unit-measure",
           },
           {
-            name: 'Patologias',
-            url: '/pathologies',
+            name: "Patologias",
+            url: "/pathologies",
           },
           {
-            name: 'Tipos de Movimentação',
-            url: '/movement-types',
+            name: "Tipos de Movimentação",
+            url: "/movement-types",
           },
         ],
       },
       {
-        title: 'Medicamentos',
+        title: "Medicamentos",
         icon: Pill,
         role: OperatorRole.MANAGER,
         items: [
           {
-            name: 'Medicamentos',
-            url: '/medicines',
+            name: "Medicamentos",
+            url: "/medicines",
           },
           {
-            name: 'Variantes',
-            url: '/medicines/variants',
+            name: "Variantes",
+            url: "/medicines/variants",
           },
         ],
       },
     ],
   },
   {
-    label: 'Área do Operador',
+    label: "Área do Operador",
     singleItems: [
       {
-        name: 'Teste',
-        url: '/test',
+        name: "Teste",
+        url: "/test",
         icon: FlaskConical,
       },
     ],
     groupedItems: [
       {
-        title: 'Movimentações',
+        title: "Movimentações",
         icon: MonitorCog,
         items: [
           {
-            name: 'Entradas',
-            url: '/movement/entries',
+            name: "Entradas",
+            url: "/movement/entries",
             role: OperatorRole.MANAGER,
           },
           {
-            name: 'Nova entrada',
-            url: '/movement/entries/new',
+            name: "Nova entrada",
+            url: "/movement/entries/new",
             role: [],
           },
           {
-            name: 'Saídas',
-            url: '/movement/exits',
+            name: "Saídas",
+            url: "/movement/exits",
             role: OperatorRole.MANAGER,
           },
           {
-            name: 'Dispensas',
-            url: '/dispensation',
+            name: "Nova Saída",
+            url: "/movement/exits/new",
+            role: [],
+          },
+          {
+            name: "Transferências",
+            url: "/movement/transfer",
+            role: [OperatorRole.MANAGER, OperatorRole.SUPER_ADMIN],
+          },
+          {
+            name: "Dispensas",
+            url: "/dispensation",
             role: OperatorRole.COMMON,
           },
         ],
       },
       {
-        title: 'Usuários',
+        title: "Usuários",
         icon: Users,
         items: [
-          { name: 'Todos', url: '/users' },
+          { name: "Todos", url: "/users" },
           {
-            name: 'Novo Usuário',
-            url: '/users/new',
+            name: "Novo Usuário",
+            url: "/users/new",
           },
         ],
       },
     ],
   },
   {
-    label: 'Inventário',
+    label: "Inventário",
     role: OperatorRole.COMMON,
     singleItems: [
       {
-        name: 'Inventário',
-        url: '/inventory',
+        name: "Inventário",
+        url: "/inventory",
         icon: Layers,
         role: OperatorRole.COMMON,
       },
     ],
   },
   {
-    label: 'Relatórios',
+    label: "Relatórios",
     role: [OperatorRole.MANAGER, OperatorRole.SUPER_ADMIN],
     groupedItems: [
       {
-        title: 'Relatórios',
+        title: "Relatórios",
         icon: FileCog,
         items: [
           {
-            name: 'Dispensas no período',
-            url: '/reports/dispenses-in-a-period',
+            name: "Dispensas no período",
+            url: "/reports/dispenses-in-a-period",
           },
           {
-            name: 'Movimentação no período',
-            url: '/reports/movimentation-in-a-period',
+            name: "Movimentação no período",
+            url: "/reports/movimentation-in-a-period",
           },
           {
-            name: 'Utilização',
-            url: '/reports/monthly-utilization',
+            name: "Utilização",
+            url: "/reports/monthly-utilization",
           },
         ],
       },
     ],
   },
   {
-    label: 'Mais',
+    label: "Mais",
     singleItems: [
       {
-        name: 'Configurações',
-        url: '#',
+        name: "Configurações",
+        url: "#",
         icon: Settings,
       },
       {
-        name: 'Notificações',
-        url: '#',
+        name: "Notificações",
+        url: "#",
         icon: Bell,
       },
     ],
   },
-]
+];
 
 export function convertSidebarToNavItems(
   sidebarSections: SidebarSection[],
@@ -227,7 +237,7 @@ export function convertSidebarToNavItems(
         })),
       })) || []),
     ],
-  }))
+  }));
 }
 
-export const NAV_ITEMS = convertSidebarToNavItems(sidebarSections)
+export const NAV_ITEMS = convertSidebarToNavItems(sidebarSections);

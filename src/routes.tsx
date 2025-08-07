@@ -35,6 +35,7 @@ import { MonthlyMedicineUtilizationReport } from "./pages/app/reports/monthly-me
 import { MonthlyMedicineUtilizationReportForm } from "./pages/app/reports/monthly-medicine-utilization/monthly-medicine-utilization-report-form";
 import { MovimentationReport } from "./pages/app/reports/movimentation-in-a-period/movimentation-report";
 import DispensationPage from "./pages/app/panel/test/dispensation-page";
+import { TransfersPage } from "./pages/app/panel/movement/transfer/tranfers-page";
 
 export const router = createBrowserRouter([
   {
@@ -268,6 +269,10 @@ export const router = createBrowserRouter([
             ),
           },
         ],
+      },
+      {
+        path: "transfer",
+        element: <TransfersPage />,
       },
     ],
   },

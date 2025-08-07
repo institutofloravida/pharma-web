@@ -1,34 +1,36 @@
-import { apiPharma } from '@/lib/axios'
+import { apiPharma } from "@/lib/axios";
 
 export interface FetchInventoryQuery {
-  institutionId: string
-  page?: number | null
-  medicineName?: string | null
-  stockId?: string | null
-  isLowStock?: boolean | null
-  therapeuticClassesIds?: string[] | null
+  institutionId: string;
+  page?: number | null;
+  medicineName?: string | null;
+  stockId?: string | null;
+  isLowStock?: boolean | null;
+  therapeuticClassesIds?: string[] | null;
 }
 
 export interface InventorySingle {
-  medicineStockId: string
-  stockId: string
-  medicineVariantId: string
-  medicine: string
-  pharmaceuticalForm: string
-  unitMeasure: string
-  dosage: string
+  medicineStockId: string;
+  stockId: string;
+  stock: string;
+  medicineVariantId: string;
+  medicine: string;
+  pharmaceuticalForm: string;
+  complement?: string;
+  unitMeasure: string;
+  dosage: string;
   quantity: {
-    current: number
-    available: number
-    unavailable: number
-  }
-  bacthesStocks: number
-  isLowStock: boolean
-  isZero: boolean
+    current: number;
+    available: number;
+    unavailable: number;
+  };
+  bacthesStocks: number;
+  isLowStock: boolean;
+  isZero: boolean;
 }
 
 export interface FetchInventoryResponse {
-  inventory: InventorySingle[]
+  inventory: InventorySingle[];
 }
 
 export async function fetchInventory(
@@ -42,7 +44,7 @@ export async function fetchInventory(
   }: FetchInventoryQuery,
   token: string,
 ) {
-  const response = await apiPharma.get<FetchInventoryResponse>('/inventory', {
+  const response = await apiPharma.get<FetchInventoryResponse>("/inventory", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -54,7 +56,7 @@ export async function fetchInventory(
       stockId,
       therapeuticClassesIds,
     },
-  })
+  });
 
-  return response.data
+  return response.data;
 }

@@ -1,20 +1,22 @@
-'use client'
+"use client";
 
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Box,
   CheckCircle,
   Layers,
+  Layers2,
   Package,
+  Pill,
   XCircle,
-} from 'lucide-react'
-import { useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+} from "lucide-react";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { inventoryMedicineDetails } from '@/api/pharma/inventory/inventory-medicine-details'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { inventoryMedicineDetails } from "@/api/pharma/inventory/inventory-medicine-details";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -22,7 +24,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -30,32 +32,32 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from "@/components/ui/table";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/tooltip";
+import { useAuth } from "@/contexts/authContext";
 
 export function InventoryMedicineDetails() {
-  const { token } = useAuth()
-  const { id } = useParams()
-  const navigate = useNavigate()
+  const { token } = useAuth();
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   const { data: medicine, isLoading } = useQuery({
-    queryKey: ['medicine-stock', id],
+    queryKey: ["medicine-stock", id],
     queryFn: () =>
-      inventoryMedicineDetails({ medicineStockId: id ?? '' }, token ?? ''),
-  })
+      inventoryMedicineDetails({ medicineStockId: id ?? "" }, token ?? ""),
+  });
 
   if (isLoading) {
     return (
       <div className="flex h-full items-center justify-center">
         <span className="text-muted-foreground">Carregando dados...</span>
       </div>
-    )
+    );
   }
 
   if (!medicine) {
@@ -63,7 +65,7 @@ export function InventoryMedicineDetails() {
       <div className="flex h-full items-center justify-center text-destructive">
         Medicamento não encontrado.
       </div>
-    )
+    );
   }
 
   return (
@@ -95,18 +97,26 @@ export function InventoryMedicineDetails() {
             </Button>
           </div>
 
-          <Card className="mb-6 border-none shadow-sm dark:bg-opacity-10">
+          <Card className="flex-col space-y-4 border-none shadow-sm dark:bg-opacity-10">
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between">
                 <div>
                   <CardTitle className="text-xl">{medicine.medicine}</CardTitle>
-                  <CardDescription>
-                    {medicine.pharmaceuticalForm} • {medicine.dosage}
-                    {medicine.unitMeasure}
+                  <CardDescription className="flex flex-col gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Pill className="h-4 w-4 text-muted-foreground" />
+                      {medicine.pharmaceuticalForm} • {medicine.dosage}
+                      {medicine.unitMeasure}{" "}
+                      {medicine.complement && `• ${medicine.complement}`}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Layers2 className="h-4 w-4 text-muted-foreground" />
+                      <span className="truncate">{medicine.stock}</span>
+                    </div>
                   </CardDescription>
                 </div>
-                <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900">
-                  <Box className="h-5 w-5 text-blue-600 dark:text-blue-300" />
+                <div className="rounded-full bg-green-100 p-2 dark:bg-green-900">
+                  <Box className="h-5 w-5 text-green-600 dark:text-green-300" />
                 </div>
               </div>
             </CardHeader>
@@ -265,14 +275,14 @@ export function InventoryMedicineDetails() {
                         <span
                           className={
                             batch.isCloseToExpiration
-                              ? 'font-medium text-amber-600 dark:text-amber-500'
+                              ? "font-medium text-amber-600 dark:text-amber-500"
                               : batch.isExpired
-                                ? 'font-medium text-red-600 dark:text-red-500'
-                                : ''
+                                ? "font-medium text-red-600 dark:text-red-500"
+                                : ""
                           }
                         >
                           {new Date(batch.expirationDate).toLocaleDateString(
-                            'pt-BR',
+                            "pt-BR",
                           )}
                         </span>
 
@@ -298,8 +308,8 @@ export function InventoryMedicineDetails() {
                         {batch.manufacturingDate
                           ? new Date(
                               batch.manufacturingDate,
-                            ).toLocaleDateString('pt-BR')
-                          : '-'}
+                            ).toLocaleDateString("pt-BR")
+                          : "-"}
                       </TableCell>
                     </TableRow>
                   ))}
@@ -310,5 +320,5 @@ export function InventoryMedicineDetails() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,21 +1,21 @@
-import { useQuery } from '@tanstack/react-query'
-import { Layers, Loader2, Pill } from 'lucide-react'
+import { useQuery } from "@tanstack/react-query";
+import { Layers, Loader2, Pill } from "lucide-react";
 
-import { GetInventoryMetrics } from '@/api/pharma/dashboard/get-inventory-metrics'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuth } from '@/contexts/authContext'
+import { GetInventoryMetrics } from "@/api/pharma/dashboard/get-inventory-metrics";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/authContext";
 
-import { CardSkeleton } from './card-skeleton'
+import { CardSkeleton } from "./card-skeleton";
 
 export function InventoryTodayCard() {
-  const { institutionId, token } = useAuth()
+  const { institutionId, token } = useAuth();
 
   const { data: inventoryMetrics, isLoading } = useQuery({
     queryFn: () =>
-      GetInventoryMetrics({ institutionId: institutionId ?? '' }, token ?? ''),
-    queryKey: ['metrics', 'inventory', institutionId],
+      GetInventoryMetrics({ institutionId: institutionId ?? "" }, token ?? ""),
+    queryKey: ["metrics", "inventory", institutionId],
     enabled: !!institutionId && !!token,
-  })
+  });
 
   return (
     <Card>
@@ -28,7 +28,7 @@ export function InventoryTodayCard() {
         )}
       </CardHeader>
       <CardContent className="space-y-1">
-        {!isLoading ? (
+        {inventoryMetrics ? (
           <>
             <span className="text-2xl font-bold">
               {Number(inventoryMetrics?.quantity.totalCurrent)}
@@ -37,32 +37,32 @@ export function InventoryTodayCard() {
               <span
                 className={
                   Number(inventoryMetrics?.quantity.zero) > 0
-                    ? 'text-red-500'
-                    : 'text-red-500'
+                    ? "text-red-500"
+                    : "text-red-500"
                 }
               >
                 {inventoryMetrics?.quantity.zero}
-              </span>{' '}
+              </span>{" "}
               zerados.
             </p>
             <p className="text-xs text-muted-foreground">
               <span
-                className={Number(4) > 0 ? 'text-yellow-500' : 'text-red-500'}
+                className={Number(4) > 0 ? "text-yellow-500" : "text-red-500"}
               >
                 0
-              </span>{' '}
+              </span>{" "}
               próximo(s) da validade.
             </p>
             <p className="text-xs text-muted-foreground">
               <span
                 className={
                   Number(inventoryMetrics?.quantity.expired) > 0
-                    ? 'text-orange-500'
-                    : 'text-red-500'
+                    ? "text-orange-500"
+                    : "text-red-500"
                 }
               >
                 {inventoryMetrics?.quantity.expired}
-              </span>{' '}
+              </span>{" "}
               vencido(s).
             </p>
           </>
@@ -71,5 +71,5 @@ export function InventoryTodayCard() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

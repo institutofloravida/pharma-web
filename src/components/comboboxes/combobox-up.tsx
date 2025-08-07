@@ -1,7 +1,7 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
-import { ReactNode, useState } from 'react'
+import { Check, ChevronsUpDown } from "lucide-react";
+import { ReactNode, useState } from "react";
 
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -9,37 +9,38 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@/components/ui/command'
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface ComboboxProps<T> {
-  items: T[]
+  items: T[];
   field: {
-    value: string
-    onChange: (value: string) => void
-  }
-  query: string
-  placeholder?: string
-  isFetching: boolean
-  isDisable?: boolean
-  onQueryChange: (query: string) => void
-  onSelect: (id: string, item: T) => void
-  itemKey: keyof T
-  itemValue?: keyof T
-  formatItem: (item: T) => ReactNode
-  getItemText?: (item: T) => string
+    value: string;
+    onChange: (value: string) => void;
+  };
+  query: string;
+  placeholder?: string;
+  isFetching: boolean;
+  isDisable?: boolean;
+  onQueryChange: (query: string) => void;
+  onSelect: (id: string, item: T) => void;
+  itemKey: keyof T;
+  itemValue?: keyof T;
+  formatItem: (item: T) => ReactNode;
+  getItemText?: (item: T) => string;
+  getItemDisabled?: (item: T) => boolean;
 }
 
 export function ComboboxUp<T extends Record<string, any>>({
   items,
   field,
   query,
-  placeholder = 'Selecione...',
+  placeholder = "Selecione...",
   isFetching,
   onQueryChange,
   onSelect,
@@ -48,8 +49,9 @@ export function ComboboxUp<T extends Record<string, any>>({
   itemValue,
   formatItem,
   getItemText = (item) => String(item[itemKey]),
+  getItemDisabled = () => false,
 }: ComboboxProps<T>) {
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -60,18 +62,18 @@ export function ComboboxUp<T extends Record<string, any>>({
           role="combobox"
           aria-expanded={open}
           className={cn(
-            'justify-between bg-transparent',
-            !field.value && 'text-muted-foreground',
+            "justify-between bg-transparent",
+            !field.value && "text-muted-foreground",
           )}
         >
           {field.value
             ? (() => {
                 const selectedItem = items.find(
                   (item) => item[itemKey] === field.value,
-                )
+                );
                 return selectedItem
                   ? formatItem(selectedItem)
-                  : 'Item não encontrado'
+                  : "Item não encontrado";
               })()
             : placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -92,28 +94,29 @@ export function ComboboxUp<T extends Record<string, any>>({
                 {items.length ? (
                   <CommandGroup>
                     {items.map((item) => {
-                      const itemText = getItemText(item)
+                      const itemText = getItemText(item);
                       return (
                         <CommandItem
                           key={item[itemKey]}
                           value={itemText}
+                          disabled={getItemDisabled(item)}
                           onSelect={() => {
-                            field.onChange(item[itemKey])
-                            onSelect(item[itemKey], item)
-                            setOpen(false)
+                            field.onChange(item[itemKey]);
+                            onSelect(item[itemKey], item);
+                            setOpen(false);
                           }}
                         >
                           {formatItem(item)}
                           <Check
                             className={cn(
-                              'ml-auto h-4 w-4',
+                              "ml-auto h-4 w-4",
                               item[itemKey] === field.value
-                                ? 'opacity-100'
-                                : 'opacity-0',
+                                ? "opacity-100"
+                                : "opacity-0",
                             )}
                           />
                         </CommandItem>
-                      )
+                      );
                     })}
                   </CommandGroup>
                 ) : (
@@ -125,5 +128,5 @@ export function ComboboxUp<T extends Record<string, any>>({
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

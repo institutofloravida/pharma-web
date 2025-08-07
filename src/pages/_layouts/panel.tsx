@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from "@tanstack/react-query";
 import {
   AudioWaveform,
   BadgeCheck,
@@ -19,27 +19,27 @@ import {
   Settings,
   UserRoundCog,
   Users,
-} from 'lucide-react'
-import { useState } from 'react'
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom'
+} from "lucide-react";
+import { useState } from "react";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 
-import { getOperatorDetails } from '@/api/pharma/auth/get-operator-details'
-import { OperatorRole } from '@/api/pharma/operators/register-operator'
-import { SelectInstitutionGlobal } from '@/components/selects/select-institution-global'
-import { ModeToggle } from '@/components/theme/mode-toggle'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getOperatorDetails } from "@/api/pharma/auth/get-operator-details";
+import { OperatorRole } from "@/api/pharma/operators/register-operator";
+import { SelectInstitutionGlobal } from "@/components/selects/select-institution-global";
+import { ModeToggle } from "@/components/theme/mode-toggle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
+} from "@/components/ui/breadcrumb";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+} from "@/components/ui/collapsible";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -48,8 +48,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { Separator } from '@/components/ui/separator'
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 import {
   Sidebar,
   SidebarContent,
@@ -67,288 +67,57 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
-} from '@/components/ui/sidebar'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useAuth } from '@/contexts/authContext'
-import { NAV_ITEMS, sidebarSections } from '@/lib/data/sidebar-config'
-import { hasAccess, type NavItem } from '@/lib/sidebar'
+} from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/authContext";
+import { NAV_ITEMS, sidebarSections } from "@/lib/data/sidebar-config";
+import { hasAccess, type NavItem } from "@/lib/sidebar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-// utils/breadcrumb.ts
 export function getBreadcrumbTrail(
   navItems: NavItem[],
   pathname: string,
 ): NavItem[] {
-  const trail: NavItem[] = []
-
   const traverse = (
     items: NavItem[],
     path: string,
     parents: NavItem[] = [],
   ): NavItem[] => {
     for (const item of items) {
-      const currentTrail = [...parents, item]
-      if (item.url === path) return currentTrail
+      const currentTrail = [...parents, item];
+      if (item.url === path) return currentTrail;
       if (item.children) {
-        const result = traverse(item.children, path, currentTrail)
-        if (result.length > 0) return result
+        const result = traverse(item.children, path, currentTrail);
+        if (result.length > 0) return result;
       }
     }
-    return []
-  }
+    return [];
+  };
 
-  return traverse(navItems, pathname)
+  return traverse(navItems, pathname);
 }
-
-const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-  teams: [
-    {
-      name: 'Instituto Flora Vida',
-      logo: GalleryVerticalEnd,
-      plan: 'ONG',
-    },
-    {
-      name: 'UBS - módulo 22',
-      logo: AudioWaveform,
-      plan: 'Pública',
-    },
-    {
-      name: 'UBS - módulo 30',
-      logo: Command,
-      plan: 'Pública',
-    },
-  ],
-  admAreaSingleItems: [
-    {
-      name: 'Instituições',
-      url: '/institutions',
-      icon: Building2,
-    },
-    {
-      name: 'Operadores',
-      url: '/operators',
-      icon: UserRoundCog,
-    },
-    {
-      name: 'Estoques',
-      url: '/stocks',
-      icon: Layers2,
-    },
-  ],
-  admAreaManyItems: [
-    {
-      title: 'Cadastros Gerais',
-      url: '#',
-      icon: MonitorCog,
-      isActive: true,
-      items: [
-        {
-          title: 'Classes Terapêuticas',
-          url: '/therapeutic-class',
-        },
-        {
-          title: 'Formas Farmacêuticas',
-          url: '/pharmaceutical-form',
-        },
-        {
-          title: 'Fabricantes',
-          url: '/manufacturer',
-        },
-        {
-          title: 'Unidades de medida',
-          url: '/unit-measure',
-        },
-        {
-          title: 'Patologias',
-          url: '/pathologies',
-        },
-        {
-          title: 'Tipos de Movimentação',
-          url: '/movement-types',
-        },
-      ],
-    },
-    {
-      title: 'Medicamentos',
-      url: '#',
-      icon: Pill,
-      isActive: true,
-      items: [
-        {
-          title: 'Medicamentos',
-          url: '/medicines',
-        },
-        {
-          title: 'Variantes',
-          url: '/medicines/variants',
-        },
-      ],
-    },
-  ],
-
-  operatorAreaSingleItem: [
-    {
-      name: 'Teste',
-      url: '/test',
-      icon: FlaskConical,
-    },
-  ],
-  operatorAreaManyItems: [
-    {
-      title: 'Movimentações',
-      url: '#',
-      icon: MonitorCog,
-      isActive: true,
-      items: [
-        {
-          title: 'Entradas',
-          url: '/movement/entries',
-        },
-        {
-          title: 'Saídas',
-          url: '/movement/exits',
-        },
-        {
-          title: 'Dispensas',
-          url: '/dispensation',
-        },
-      ],
-    },
-    {
-      title: 'Usuários',
-      url: '#',
-      icon: Users,
-      isActive: true,
-      items: [
-        {
-          title: 'Usuários',
-          url: '/users',
-        },
-        {
-          title: 'Novo Usuário',
-          url: '/users/new',
-        },
-      ],
-    },
-    // {
-    //   title: 'Dispensas',
-    //   url: '#',
-    //   icon: BriefcaseMedical,
-    //   isActive: true,
-    //   items: [
-    //     {
-    //       title: 'Nova',
-    //       url: '/dispensation/new',
-    //     },
-    //   ],
-    // },
-  ],
-
-  inventoryAreaSingleItem: [
-    {
-      name: 'Inventário',
-      url: '/inventory',
-      icon: Layers,
-    },
-  ],
-  reportsManyItems: [
-    {
-      title: 'Relatórios',
-      url: '/reports',
-      icon: FileCog,
-      isActive: true,
-      items: [
-        {
-          title: 'Teste',
-          url: '/reports',
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: 'Configurações',
-      url: '#',
-      icon: Settings,
-    },
-    {
-      name: 'Notificações',
-      url: '#',
-      icon: Bell,
-    },
-  ],
-}
-
-// export const NAV_ITEMS: NavItem[] = [
-//   {
-//     title: 'Dashboard',
-//     url: '/panel',
-//     icon: MonitorCog,
-//   },
-//   {
-//     title: 'Instituições',
-//     url: '/institutions',
-//     icon: Building2,
-//     roles: ['admin'],
-//   },
-//   {
-//     title: 'Operadores',
-//     url: '/operators',
-//     icon: UserRoundCog,
-//     roles: ['admin'],
-//   },
-//   {
-//     title: 'Cadastros Gerais',
-//     url: '#',
-//     icon: Layers2,
-//     roles: ['admin'],
-//     children: [
-//       { title: 'Classes Terapêuticas', url: '/therapeutic-class' },
-//       { title: 'Formas Farmacêuticas', url: '/pharmaceutical-form' },
-//       { title: 'Fabricantes', url: '/manufacturer' },
-//     ],
-//   },
-//   {
-//     title: 'Movimentações',
-//     url: '#',
-//     icon: MonitorCog,
-//     roles: ['operator'],
-//     children: [
-//       { title: 'Entradas', url: '/movement/entries' },
-//       { title: 'Saídas', url: '/movement/exits' },
-//     ],
-//   },
-//   {
-//     title: 'Inventário',
-//     url: '/inventory',
-//     icon: Layers,
-//     roles: ['inventory'],
-//   },
-//   {
-//     title: 'Relatórios',
-//     url: '/reports',
-//     icon: FileCog,
-//   },
-// ]
 
 export default function PanelLayout() {
-  const [activeTeam, setActiveTeam] = useState(data.teams[0])
-  const navigate = useNavigate()
-  const { token, logout, isAuthenticated, loading, me } = useAuth()
-  const location = useLocation()
-  const currentPath = location.pathname
+  // const [activeTeam, setActiveTeam] = useState(data.teams[0]);
+  const navigate = useNavigate();
+  const { token, logout, isAuthenticated, loading, me, institutionId } =
+    useAuth();
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   const { data: operatorResult, isLoading } = useQuery({
-    queryKey: ['me', token],
-    queryFn: () => getOperatorDetails(token ?? ''),
-  })
+    queryKey: ["me", token],
+    queryFn: () => getOperatorDetails(token ?? ""),
+  });
 
   if (!isAuthenticated) {
-    navigate('/sign-in')
+    navigate("/sign-in");
   }
 
   return (
@@ -361,6 +130,19 @@ export default function PanelLayout() {
         </>
       ) : (
         <SidebarProvider>
+          <Dialog open={!institutionId}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Selecione uma instituição</DialogTitle>
+              </DialogHeader>
+              <DialogDescription className="py-2 text-base">
+                É necessário selecionar uma instituição para acessar o sistema.
+                Você poderá mudar a instituição a qualquer momento na barra
+                lateral à esquerda, canto superior.
+              </DialogDescription>
+              <SelectInstitutionGlobal />
+            </DialogContent>
+          </Dialog>
           <Sidebar collapsible="icon">
             <SidebarHeader>
               <SidebarMenu>
@@ -386,7 +168,7 @@ export default function PanelLayout() {
                         ),
                       )
                       .map((item) => {
-                        const isActive = currentPath === item.url
+                        const isActive = currentPath === item.url;
 
                         return (
                           <SidebarMenuButton
@@ -395,8 +177,8 @@ export default function PanelLayout() {
                             key={item.name}
                             className={
                               isActive
-                                ? 'bg-muted font-semibold text-primary'
-                                : ''
+                                ? "bg-muted font-semibold text-primary"
+                                : ""
                             }
                           >
                             <Link to={item.url}>
@@ -404,7 +186,7 @@ export default function PanelLayout() {
                               <span>{item.name}</span>
                             </Link>
                           </SidebarMenuButton>
-                        )
+                        );
                       })}
 
                     <SidebarMenu>
@@ -439,7 +221,7 @@ export default function PanelLayout() {
                                       ),
                                     )
                                     .map((sub) => {
-                                      const isActive = currentPath === sub.url
+                                      const isActive = currentPath === sub.url;
 
                                       return (
                                         <SidebarMenuSubItem key={sub.name}>
@@ -447,8 +229,8 @@ export default function PanelLayout() {
                                             asChild
                                             className={
                                               isActive
-                                                ? 'bg-muted font-semibold text-primary'
-                                                : ''
+                                                ? "bg-muted font-semibold text-primary"
+                                                : ""
                                             }
                                           >
                                             <Link to={sub.url}>
@@ -456,7 +238,7 @@ export default function PanelLayout() {
                                             </Link>
                                           </SidebarMenuSubButton>
                                         </SidebarMenuSubItem>
-                                      )
+                                      );
                                     })}
                                 </SidebarMenuSub>
                               </CollapsibleContent>
@@ -478,7 +260,7 @@ export default function PanelLayout() {
                       >
                         <Avatar className="h-8 w-8 rounded-lg">
                           <AvatarImage
-                            src={''}
+                            src={""}
                             alt={operatorResult?.operator?.name}
                           />
                           <AvatarFallback className="rounded-lg">
@@ -573,12 +355,12 @@ export default function PanelLayout() {
         </SidebarProvider>
       )}
     </>
-  )
+  );
 }
 
 const AppBreadcrumb = () => {
-  const { pathname } = useLocation()
-  const breadcrumbTrail = getBreadcrumbTrail(NAV_ITEMS, pathname)
+  const { pathname } = useLocation();
+  const breadcrumbTrail = getBreadcrumbTrail(NAV_ITEMS, pathname);
 
   return (
     <Breadcrumb>
@@ -593,5 +375,5 @@ const AppBreadcrumb = () => {
         ))}
       </BreadcrumbList>
     </Breadcrumb>
-  )
-}
+  );
+};

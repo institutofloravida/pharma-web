@@ -1,28 +1,28 @@
-'use client'
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { formatters } from 'date-fns'
-import { AlertCircle, FileText, Save } from 'lucide-react'
-import { useState } from 'react'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { formatters } from "date-fns";
+import { AlertCircle, FileText, Save } from "lucide-react";
+import { useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 
-import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
-import { fetchMovementTypes } from '@/api/pharma/auxiliary-records/movement-type/fetch-movement-types'
-import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
+import { fetchInstitutions } from "@/api/pharma/auxiliary-records/institution/fetch-institutions";
+import { fetchMovementTypes } from "@/api/pharma/auxiliary-records/movement-type/fetch-movement-types";
+import { fetchStocks } from "@/api/pharma/auxiliary-records/stock/fetch-stocks";
 import {
   ExitType,
   registerMedicineExit,
   type RegisterMedicineExitBodyAndParams,
-} from '@/api/pharma/movement/exit/register-medicine-exit'
-import { Combobox } from '@/components/comboboxes/combobox'
-import { ComboboxUp } from '@/components/comboboxes/combobox-up'
-import { DatePickerFormItem } from '@/components/date/date-picker-form-item'
-import { SelectExitType } from '@/components/selects/locate/select-exit-type'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+} from "@/api/pharma/movement/exit/register-medicine-exit";
+import { Combobox } from "@/components/comboboxes/combobox";
+import { ComboboxUp } from "@/components/comboboxes/combobox-up";
+import { DatePickerFormItem } from "@/components/date/date-picker-form-item";
+import { SelectExitType } from "@/components/selects/locate/select-exit-type";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -30,88 +30,134 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select'
-import { Separator } from '@/components/ui/separator'
-import { useAuth } from '@/contexts/authContext'
-import { useToast } from '@/hooks/use-toast'
-import { queryClient } from '@/lib/react-query'
-import { Formatter } from '@/lib/utils/formaters/formaters'
-import { handleApiError } from '@/lib/utils/handle-api-error'
-import { MovementTypeDirection } from '@/lib/utils/movement-type'
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/contexts/authContext";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/react-query";
+import { Formatter } from "@/lib/utils/formaters/formaters";
+import { handleApiError } from "@/lib/utils/handle-api-error";
+import { MovementTypeDirection } from "@/lib/utils/movement-type";
 
-import { MedicineExitCard } from './components/medicine-exit-card'
-import { MedicineStockSearch } from './components/medicine-stock-search'
+import { MedicineExitCard } from "./components/medicine-exit-card";
+import { MedicineStockSearch } from "./components/medicine-stock-search";
 import {
   batchExitSchema,
   type MedicineExitFormSchema,
   medicineExitFormSchema,
-} from './schemas/medicine-exit'
+} from "./schemas/medicine-exit";
 import {
   type MedicineStock,
   type MovementType,
   type Stock,
-} from './types/medicine-exit'
+} from "./types/medicine-exit";
+import {
+  createTransfer,
+  type CreateTransferBodyAndParams,
+} from "@/api/pharma/movement/transfer/create-transfer";
+import { exit } from "process";
+import { useNavigate } from "react-router-dom";
 
 // Mock data
 const mockStocks: Stock[] = [
-  { id: '1', name: 'Estoque Principal', status: true },
-  { id: '2', name: 'Estoque Secundário', status: true },
-]
+  { id: "1", name: "Estoque Principal", status: true },
+  { id: "2", name: "Estoque Secundário", status: true },
+];
 
 const mockMovementTypes: MovementType[] = [
-  { id: '1', name: 'Transferência' },
-  { id: '2', name: 'Descarte' },
-  { id: '3', name: 'Devolução' },
-]
+  { id: "1", name: "Transferência" },
+  { id: "2", name: "Descarte" },
+  { id: "3", name: "Devolução" },
+];
 
 export default function MedicineExitPage() {
-  const { token } = useAuth()
-  const [queryStock, setQueryStock] = useState('')
-  const [queryMovementType, setQueryMovementType] = useState('')
-  const [queryInstitution, setQueryInstitution] = useState('')
+  const { token, institutionId } = useAuth();
+  const [queryStock, setQueryStock] = useState("");
+  const [queryStockDestination, setQueryStockDestination] = useState("");
+  const [queryMovementType, setQueryMovementType] = useState("");
+  const [queryInstitution, setQueryInstitution] = useState("");
 
   const [selectedMedicines, setSelectedMedicines] = useState<MedicineStock[]>(
     [],
-  )
-  const [showErrors, setShowErrors] = useState(false)
-  const { toast } = useToast()
+  );
+  const [showErrors, setShowErrors] = useState(false);
+  const { toast } = useToast();
+
+  const navigate = useNavigate();
 
   const form = useForm<MedicineExitFormSchema>({
     resolver: zodResolver(medicineExitFormSchema),
-    mode: 'onSubmit',
+    mode: "onSubmit",
     defaultValues: {
-      stockId: '',
+      stockId: "",
       exitType: ExitType.MOVEMENT_TYPE,
-      movementTypeId: '',
+      movementTypeId: "",
       medicines: [],
       exitDate: new Date(),
     },
-  })
+  });
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'medicines',
-  })
+    name: "medicines",
+  });
 
   const { data: stocksResult, isFetching: isFetchingStocks } = useQuery({
-    queryKey: ['stocks', queryStock],
-    queryFn: () => fetchStocks({ page: 1, query: queryStock }, token ?? ''),
+    queryKey: ["stocks", queryStock],
+    queryFn: () =>
+      fetchStocks(
+        { page: 1, query: queryStock, institutionsIds: [institutionId ?? ""] },
+        token ?? "",
+      ),
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
+
+  const { data: institutionsResult, isFetching: isFetchingInstitutions } =
+    useQuery({
+      queryKey: ["institution-destination", queryInstitution],
+      queryFn: () =>
+        fetchInstitutions({ page: 1, query: queryInstitution }, token ?? ""),
+      enabled: queryInstitution !== null,
+      staleTime: 1000,
+      refetchOnMount: true,
+    });
+
+  const {
+    data: stocksDestinationResult,
+    isFetching: isFetchingStocksDestination,
+  } = useQuery({
+    queryKey: [
+      "stocks-destination",
+      queryStockDestination,
+      form.watch("destinationInstitutionId"),
+    ],
+    queryFn: () =>
+      fetchStocks(
+        {
+          page: 1,
+          query: queryStockDestination,
+          institutionsIds: [form.watch("destinationInstitutionId") ?? ""],
+        },
+        token ?? "",
+      ),
+    staleTime: 1000,
+    enabled: !!form.watch("destinationInstitutionId"),
+    refetchOnMount: true,
+  });
 
   const { data: movementTypesResult, isFetching: isFetchingMovementTypes } =
     useQuery({
       queryKey: [
-        'movement-types',
+        "movement-types",
         queryMovementType,
         MovementTypeDirection.EXIT,
       ],
@@ -122,124 +168,148 @@ export default function MedicineExitPage() {
             query: queryMovementType,
             direction: MovementTypeDirection.EXIT,
           },
-          token ?? '',
+          token ?? "",
         ),
       enabled: queryStock !== null,
       staleTime: 1000,
       refetchOnMount: true,
-    })
+    });
 
   const { mutateAsync: registerMedicineExitFn } = useMutation({
     mutationFn: (data: RegisterMedicineExitBodyAndParams) =>
-      registerMedicineExit(data, token ?? ''),
+      registerMedicineExit(data, token ?? ""),
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ['medicines-exits'],
-      })
+        queryKey: ["medicines-exits"],
+      });
     },
-  })
+  });
 
-  const { data: institutionsResult, isFetching: isFetchingInstitutions } =
-    useQuery({
-      queryKey: ['institutions', queryInstitution],
-      queryFn: () =>
-        fetchInstitutions({ page: 1, query: queryInstitution }, token ?? ''),
-      enabled: queryInstitution !== null,
-      staleTime: 1000,
-      refetchOnMount: true,
-    })
+  const { mutateAsync: createTransferFn } = useMutation({
+    mutationFn: (data: CreateTransferBodyAndParams) =>
+      createTransfer(data, token ?? ""),
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ["medicines-exits"],
+      });
+    },
+  });
 
   const addMedicine = (medicine: MedicineStock) => {
     append({
       medicineStockId: medicine.id,
       batches: [],
-    })
+    });
 
-    setSelectedMedicines([...selectedMedicines, medicine])
+    setSelectedMedicines([...selectedMedicines, medicine]);
 
     toast({
-      title: 'Medicamento adicionado',
+      title: "Medicamento adicionado",
       description: `${medicine.medicine} foi adicionado à lista.`,
-    })
-  }
+    });
+  };
 
   const removeMedicine = (index: number) => {
-    const medicine = selectedMedicines[index]
-    remove(index)
-    setSelectedMedicines(selectedMedicines.filter((_, i) => i !== index))
+    const medicine = selectedMedicines[index];
+    remove(index);
+    setSelectedMedicines(selectedMedicines.filter((_, i) => i !== index));
 
     toast({
-      title: 'Medicamento removido',
+      title: "Medicamento removido",
       description: `${medicine.medicine} foi removido da lista.`,
-      variant: 'destructive',
-    })
-  }
+      variant: "destructive",
+    });
+  };
 
   const onSubmit = async (data: MedicineExitFormSchema) => {
     try {
-      setShowErrors(false)
-      console.log('Dados do formulário:', data)
+      setShowErrors(false);
+      console.log("Dados do formulário:", data);
 
       const batches = data.medicines.flatMap((medicine) =>
         medicine.batches.map((batch) => ({
           batcheStockId: batch.batchStockId,
           quantity: batch.quantity,
         })),
-      )
-      const apiData = {
-        stockId: data.stockId,
-        exitType: data.exitType,
-        movementTypeId: data.movementTypeId,
-        exitDate: data.exitDate,
-        batches,
+      );
+      console.log("transfer type", data.exitType === ExitType.TRANSFER);
+      if (data.exitType === ExitType.TRANSFER.toString()) {
+        const apiData = {
+          stockId: data.stockId,
+          exitType: data.exitType,
+          stockDestinationId: data.stockDestinationId,
+          movementTypeId: data.movementTypeId,
+          exitDate: data.exitDate,
+          batches,
+        };
+
+        console.log("Dados formatados para API:", apiData);
+        await createTransferFn({
+          exitType: data.exitType,
+          stockId: data.stockId,
+          transferDate: new Date(data.exitDate),
+          batches,
+          stockDestinationId: data.stockDestinationId,
+        });
+
+        toast({
+          title: "✅ Transferência realizada com sucesso!",
+          description: `${data.medicines.length} medicamento(s) foram registrados.`,
+        });
+      } else {
+        const apiData = {
+          stockId: data.stockId,
+          exitType: data.exitType,
+          movementTypeId: data.movementTypeId,
+          exitDate: data.exitDate,
+          batches,
+        };
+
+        console.log("Dados formatados para API:", apiData);
+        await registerMedicineExitFn({
+          exitType: data.exitType,
+          movementTypeId: data.movementTypeId,
+          stockId: data.stockId,
+          exitDate: new Date(data.exitDate),
+          batches,
+          destinationInstitutionId: data.destinationInstitutionId,
+        });
+
+        toast({
+          title: "✅ Saída registrada com sucesso!",
+          description: `${data.medicines.length} medicamento(s) foram registrados.`,
+        });
       }
 
-      console.log('Dados formatados para API:', apiData)
-      await registerMedicineExitFn({
-        exitType: data.exitType,
-        movementTypeId: data.movementTypeId,
-        stockId: data.stockId,
-        exitDate: new Date(data.exitDate),
-        batches,
-        destinationInstitutionId: data.destinationInstitutionId,
-      })
-      // amox 200 - 40
-      // metf 180 - 30
-
-      toast({
-        title: '✅ Saída registrada com sucesso!',
-        description: `${data.medicines.length} medicamento(s) foram registrados.`,
-      })
-
       // Reset form
-      form.reset()
-      setSelectedMedicines([])
+      form.reset();
+      setSelectedMedicines([]);
     } catch (error) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Erro ao registrar saída',
+        title: "Erro ao registrar saída",
         description: errorMessage,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     }
-  }
+  };
 
   const onError = (errors: any) => {
-    console.log('Erros de validação:', errors)
-    setShowErrors(true)
+    console.log("Erros de validação:", errors);
+    setShowErrors(true);
 
     toast({
-      title: '❌ Erro de validação',
-      description: 'Por favor, corrija os campos destacados em vermelho.',
-      variant: 'destructive',
-    })
-  }
+      title: "❌ Erro de validação",
+      description: "Por favor, corrija os campos destacados em vermelho.",
+      variant: "destructive",
+    });
+  };
 
-  const totalMedications = fields.length
+  const totalMedications = fields.length;
   const totalBatches = fields.reduce(
     (sum, field) => sum + (field.batches?.length || 0),
     0,
-  )
+  );
   const totalQuantity = fields.reduce(
     (sum, field) =>
       sum +
@@ -248,7 +318,7 @@ export default function MedicineExitPage() {
         0,
       ) || 0),
     0,
-  )
+  );
 
   return (
     <div className="container mx-auto max-w-7xl p-4">
@@ -259,13 +329,23 @@ export default function MedicineExitPage() {
         >
           {/* Header */}
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                Saída de Medicamentos
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Gerencie a saída de medicamentos e seus respectivos lotes
-              </p>
+            <div className="mb-2 flex items-center">
+              <Button
+                type="button"
+                variant="outline"
+                className="mr-4"
+                onClick={() => navigate("/movement/exits")}
+              >
+                Voltar
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight">
+                  Entrada de Medicamentos
+                </h1>
+                <p className="text-muted-foreground">
+                  Gerencie a entrada de medicamentos e seus respectivos lotes
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="gap-1 px-2 py-1 text-xs">
@@ -298,7 +378,7 @@ export default function MedicineExitPage() {
               <CardTitle className="text-base">Informações da Saída</CardTitle>
             </CardHeader>
             <CardContent className="pb-3 pt-0">
-              <div className="grid grid-cols-5 gap-4">
+              <div className="grid grid-cols-12 gap-4">
                 <FormField
                   control={form.control}
                   name="stockId"
@@ -306,6 +386,7 @@ export default function MedicineExitPage() {
                     <FormItem className="col-span-3 flex flex-col">
                       <FormLabel>Estoque</FormLabel>
                       <ComboboxUp
+                        isDisable={selectedMedicines.length > 0}
                         items={stocksResult?.stocks ?? []}
                         field={field}
                         query={queryStock}
@@ -313,14 +394,14 @@ export default function MedicineExitPage() {
                         isFetching={isFetchingStocks}
                         onQueryChange={setQueryStock}
                         onSelect={(id, _) => {
-                          form.setValue('stockId', id)
+                          form.setValue("stockId", id);
                         }}
                         itemKey="id"
                         formatItem={(item) => {
-                          return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
+                          return `${item.name} - ${item.status ? "ATIVO" : "INATIVO"}`;
                         }}
                         getItemText={(item) => {
-                          return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
+                          return `${item.name} - ${item.status ? "ATIVO" : "INATIVO"}`;
                         }}
                       />
                       <FormMessage />
@@ -332,7 +413,7 @@ export default function MedicineExitPage() {
                   control={form.control}
                   name="exitType"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="col-span-3 grid">
                       <FormLabel>Tipo de Saída</FormLabel>
                       <SelectExitType
                         onChange={field.onChange}
@@ -342,30 +423,54 @@ export default function MedicineExitPage() {
                     </FormItem>
                   )}
                 />
-                {form.watch('exitType') === ExitType.DONATION && (
+
+                <FormField
+                  control={form.control}
+                  name={`exitDate`}
+                  render={({ field }) => (
+                    <DatePickerFormItem
+                      disabled={(date) => date > new Date()}
+                      className="col-span-2 grid"
+                      field={field}
+                      label="Data de Saída"
+                    />
+                  )}
+                />
+
+                {(form.watch("exitType") === ExitType.DONATION ||
+                  form.watch("exitType") === ExitType.TRANSFER) && (
                   <FormField
                     control={form.control}
                     name="destinationInstitutionId"
                     render={({ field }) => (
-                      <FormItem className="col-span-3">
+                      <FormItem className="col-span-3 grid">
+                        <FormLabel>Instituição de destino</FormLabel>
                         <ComboboxUp
-                          items={institutionsResult?.institutions || []}
+                          items={
+                            (form.watch("exitType") === ExitType.DONATION
+                              ? institutionsResult?.institutions.filter(
+                                  (institution) =>
+                                    institution.id !== institutionId,
+                                )
+                              : institutionsResult?.institutions) || []
+                          }
                           field={field}
                           query={queryInstitution}
                           placeholder="Instituição de destino"
                           isFetching={isFetchingInstitutions}
                           onQueryChange={setQueryInstitution}
                           onSelect={(id, item) => {
-                            form.setValue('destinationInstitutionId', id)
-                            setQueryInstitution(item.name)
+                            form.setValue("destinationInstitutionId", id);
+                            form.setValue("stockDestinationId", "");
+                            setQueryInstitution("");
                           }}
                           itemKey="id"
                           itemValue="name"
                           formatItem={(item) => {
-                            return `${item.name}`
+                            return `${item.name}`;
                           }}
                           getItemText={(item) => {
-                            return `${item.name}`
+                            return `${item.name}`;
                           }}
                         />
                         <FormMessage />
@@ -373,7 +478,48 @@ export default function MedicineExitPage() {
                     )}
                   />
                 )}
-                {form.watch('exitType') === ExitType.MOVEMENT_TYPE && (
+
+                {form.watch("exitType") === ExitType.TRANSFER && (
+                  <>
+                    {" "}
+                    <FormField
+                      control={form.control}
+                      name="stockDestinationId"
+                      render={({ field }) => (
+                        <FormItem className="col-span-3 flex flex-col">
+                          <FormLabel>Estoque de Destino</FormLabel>
+                          <ComboboxUp
+                            items={
+                              (form.watch("exitType") === ExitType.TRANSFER
+                                ? stocksDestinationResult?.stocks.filter(
+                                    (stock) =>
+                                      stock.id !== form.watch("stockId"),
+                                  )
+                                : stocksDestinationResult?.stocks) ?? []
+                            }
+                            field={field}
+                            query={queryStockDestination}
+                            placeholder="Selecione um estoque"
+                            isFetching={isFetchingStocksDestination}
+                            onQueryChange={setQueryStockDestination}
+                            onSelect={(id, _) => {
+                              form.setValue("stockDestinationId", id);
+                            }}
+                            itemKey="id"
+                            formatItem={(item) => {
+                              return `${item.name} - ${item.status ? "ATIVO" : "INATIVO"}`;
+                            }}
+                            getItemText={(item) => {
+                              return `${item.name} - ${item.status ? "ATIVO" : "INATIVO"}`;
+                            }}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />{" "}
+                  </>
+                )}
+                {form.watch("exitType") === ExitType.MOVEMENT_TYPE && (
                   <FormField
                     control={form.control}
                     name="movementTypeId"
@@ -388,14 +534,14 @@ export default function MedicineExitPage() {
                           isFetching={isFetchingMovementTypes}
                           onQueryChange={setQueryMovementType}
                           onSelect={(id, _) => {
-                            form.setValue('movementTypeId', id)
+                            form.setValue("movementTypeId", id);
                           }}
                           itemKey="id"
                           getItemText={(item) => {
-                            return `${item.name}`
+                            return `${item.name}`;
                           }}
                           formatItem={(item) => {
-                            return `${item.name}`
+                            return `${item.name}`;
                           }}
                         />
                         <FormMessage />
@@ -403,19 +549,6 @@ export default function MedicineExitPage() {
                     )}
                   />
                 )}
-
-                <FormField
-                  control={form.control}
-                  name={`exitDate`}
-                  render={({ field }) => (
-                    <DatePickerFormItem
-                      disabled={(date) => date > new Date()}
-                      className="col-span-2 grid"
-                      field={field}
-                      label="Data de Saída"
-                    />
-                  )}
-                />
               </div>
             </CardContent>
           </Card>
@@ -429,7 +562,7 @@ export default function MedicineExitPage() {
               <MedicineStockSearch
                 onSelect={addMedicine}
                 selectedMedicines={selectedMedicines}
-                stockId={form.watch('stockId')}
+                stockId={form.watch("stockId")}
               />
             </CardContent>
           </Card>
@@ -447,7 +580,7 @@ export default function MedicineExitPage() {
                   disabled={form.formState.isSubmitting}
                 >
                   <Save className="h-3 w-3" />
-                  {form.formState.isSubmitting ? 'Salvando...' : 'Salvar Saída'}
+                  {form.formState.isSubmitting ? "Salvando..." : "Salvar Saída"}
                 </Button>
               </div>
 
@@ -484,5 +617,5 @@ export default function MedicineExitPage() {
         </form>
       </Form>
     </div>
-  )
+  );
 }

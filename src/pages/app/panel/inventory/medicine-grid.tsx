@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import { Box, ChevronRight, Layers, Package } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Box, ChevronRight, Layers, Layers2, Package } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-import type { InventorySingle } from '@/api/pharma/inventory/fetch-inventory'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import type { InventorySingle } from "@/api/pharma/inventory/fetch-inventory";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -13,16 +13,16 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 
 import {
   getCategoryColor,
   getCategoryIcon,
   hasLowStock,
-} from './inventory-utils'
+} from "./inventory-utils";
 
 interface MedicationGridProps {
-  inventory: InventorySingle[]
+  inventory: InventorySingle[];
 }
 export function MedicationGrid({ inventory }: MedicationGridProps) {
   return (
@@ -40,21 +40,21 @@ export function MedicationGrid({ inventory }: MedicationGridProps) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 interface MedicationCardProps {
-  medication: InventorySingle
+  medication: InventorySingle;
 }
 
 function MedicationCard({ medication }: MedicationCardProps) {
   // const categoryColor = getCategoryColor(medication.category)
   // const categoryIcon = getCategoryIcon(medication.category)
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   function redirect() {
-    navigate(`/inventory/${medication.medicineStockId}`)
+    navigate(`/inventory/${medication.medicineStockId}`);
   }
 
   return (
@@ -68,7 +68,8 @@ function MedicationCard({ medication }: MedicationCardProps) {
           </CardTitle>
           <CardDescription className="text-sm">
             {medication.pharmaceuticalForm} • {medication.dosage}
-            {medication.unitMeasure}
+            {medication.unitMeasure}{" "}
+            {medication.complement && `• ${medication.complement}`}
           </CardDescription>
         </div>
         <div className={`rounded-full p-2`}>
@@ -80,7 +81,7 @@ function MedicationCard({ medication }: MedicationCardProps) {
           <div className="flex items-center gap-2 text-sm">
             <Box className="h-4 w-4 text-muted-foreground" />
             <span
-              className={`font-medium ${hasLowStock(medication) ? 'text-destructive' : ''}`}
+              className={`font-medium ${hasLowStock(medication) ? "text-destructive" : ""}`}
             >
               {medication.quantity.available} unidades
             </span>
@@ -88,6 +89,10 @@ function MedicationCard({ medication }: MedicationCardProps) {
           <div className="flex items-center gap-2 text-sm">
             <Layers className="h-4 w-4 text-muted-foreground" />
             <span>{medication.bacthesStocks} lotes</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Layers2 className="h-4 w-4 text-muted-foreground" />
+            <span className="truncate">{medication.stock}</span>
           </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-1">
@@ -116,7 +121,7 @@ function MedicationCard({ medication }: MedicationCardProps) {
           size="sm"
           className="h-8"
           onClick={() => {
-            redirect()
+            redirect();
           }}
         >
           Ver Lotes
@@ -124,5 +129,5 @@ function MedicationCard({ medication }: MedicationCardProps) {
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }

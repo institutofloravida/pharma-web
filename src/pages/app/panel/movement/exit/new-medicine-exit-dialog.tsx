@@ -1,33 +1,28 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import { CalendarIcon, Link } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { CalendarIcon } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { fetchManufacturers } from '@/api/pharma/auxiliary-records/manufacturer/fetch-manufacturer'
-import { fetchMovementTypes } from '@/api/pharma/auxiliary-records/movement-type/fetch-movement-types'
-import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
-import { fetchMedicinesVariants } from '@/api/pharma/medicines-variants/fetch-medicines-variants'
+import { fetchMovementTypes } from "@/api/pharma/auxiliary-records/movement-type/fetch-movement-types";
+import { fetchStocks } from "@/api/pharma/auxiliary-records/stock/fetch-stocks";
 import {
   ExitType,
   registerMedicineExit,
   type RegisterMedicineExitBodyAndParams,
-} from '@/api/pharma/movement/exit/register-medicine-exit'
+} from "@/api/pharma/movement/exit/register-medicine-exit";
 import {
   type BatchestockDetails,
   fetchBatchesOnStock,
-} from '@/api/pharma/stock/bacth-stock/fetch-batches-stock'
-import {
-  fetchMedicinesOnStock,
-  type MedicineStockDetails,
-} from '@/api/pharma/stock/medicine-stock/fetch-medicines-stock'
-import { ComboboxUp } from '@/components/comboboxes/combobox-up'
-import { SelectExitType } from '@/components/selects/locate/select-exit-type'
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
+} from "@/api/pharma/stock/bacth-stock/fetch-batches-stock";
+import { fetchMedicinesOnStock } from "@/api/pharma/stock/medicine-stock/fetch-medicines-stock";
+import { ComboboxUp } from "@/components/comboboxes/combobox-up";
+import { SelectExitType } from "@/components/selects/locate/select-exit-type";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   DialogClose,
   DialogContent,
@@ -35,144 +30,136 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { useAuth } from '@/contexts/authContext'
-import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/lib/react-query'
-import { cn } from '@/lib/utils'
-import { dateFormatter } from '@/lib/utils/formatter'
-import { handleApiError } from '@/lib/utils/handle-api-error'
-import { MovementTypeDirection } from '@/lib/utils/movement-type'
+} from "@/components/ui/popover";
+import { useAuth } from "@/contexts/authContext";
+import { toast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/react-query";
+import { cn } from "@/lib/utils";
+import { dateFormatter } from "@/lib/utils/formatter";
+import { handleApiError } from "@/lib/utils/handle-api-error";
+import { MovementTypeDirection } from "@/lib/utils/movement-type";
 
 const FormSchema = z
   .object({
     stockId: z.string({
-      required_error: 'Selecione um estoque.',
+      required_error: "Selecione um estoque.",
     }),
     medicineStockId: z.string({
-      required_error: 'Selecione um medicamento.',
+      required_error: "Selecione um medicamento.",
     }),
     movementTypeId: z.string().optional(),
     exitType: z.nativeEnum(ExitType),
     batchStockId: z.string({
-      required_error: 'Selecione um lote.',
+      required_error: "Selecione um lote.",
     }),
     quantity: z.coerce
       .number({
-        required_error: 'A quantidade é obrigatória.',
+        required_error: "A quantidade é obrigatória.",
       })
-      .min(1, 'Quantidade mínima: 1.'),
+      .min(1, "Quantidade mínima: 1."),
     exitDate: z.date({
-      required_error: 'Selecione uma data válida',
+      required_error: "Selecione uma data válida",
     }),
   })
   .superRefine((data, ctx) => {
     if (data.exitType === ExitType.MOVEMENT_TYPE && !data.movementTypeId) {
       ctx.addIssue({
-        path: ['movementTypeId'],
+        path: ["movementTypeId"],
         code: z.ZodIssueCode.custom,
-        message: 'Selecione um tipo de movimentação.',
-      })
+        message: "Selecione um tipo de movimentação.",
+      });
     }
-  })
+  });
 
 export function NewMedicineExitDialog() {
-  const [queryStock, setQueryStock] = useState('')
-  const [queryMedicineStock, setQueryMedicineStock] = useState('')
-  const [queryBatchesStock, setQueryBatchesStock] = useState('')
-  const [queryMovementType, setQueryMovementType] = useState('')
+  const [queryStock, setQueryStock] = useState("");
+  const [queryMedicineStock, setQueryMedicineStock] = useState("");
+  const [queryBatchesStock, setQueryBatchesStock] = useState("");
+  const [queryMovementType, setQueryMovementType] = useState("");
 
   const [selectedBatch, setSelectedBatch] = useState<BatchestockDetails | null>(
     null,
-  )
+  );
 
-  const { token } = useAuth()
+  const { token } = useAuth();
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-  })
+  });
 
   const { mutateAsync: registerMedicineExitFn } = useMutation({
     mutationFn: (data: RegisterMedicineExitBodyAndParams) =>
-      registerMedicineExit(data, token ?? ''),
+      registerMedicineExit(data, token ?? ""),
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ['medicines-exits'],
-      })
+        queryKey: ["medicines-exits"],
+      });
     },
-  })
+  });
 
   const { data: medicinesStockResult, isFetching: isFetchingMedicinesStock } =
     useQuery({
-      queryKey: ['medicines-stock', form.watch('stockId'), queryMedicineStock],
+      queryKey: ["medicines-stock", form.watch("stockId"), queryMedicineStock],
       queryFn: () =>
         fetchMedicinesOnStock(
           {
             page: 1,
-            stockId: form.watch('stockId'),
+            stockId: form.watch("stockId"),
             medicineName: queryMedicineStock,
           },
-          token ?? '',
+          token ?? "",
         ),
       staleTime: 1000,
-      enabled: !!form.watch('stockId'),
+      enabled: !!form.watch("stockId"),
       refetchOnMount: true,
-    })
+    });
 
   const { data: batchesStockResult, isFetching: isFetchingBatchesStock } =
     useQuery({
       queryKey: [
-        'batches-stock',
-        form.watch('medicineStockId'),
+        "batches-stock",
+        form.watch("medicineStockId"),
         queryBatchesStock,
       ],
       queryFn: () =>
         fetchBatchesOnStock(
           {
             page: 1,
-            medicineStockId: form.watch('medicineStockId'),
+            medicineStockId: form.watch("medicineStockId"),
             code: queryBatchesStock,
           },
-          token ?? '',
+          token ?? "",
         ),
       staleTime: 1000,
-      enabled: !!form.watch('medicineStockId'),
+      enabled: !!form.watch("medicineStockId"),
       refetchOnMount: true,
-    })
+    });
 
   const { data: stocksResult, isFetching: isFetchingStocks } = useQuery({
-    queryKey: ['stocks', queryStock],
-    queryFn: () => fetchStocks({ page: 1, query: queryStock }, token ?? ''),
+    queryKey: ["stocks", queryStock],
+    queryFn: () => fetchStocks({ page: 1, query: queryStock }, token ?? ""),
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
 
   const { data: movementTypesResult, isFetching: isFetchingMovementTypes } =
     useQuery({
       queryKey: [
-        'movement-types',
+        "movement-types",
         queryMovementType,
         MovementTypeDirection.EXIT,
       ],
@@ -183,23 +170,23 @@ export function NewMedicineExitDialog() {
             query: queryMovementType,
             direction: MovementTypeDirection.EXIT,
           },
-          token ?? '',
+          token ?? "",
         ),
       enabled: queryStock !== null,
       staleTime: 1000,
       refetchOnMount: true,
-    })
+    });
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      const quantity = Number(form.getValues('quantity'))
-      const availableQuantity = Number(selectedBatch?.quantity ?? 0)
+      const quantity = Number(form.getValues("quantity"));
+      const availableQuantity = Number(selectedBatch?.quantity ?? 0);
       if (quantity > availableQuantity) {
-        form.setError('quantity', {
-          type: 'manual',
+        form.setError("quantity", {
+          type: "manual",
           message: `Quantidade indisponível. Estoque: ${availableQuantity}`,
-        })
-        return
+        });
+        return;
       }
       await registerMedicineExitFn({
         batcheStockId: data.batchStockId,
@@ -208,23 +195,23 @@ export function NewMedicineExitDialog() {
         medicineStockId: data.medicineStockId,
         quantity: data.quantity,
         movementTypeId: data.movementTypeId,
-      })
+      });
 
       toast({
-        title: 'Saída de Medicamento',
+        title: "Saída de Medicamento",
         description: (
           <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
             <code className="text-white">{JSON.stringify(data, null, 2)}</code>
           </pre>
         ),
-      })
+      });
     } catch (error: any) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Erro ao registrar saída',
+        title: "Erro ao registrar saída",
         description: errorMessage,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     }
   }
 
@@ -268,14 +255,14 @@ export function NewMedicineExitDialog() {
                   isFetching={isFetchingStocks}
                   onQueryChange={setQueryStock}
                   onSelect={(id, _) => {
-                    form.setValue('stockId', id)
+                    form.setValue("stockId", id);
                   }}
                   itemKey="id"
                   formatItem={(item) => {
-                    return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
+                    return `${item.name} - ${item.status ? "ATIVO" : "INATIVO"}`;
                   }}
                   getItemText={(item) => {
-                    return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
+                    return `${item.name} - ${item.status ? "ATIVO" : "INATIVO"}`;
                   }}
                 />
                 <FormMessage />
@@ -296,8 +283,8 @@ export function NewMedicineExitDialog() {
                   isFetching={isFetchingMedicinesStock}
                   onQueryChange={setQueryMedicineStock}
                   onSelect={(id, item) => {
-                    form.setValue('medicineStockId', id)
-                    form.setValue('quantity', 0)
+                    form.setValue("medicineStockId", id);
+                    form.setValue("quantity", 0);
                   }}
                   itemKey="id"
                   getItemText={(item) =>
@@ -306,7 +293,7 @@ export function NewMedicineExitDialog() {
                   formatItem={(item) => (
                     <div className="flex gap-2">
                       <span>
-                        {item.medicine} - {item.pharmaceuticalForm} -{' '}
+                        {item.medicine} - {item.pharmaceuticalForm} -{" "}
                         {item.dosage}
                         {item.unitMeasure}
                       </span>
@@ -348,9 +335,9 @@ export function NewMedicineExitDialog() {
                   isFetching={isFetchingBatchesStock}
                   onQueryChange={setQueryBatchesStock}
                   onSelect={(id, item) => {
-                    form.setValue('batchStockId', id)
-                    form.setValue('quantity', 0)
-                    setSelectedBatch(item)
+                    form.setValue("batchStockId", id);
+                    form.setValue("quantity", 0);
+                    setSelectedBatch(item);
                   }}
                   itemKey="id"
                   getItemText={(item) =>
@@ -359,12 +346,12 @@ export function NewMedicineExitDialog() {
                   formatItem={(item) => (
                     <div className="flex gap-2">
                       <span>
-                        {item.batch} -{' '}
+                        {item.batch} -{" "}
                         {/* {dateFormatter.format(item.expirationDate)} -{' '} */}
                       </span>
                       <div className="text-sm">
                         <span
-                          className={`${item.isAvailable ? 'text-green-600' : 'text-red-600'}`}
+                          className={`${item.isAvailable ? "text-green-600" : "text-red-600"}`}
                         >
                           {item.quantity}
                         </span>
@@ -383,7 +370,7 @@ export function NewMedicineExitDialog() {
             )}
           />
 
-          {form.watch('exitType') === ExitType.MOVEMENT_TYPE && (
+          {form.watch("exitType") === ExitType.MOVEMENT_TYPE && (
             <FormField
               control={form.control}
               name="movementTypeId"
@@ -398,14 +385,14 @@ export function NewMedicineExitDialog() {
                     isFetching={isFetchingMovementTypes}
                     onQueryChange={setQueryMovementType}
                     onSelect={(id, _) => {
-                      form.setValue('movementTypeId', id)
+                      form.setValue("movementTypeId", id);
                     }}
                     itemKey="id"
                     getItemText={(item) => {
-                      return `${item.name}`
+                      return `${item.name}`;
                     }}
                     formatItem={(item) => {
-                      return `${item.name}`
+                      return `${item.name}`;
                     }}
                   />
                   <FormMessage />
@@ -445,14 +432,14 @@ export function NewMedicineExitDialog() {
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
-                        variant={'outline'}
+                        variant={"outline"}
                         className={cn(
-                          'w-[240px] pl-3 text-left font-normal',
-                          !field.value && 'text-muted-foreground',
+                          "w-[240px] pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
-                          format(field.value, 'PPP', { locale: ptBR })
+                          format(field.value, "PPP", { locale: ptBR })
                         ) : (
                           <span>Selecione uma data</span>
                         )}
@@ -480,7 +467,7 @@ export function NewMedicineExitDialog() {
           <DialogFooter className="col-span-6 grid justify-end">
             <div className="flex-gap-2">
               <DialogClose asChild>
-                <Button variant={'ghost'}>Cancelar</Button>
+                <Button variant={"ghost"}>Cancelar</Button>
               </DialogClose>
               <Button type="submit">Enviar</Button>
             </div>
@@ -488,5 +475,5 @@ export function NewMedicineExitDialog() {
         </form>
       </Form>
     </DialogContent>
-  )
+  );
 }

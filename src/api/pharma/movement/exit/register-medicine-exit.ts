@@ -5,17 +5,18 @@ export enum ExitType {
   MOVEMENT_TYPE = "MOVEMENT_TYPE",
   EXPIRATION = "EXPIRATION",
   DONATION = "DONATION",
+  TRANSFER = "TRANSFER",
 }
 
 export interface RegisterMedicineExitBodyAndParams {
   batches: {
     batcheStockId: string;
     quantity: number;
-  }[]
+  }[];
   stockId: string;
   exitType: ExitType;
   movementTypeId?: string;
-  destinationInstitutionId?: string
+  destinationInstitutionId?: string;
   exitDate?: Date;
 }
 
@@ -26,7 +27,7 @@ export async function registerMedicineExit(
     exitType,
     batches,
     stockId,
-    destinationInstitutionId
+    destinationInstitutionId,
   }: RegisterMedicineExitBodyAndParams,
   token: string,
 ) {
@@ -38,8 +39,7 @@ export async function registerMedicineExit(
       batches,
       exitType,
       stockId,
-      destinationInstitutionId
-
+      destinationInstitutionId,
     },
     {
       headers: {
