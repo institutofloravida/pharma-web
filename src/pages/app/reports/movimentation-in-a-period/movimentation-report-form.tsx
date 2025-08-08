@@ -37,6 +37,7 @@ import { MovementTypeDirection } from "@/lib/utils/movement-type";
 import { getOperatorRoleTranslation } from "@/lib/utils/translations-mappers/operator-role-translation";
 
 import { useMovimentationReportPdf } from "./use-movimentation-report";
+import { DatePickerFormItem } from "@/components/date/date-picker-form-item";
 
 export const movimentationReportFormSchema = z.object({
   direction: z.nativeEnum(MovementTypeDirection).optional(),
@@ -302,29 +303,27 @@ export function MovimentationReportForm() {
         <div className="grid grid-cols-12 gap-2">
           <FormField
             control={form.control}
-            name="startDate"
+            name={`startDate`}
             render={({ field }) => (
-              <FormItem className="col-span-2 grid">
-                <FormLabel>Data de Início</FormLabel>
-                <FormControl>
-                  <DatePicker value={field.value} onChange={field.onChange} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+              <DatePickerFormItem
+                disabled={(date) => date > new Date()}
+                className="col-span-2 grid"
+                field={field}
+                label="Data de Início"
+              />
             )}
           />
 
           <FormField
             control={form.control}
-            name="endDate"
+            name={`endDate`}
             render={({ field }) => (
-              <FormItem className="col-span-2 grid">
-                <FormLabel>Data de Fim</FormLabel>
-                <FormControl>
-                  <DatePicker value={field.value} onChange={field.onChange} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+              <DatePickerFormItem
+                disabled={(date) => date > new Date()}
+                className="col-span-2 grid"
+                field={field}
+                label="Data de Fim"
+              />
             )}
           />
 

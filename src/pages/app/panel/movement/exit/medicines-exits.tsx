@@ -66,7 +66,7 @@ export function MedicinesExits() {
 
   return (
     <>
-      <Helmet title="Entradas de medicamentos" />
+      <Helmet title="Saídas de medicamentos" />
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">
           Saídas de Medicamentos

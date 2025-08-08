@@ -1,36 +1,37 @@
-import { apiPharma } from '@/lib/axios'
+import { apiPharma } from "@/lib/axios";
 
 export interface GetDispensesInAPeriodReportQuery {
-  institutionId: string
-  startDate: Date
-  endDate: Date
-  patientId?: string
-  operatorId?: string
+  institutionId: string;
+  startDate: Date;
+  endDate: Date;
+  patientId?: string;
+  operatorId?: string;
 }
 
 export interface Dispensation {
-  id: string
-  dispensationDate: string
-  patientId: string
-  patient: string
-  operatorId: string
-  operator: string
-  items: number
+  id: string;
+  dispensationDate: string;
+  patientId: string;
+  patient: string;
+  operatorId: string;
+  operator: string;
+  items: number;
   medicines: {
-    medicine: string
-    pharmaceuticalForm: string
-    unitMeasure: string
-    complement: string | null
-    quantity: number
-    medicineStockId: string
-  }[]
+    medicine: string;
+    pharmaceuticalForm: string;
+    unitMeasure: string;
+    complement: string | null;
+    quantity: number;
+    dosage: string;
+    medicineStockId: string;
+  }[];
 }
 
 interface GetDispensesInAPeriodReportResponse {
-  dispenses: Dispensation[]
+  dispenses: Dispensation[];
   meta: {
-    totalCount: number
-  }
+    totalCount: number;
+  };
 }
 
 export async function getDispensesInAPeriodReport(
@@ -44,7 +45,7 @@ export async function getDispensesInAPeriodReport(
   token: string,
 ) {
   const response = await apiPharma.get<GetDispensesInAPeriodReportResponse>(
-    '/reports/dispenses',
+    "/reports/dispenses",
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -57,7 +58,7 @@ export async function getDispensesInAPeriodReport(
         patientId,
       },
     },
-  )
+  );
 
-  return response.data
+  return response.data;
 }
