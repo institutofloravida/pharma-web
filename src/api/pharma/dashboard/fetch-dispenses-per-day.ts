@@ -1,21 +1,21 @@
-import { apiPharma } from '@/lib/axios'
+import { apiPharma } from "@/lib/axios";
 
 export interface FetchDispensesPerDayQuery {
-  institutionId: string
-  startDate: Date
-  endDate: Date
+  institutionId: string;
+  startDate: Date;
+  endDate: Date;
 }
 
 export interface DispensationPerDay {
-  dispensationDate: string
-  total: number
+  dispensationDate: Date;
+  total: number;
 }
 
 interface FetchDispensesPerDayResponse {
-  dispenses: DispensationPerDay[]
+  dispenses: DispensationPerDay[];
   meta: {
-    totalCount: number
-  }
+    totalCount: number;
+  };
 }
 
 export async function fetchDispensesPerDay(
@@ -23,7 +23,7 @@ export async function fetchDispensesPerDay(
   token: string,
 ) {
   const response = await apiPharma.get<FetchDispensesPerDayResponse>(
-    '/charts/dispenses-per-day',
+    "/charts/dispenses-per-day",
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -34,7 +34,7 @@ export async function fetchDispensesPerDay(
         endDate,
       },
     },
-  )
+  );
 
-  return response.data
+  return response.data;
 }
