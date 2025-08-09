@@ -1,28 +1,29 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
-import { Search, X } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import InputMask from 'react-input-mask'
-import { useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
+import { Search, X } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import InputMask from "react-input-mask";
+import { useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
-import { Gender } from '@/api/pharma/users/fetch-users'
-import { Combobox } from '@/components/comboboxes/combobox'
-import { DatePicker } from '@/components/date-picker'
-import { SelectRole } from '@/components/selects/select-role'
-import { Button } from '@/components/ui/button'
+import { fetchInstitutions } from "@/api/pharma/auxiliary-records/institution/fetch-institutions";
+import { Gender } from "@/api/pharma/users/fetch-users";
+import { Combobox } from "@/components/comboboxes/combobox";
+import { DatePicker } from "@/components/date-picker";
+import { SelectRole } from "@/components/selects/select-role";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { useAuth } from '@/contexts/authContext'
-import { Race } from '@/lib/utils/race'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/contexts/authContext";
+import { Race } from "@/lib/utils/race";
+import { DatePickerFormItem } from "@/components/date/date-picker-form-item";
 
 const unitsmeasureFiltersSchema = z.object({
   name: z.string().optional(),
@@ -31,31 +32,31 @@ const unitsmeasureFiltersSchema = z.object({
   birthDate: z.date().optional(),
   generalRegistration: z.string().optional(),
   pathologyId: z.string().optional(),
-})
+});
 
-type UnitsMeasureFiltersSchema = z.infer<typeof unitsmeasureFiltersSchema>
+type UnitsMeasureFiltersSchema = z.infer<typeof unitsmeasureFiltersSchema>;
 
 export function UserTableFilters() {
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const name = searchParams.get('name')
-  const sus = searchParams.get('sus')
-  const cpf = searchParams.get('cpf')
-  const birthDate = searchParams.get('birthDate')
-  const generalRegistration = searchParams.get('generalRegistration')
-  const pathologyId = searchParams.get('pathologyId')
+  const name = searchParams.get("name");
+  const sus = searchParams.get("sus");
+  const cpf = searchParams.get("cpf");
+  const birthDate = searchParams.get("birthDate");
+  const generalRegistration = searchParams.get("generalRegistration");
+  const pathologyId = searchParams.get("pathologyId");
 
   const form = useForm<UnitsMeasureFiltersSchema>({
     resolver: zodResolver(unitsmeasureFiltersSchema),
     defaultValues: {
-      name: name ?? '',
-      sus: sus ?? '',
-      cpf: cpf ?? '',
+      name: name ?? "",
+      sus: sus ?? "",
+      cpf: cpf ?? "",
       birthDate: birthDate ? new Date(birthDate) : undefined,
-      pathologyId: pathologyId ?? '',
+      pathologyId: pathologyId ?? "",
       generalRegistration: generalRegistration || undefined,
     },
-  })
+  });
 
   function handleFilter({
     name,
@@ -67,82 +68,84 @@ export function UserTableFilters() {
   }: UnitsMeasureFiltersSchema) {
     setSearchParams((state) => {
       if (name) {
-        state.set('name', name)
+        state.set("name", name);
       } else {
-        state.delete('name')
+        state.delete("name");
       }
 
       if (sus) {
-        state.set('sus', sus)
+        state.set("sus", sus);
       } else {
-        state.delete('sus')
+        state.delete("sus");
       }
 
       if (cpf) {
-        state.set('cpf', cpf)
+        state.set("cpf", cpf);
       } else {
-        state.delete('cpf')
+        state.delete("cpf");
       }
 
       if (birthDate) {
-        state.set('birthDate', birthDate.toISOString())
+        state.set("birthDate", birthDate.toISOString());
       } else {
-        state.delete('birthDate')
+        state.delete("birthDate");
       }
 
       if (pathologyId) {
-        state.set('pathologyId', pathologyId)
+        state.set("pathologyId", pathologyId);
       } else {
-        state.delete('pathologyId')
+        state.delete("pathologyId");
       }
 
       if (generalRegistration) {
-        state.set('generalRegistration', generalRegistration)
+        state.set("generalRegistration", generalRegistration);
       } else {
-        state.delete('generalRegistration')
+        state.delete("generalRegistration");
       }
 
-      state.set('page', '1')
+      state.set("page", "1");
 
-      return state
-    })
+      return state;
+    });
   }
 
   function handleClearFilters() {
     setSearchParams((state) => {
-      state.delete('name')
-      state.delete('sus')
-      state.delete('cpf')
-      state.delete('birthDate')
-      state.delete('pathologyId')
-      state.delete('generalRegistration')
-      state.set('page', '1')
+      state.delete("name");
+      state.delete("sus");
+      state.delete("cpf");
+      state.delete("birthDate");
+      state.delete("pathologyId");
+      state.delete("generalRegistration");
+      state.set("page", "1");
 
-      return state
-    })
+      return state;
+    });
 
     form.reset({
-      name: '',
+      name: "",
       birthDate: undefined,
-      cpf: '',
-      generalRegistration: '',
-      pathologyId: '',
-      sus: '',
-    })
+      cpf: "",
+      generalRegistration: "",
+      pathologyId: "",
+      sus: "",
+    });
   }
 
   return (
     <Form {...form}>
       <form
-        className="grid grid-cols-10 grid-rows-2 gap-1 space-x-2 p-2"
+        className="grid grid-cols-12 grid-rows-3 gap-1 space-x-2 p-2"
         onSubmit={form.handleSubmit(handleFilter)}
       >
-        <span className="text-sm font-semibold">Filtros:</span>
+        <span className="col-span-12 self-end text-sm font-semibold">
+          Filtros:
+        </span>
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
-            <FormItem className="col-span-5 h-8">
+            <FormItem className="col-span-8 h-8">
               <FormControl>
                 <Input placeholder="Nome..." {...field} />
               </FormControl>
@@ -153,16 +156,16 @@ export function UserTableFilters() {
 
         <FormField
           control={form.control}
-          name="cpf"
+          name="sus"
           render={({ field }) => (
-            <FormItem className="col-span-2">
+            <FormItem className="col-span-4">
               <FormControl>
                 <InputMask
                   {...field}
-                  mask="999.999.999-99"
-                  placeholder="CPF..."
+                  mask="99999.99999.99999"
+                  placeholder="SUS..."
                   onChange={(e: any) =>
-                    field.onChange(e.target.value.replace(/\D/g, ''))
+                    field.onChange(e.target.value.replace(/\D/g, ""))
                   }
                 >
                   {(inputProps: any) => <Input {...inputProps} />}
@@ -172,18 +175,19 @@ export function UserTableFilters() {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
-          name="sus"
+          name="cpf"
           render={({ field }) => (
-            <FormItem className="col-span-2">
+            <FormItem className="col-span-3">
               <FormControl>
                 <InputMask
                   {...field}
-                  mask="99999.99999.99999"
-                  placeholder="SUS..."
+                  mask="999.999.999-99"
+                  placeholder="CPF..."
                   onChange={(e: any) =>
-                    field.onChange(e.target.value.replace(/\D/g, ''))
+                    field.onChange(e.target.value.replace(/\D/g, ""))
                   }
                 >
                   {(inputProps: any) => <Input {...inputProps} />}
@@ -198,7 +202,7 @@ export function UserTableFilters() {
           control={form.control}
           name="generalRegistration"
           render={({ field }) => (
-            <FormItem className="col-span-2">
+            <FormItem className="col-span-3">
               <FormControl>
                 <Input placeholder="RG" {...field} />
               </FormControl>
@@ -209,37 +213,37 @@ export function UserTableFilters() {
 
         <FormField
           control={form.control}
-          name="birthDate"
+          name={`birthDate`}
           render={({ field }) => (
-            <FormItem className="col-span-2">
-              <FormControl>
-                <DatePicker value={field.value} onChange={field.onChange} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
+            <DatePickerFormItem
+              disabled={(date) => date > new Date()}
+              className="col-span-2 grid"
+              field={field}
+              placeholder="Nascimento"
+            />
           )}
         />
 
         <Button
           type="submit"
-          variant={'secondary'}
-          size={'xs'}
-          className="col-span-2 flex justify-between"
+          variant={"secondary"}
+          size={"xs"}
+          className="col-span-2 flex justify-stretch"
         >
           <Search className="mr-2 h-4 w-4" />
-          Filtrar Resultados
+          Filtrar
         </Button>
         <Button
-          className="col-span-2 flex justify-between"
+          className="col-span-2 flex justify-stretch"
           onClick={handleClearFilters}
           type="button"
-          variant={'outline'}
-          size={'xs'}
+          variant={"outline"}
+          size={"xs"}
         >
           <X className="mr-2 h-4 w-4" />
-          Remover Filtros
+          Limpar
         </Button>
       </form>
     </Form>
-  )
+  );
 }

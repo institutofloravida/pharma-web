@@ -115,12 +115,12 @@ export function MonthlyMedicineUtilizationReportForm() {
   return (
     <Form {...form}>
       <form className="w-full items-center gap-2">
-        <div className="grid grid-cols-12 gap-2">
+        <div className="grid grid-cols-12 grid-rows-2 gap-2">
           <FormField
             control={form.control}
             name="year"
             render={({ field }) => (
-              <FormItem className="col-span-4 grid gap-1">
+              <FormItem className="col-span-3 grid gap-1">
                 <FormLabel>Ano</FormLabel>
                 <ComboboxUp
                   field={{
@@ -141,7 +141,7 @@ export function MonthlyMedicineUtilizationReportForm() {
                   onSelect={(id, item) => {
                     form.setValue("year", Number(item.value));
                   }}
-                  itemValue="value"
+                  itemValue="id"
                   query={queryYear}
                   onQueryChange={setQueryYear}
                   isFetching={false}
@@ -179,7 +179,7 @@ export function MonthlyMedicineUtilizationReportForm() {
                     onChange: field.onChange,
                   }}
                   query={queryStock}
-                  placeholder="Selecione um estoque"
+                  placeholder="Selecione"
                   isFetching={isFetchingStocks}
                   onQueryChange={setQueryStock}
                   onSelect={(id, item) => {

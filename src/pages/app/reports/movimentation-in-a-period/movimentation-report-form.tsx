@@ -310,6 +310,7 @@ export function MovimentationReportForm() {
                 className="col-span-2 grid"
                 field={field}
                 label="Data de Início"
+                placeholder="Início"
               />
             )}
           />
@@ -323,6 +324,7 @@ export function MovimentationReportForm() {
                 className="col-span-2 grid"
                 field={field}
                 label="Data de Fim"
+                placeholder="Fim"
               />
             )}
           />

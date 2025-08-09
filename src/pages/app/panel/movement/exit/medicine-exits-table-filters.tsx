@@ -36,6 +36,7 @@ import { useAuth } from "@/contexts/authContext";
 import { cn } from "@/lib/utils";
 import { MovementTypeDirection } from "@/lib/utils/movement-type";
 import { getOperatorRoleTranslation } from "@/lib/utils/translations-mappers/operator-role-translation";
+import { DatePickerFormItem } from "@/components/date/date-picker-form-item";
 
 const FormSchema = z.object({
   medicineId: z.string().optional(),
@@ -285,7 +286,7 @@ export function MedicineExitTableFilters() {
                 items={movementTypesResult?.movement_types ?? []}
                 field={field}
                 query={queryMovementType}
-                placeholder="Selecione um tipo"
+                placeholder="Tipo"
                 isFetching={isFetchingMovementTypes}
                 onQueryChange={setQueryMovementType}
                 onSelect={(id, _) => {
@@ -306,62 +307,34 @@ export function MedicineExitTableFilters() {
 
         <FormField
           control={form.control}
-          name="exitDate"
+          name={`exitDate`}
           render={({ field }) => (
-            <FormItem className="col-span-3 flex flex-col gap-1">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground",
-                      )}
-                    >
-                      {field.value ? (
-                        format(field.value, "PPP", { locale: ptBR })
-                      ) : (
-                        <span>Selecione uma data</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) => date > new Date()}
-                    lang="pt-BR"
-                  />
-                </PopoverContent>
-              </Popover>
-
-              <FormMessage />
-            </FormItem>
+            <DatePickerFormItem
+              disabled={(date) => date > new Date()}
+              className="col-span-2 grid"
+              field={field}
+            />
           )}
         />
 
         <Button
           type="submit"
-          className="col-span-2"
           variant={"secondary"}
           size={"xs"}
+          className="col-span-2 flex justify-stretch"
         >
           <Search className="mr-2 h-4 w-4" />
-          Filtrar Resultados
+          Filtrar
         </Button>
         <Button
-          type="button"
-          className="col-span-2"
-          variant={"outline"}
+          className="col-span-2 flex justify-stretch"
           onClick={handleClearFilters}
+          type="button"
+          variant={"outline"}
           size={"xs"}
         >
           <X className="mr-2 h-4 w-4" />
-          Remover Filtros
+          Limpar
         </Button>
       </form>
     </Form>
