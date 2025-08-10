@@ -1,44 +1,45 @@
-import { Dialog, DialogTrigger } from '@radix-ui/react-dialog'
-import { useQuery } from '@tanstack/react-query'
-import { Helmet } from 'react-helmet-async'
-import { useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
+import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
+import { useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchTherapeuticClasses } from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
-import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
+import { fetchTherapeuticClasses } from "@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class";
+import { Pagination } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/table";
+import { useAuth } from "@/contexts/authContext";
 
-import { NewTherapeuticClassDialog } from './new-therapeutic-class-dialog'
-import { TherapeuticClassTableFilters } from './therapeutic-class-table-filters'
-import { TherapeuticClassTableRow } from './therapeutic-class-table-row'
+import { NewTherapeuticClassDialog } from "./new-therapeutic-class-dialog";
+import { TherapeuticClassTableFilters } from "./therapeutic-class-table-filters";
+import { TherapeuticClassTableRow } from "./therapeutic-class-table-row";
+import { useState } from "react";
 
 export function TherapeuticClass() {
-  const { token } = useAuth()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const { token } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const query = searchParams.get("query");
 
-  const query = searchParams.get('query')
-
-  const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const pageIndex = z.coerce.number().parse(searchParams.get("page") ?? "1");
 
   const { data: therapeuticClassesResult } = useQuery({
-    queryKey: ['therapeutic-class', pageIndex, query],
+    queryKey: ["therapeutic-classes", pageIndex, query],
     queryFn: () =>
-      fetchTherapeuticClasses({ page: pageIndex, query }, token ?? ''),
-  })
+      fetchTherapeuticClasses({ page: pageIndex, query }, token ?? ""),
+  });
 
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
-      state.set('page', pageIndex.toString())
-      return state
-    })
+      state.set("page", pageIndex.toString());
+      return state;
+    });
   }
 
   return (
@@ -51,11 +52,13 @@ export function TherapeuticClass() {
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <TherapeuticClassTableFilters />
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant={'default'}>Nova Classe Terapeutica</Button>
+                <Button variant={"default"}>Nova Classe Terapeutica</Button>
               </DialogTrigger>
-              <NewTherapeuticClassDialog />
+              <NewTherapeuticClassDialog
+                onSuccess={() => setIsDialogOpen(false)}
+              />
             </Dialog>
           </div>
           <div className="rounded-md border">
@@ -95,5 +98,5 @@ export function TherapeuticClass() {
         </div>
       </div>
     </>
-  )
+  );
 }

@@ -1,21 +1,21 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { DialogClose } from '@radix-ui/react-dialog'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { getTherapeuticClass } from '@/api/pharma/auxiliary-records/therapeutic-class/get-therapeutic-class'
+import { getTherapeuticClass } from "@/api/pharma/auxiliary-records/therapeutic-class/get-therapeutic-class";
 import {
   updateTherapeuticClass,
   type UpdateTherapeuticClassBody,
-} from '@/api/pharma/auxiliary-records/therapeutic-class/update-therapeutic-class'
-import { Button } from '@/components/ui/button'
+} from "@/api/pharma/auxiliary-records/therapeutic-class/update-therapeutic-class";
+import { Button } from "@/components/ui/button";
 import {
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -23,58 +23,65 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Textarea } from '@/components/ui/textarea'
-import { useAuth } from '@/contexts/authContext'
-import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/lib/react-query'
-import { handleApiError } from '@/lib/utils/handle-api-error'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/authContext";
+import { toast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/react-query";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 const updateTherapeuticClassSchema = z.object({
   name: z.string().min(3).optional(),
   description: z.string().optional(),
-})
-type UpdateTherapeuticClassSchema = z.infer<typeof updateTherapeuticClassSchema>
+});
+type UpdateTherapeuticClassSchema = z.infer<
+  typeof updateTherapeuticClassSchema
+>;
 
 interface UpdateTherapeuticClassProps {
-  therapeuticClassId: string
-  open: boolean
+  therapeuticClassId: string;
+  open: boolean;
+  onSuccess?: () => void;
 }
 
 export function UpdateTherapeuticClassDialog({
   therapeuticClassId,
   open,
+  onSuccess,
 }: UpdateTherapeuticClassProps) {
-  const { token } = useAuth()
+  const { token } = useAuth();
 
   const { data: therapeuticClass, isLoading: isLoadingTherapeuticClass } =
     useQuery({
-      queryKey: ['therapeutic-class', therapeuticClassId],
+      queryKey: ["therapeutic-classes", therapeuticClassId],
       queryFn: () => {
-        return getTherapeuticClass({ id: therapeuticClassId }, token ?? '')
+        return getTherapeuticClass({ id: therapeuticClassId }, token ?? "");
       },
       enabled: open,
-    })
+    });
 
   const form = useForm<UpdateTherapeuticClassSchema>({
     resolver: zodResolver(updateTherapeuticClassSchema),
     values: {
-      name: therapeuticClass?.name ?? '',
-      description: therapeuticClass?.description ?? '',
+      name: therapeuticClass?.name ?? "",
+      description: therapeuticClass?.description ?? "",
     },
-  })
+  });
 
   const { mutateAsync: updateTherapeuticClassFn } = useMutation({
     mutationFn: (data: UpdateTherapeuticClassBody) =>
-      updateTherapeuticClass(data, token ?? ''),
+      updateTherapeuticClass(data, token ?? ""),
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ['therapeutic-class'],
-      })
+        queryKey: ["therapeutic-classes"],
+      });
+      if (onSuccess) {
+        onSuccess();
+      }
     },
-  })
+  });
 
   async function handleUpdateTherapeuticClass(
     data: UpdateTherapeuticClassSchema,
@@ -84,18 +91,18 @@ export function UpdateTherapeuticClassDialog({
         therapeuticClassId,
         name: data.name,
         description: data.description,
-      })
+      });
 
       toast({
         title: `Classe Therapeutica atualizada com sucesso!`,
-      })
+      });
     } catch (error) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Erro ao tentar atualizar a classe therapeutica.',
+        title: "Erro ao tentar atualizar a classe therapeutica.",
         description: errorMessage,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     }
   }
 
@@ -148,7 +155,7 @@ export function UpdateTherapeuticClassDialog({
           <DialogFooter className="col-span-3 grid justify-end">
             <div className="flex gap-2">
               <DialogClose asChild>
-                <Button variant={'ghost'}>Cancelar</Button>
+                <Button variant={"ghost"}>Cancelar</Button>
               </DialogClose>
               <Button type="submit" disabled={form.formState.isSubmitting}>
                 Atualizar
@@ -158,5 +165,5 @@ export function UpdateTherapeuticClassDialog({
         </form>
       </Form>
     </DialogContent>
-  )
+  );
 }
