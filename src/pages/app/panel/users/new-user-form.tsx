@@ -1,25 +1,24 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import InputMask from 'react-input-mask'
-import { useNavigate } from 'react-router-dom'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import InputMask from "react-input-mask";
+import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchCities } from '@/api/ibge/fetch-cities'
-import { fetchStates } from '@/api/ibge/fetch-states'
-import { fetchPathologies } from '@/api/pharma/auxiliary-records/pharmaceutical-form/pathology/fetch-pathology'
+import { fetchCities } from "@/api/ibge/fetch-cities";
+import { fetchStates } from "@/api/ibge/fetch-states";
 import {
   registerUser,
   type RegisterUserBody,
-} from '@/api/pharma/users/register-user'
-import { getAddressByCep } from '@/api/viacep/get-address-by-cep'
-import { ComboboxMany } from '@/components/comboboxes/combobox-many'
-import { ComboboxUp } from '@/components/comboboxes/combobox-up'
-import { DatePicker } from '@/components/date-picker'
-import { SelectGender } from '@/components/selects/select-gender'
-import { SelectRace } from '@/components/selects/select-race'
-import { Button } from '@/components/ui/button'
+} from "@/api/pharma/users/register-user";
+import { getAddressByCep } from "@/api/viacep/get-address-by-cep";
+import { ComboboxMany } from "@/components/comboboxes/combobox-many";
+import { ComboboxUp } from "@/components/comboboxes/combobox-up";
+import { DatePicker } from "@/components/date-picker";
+import { SelectGender } from "@/components/selects/select-gender";
+import { SelectRace } from "@/components/selects/select-race";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -28,32 +27,33 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useAuth } from '@/contexts/authContext'
-import { toast } from '@/hooks/use-toast'
-import { handleApiError } from '@/lib/utils/handle-api-error'
-import { Race } from '@/lib/utils/race'
-const { BLACK, INDIGENOUS, MIXED, UNDECLARED, WHITE, YELLOW } = Race
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/authContext";
+import { toast } from "@/hooks/use-toast";
+import { handleApiError } from "@/lib/utils/handle-api-error";
+import { Race } from "@/lib/utils/race";
+import { fetchPathologies } from "@/api/pharma/auxiliary-records/pathology/fetch-pathology";
+const { BLACK, INDIGENOUS, MIXED, UNDECLARED, WHITE, YELLOW } = Race;
 export const newUserSchema = z.object({
   name: z
-    .string({ required_error: 'campo obrigatório' })
-    .min(3, { message: 'O nome deve ter pelo menos 3 caracteres.' })
-    .max(100, { message: 'O nome pode ter no máximo 100 caracteres.' }),
+    .string({ required_error: "campo obrigatório" })
+    .min(3, { message: "O nome deve ter pelo menos 3 caracteres." })
+    .max(100, { message: "O nome pode ter no máximo 100 caracteres." }),
   cpf: z
     .string()
-    .regex(/^\d{11}$/, { message: 'O CPF deve conter exatamente 11 dígitos.' })
+    .regex(/^\d{11}$/, { message: "O CPF deve conter exatamente 11 dígitos." })
     .optional(),
   sus: z
     .string()
-    .regex(/^\d{15}$/, { message: 'O SUS deve conter exatamente 15 dígitos.' }),
-  birthDate: z.date({ required_error: 'Campo obrigatório' }),
-  gender: z.enum(['M', 'F', 'O'], {
-    errorMap: () => ({ message: 'Campo obrigatório' }),
+    .regex(/^\d{15}$/, { message: "O SUS deve conter exatamente 15 dígitos." }),
+  birthDate: z.date({ required_error: "Campo obrigatório" }),
+  gender: z.enum(["M", "F", "O"], {
+    errorMap: () => ({ message: "Campo obrigatório" }),
   }),
   race: z.enum([BLACK, INDIGENOUS, MIXED, UNDECLARED, WHITE, YELLOW], {
-    errorMap: () => ({ message: 'Campo obrigatório' }),
+    errorMap: () => ({ message: "Campo obrigatório" }),
   }),
   generalRegistration: z.string().optional(),
 
@@ -63,21 +63,21 @@ export const newUserSchema = z.object({
     complement: z.string().optional(),
     neighborhood: z
       .string()
-      .min(3, { message: 'O bairro deve ter pelo menos 3 caracteres.' }),
+      .min(3, { message: "O bairro deve ter pelo menos 3 caracteres." }),
     city: z.string().min(2, {
-      message: 'O nome da cidade deve ter pelo menos 2 caracteres.',
+      message: "O nome da cidade deve ter pelo menos 2 caracteres.",
     }),
     state: z
       .string()
-      .length(2, { message: 'O estado deve conter exatamente 2 caracteres.' }),
+      .length(2, { message: "O estado deve conter exatamente 2 caracteres." }),
     zipCode: z
       .string()
       .optional()
       .refine(
         (value) =>
-          value === undefined || value === '' || /^\d{5}-?\d{3}$/.test(value),
+          value === undefined || value === "" || /^\d{5}-?\d{3}$/.test(value),
         {
-          message: 'CEP inválido. Formato esperado: 00000-000.',
+          message: "CEP inválido. Formato esperado: 00000-000.",
         },
       ),
   }),
@@ -86,84 +86,84 @@ export const newUserSchema = z.object({
       z.object({
         id: z
           .string()
-          .min(1, { message: 'O ID da patologia não pode estar vazio.' }),
+          .min(1, { message: "O ID da patologia não pode estar vazio." }),
         value: z.string(),
       }),
     )
-    .min(1, { message: 'Selecione pelo menos uma patologia.' })
+    .min(1, { message: "Selecione pelo menos uma patologia." })
     .transform((items) => items.map((item) => item.id)),
-})
+});
 
-export type NewUserSchema = z.infer<typeof newUserSchema>
+export type NewUserSchema = z.infer<typeof newUserSchema>;
 
 export function NewUserForm() {
-  const queryClient = useQueryClient()
-  const { token } = useAuth()
-  const [queryPathology, setQueryPathology] = useState('')
-  const [queryCity, setQueryCity] = useState('')
-  const [queryState, setQueryState] = useState('')
-  const [date, setDate] = useState<Date | undefined>(undefined)
-  const [zipCode, setZipCode] = useState('')
-  const [activeTab, setActiveTab] = useState('personal-data')
+  const queryClient = useQueryClient();
+  const { token } = useAuth();
+  const [queryPathology, setQueryPathology] = useState("");
+  const [queryCity, setQueryCity] = useState("");
+  const [queryState, setQueryState] = useState("");
+  const [date, setDate] = useState<Date | undefined>(undefined);
+  const [zipCode, setZipCode] = useState("");
+  const [activeTab, setActiveTab] = useState("personal-data");
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const { mutateAsync: registerUserFn, isPending: isPendingRegisterUser } =
     useMutation({
-      mutationFn: (data: RegisterUserBody) => registerUser(data, token ?? ''),
+      mutationFn: (data: RegisterUserBody) => registerUser(data, token ?? ""),
       onSuccess() {
         queryClient.invalidateQueries({
-          queryKey: ['users'],
-        })
+          queryKey: ["users"],
+        });
       },
-    })
+    });
 
   const form = useForm<z.infer<typeof newUserSchema>>({
     resolver: zodResolver(newUserSchema),
     defaultValues: {},
-  })
+  });
 
   const handleNext = async () => {
-    let isValid = false
+    let isValid = false;
 
-    if (activeTab === 'personal-data') {
+    if (activeTab === "personal-data") {
       isValid = await form.trigger([
-        'name',
-        'cpf',
-        'sus',
-        'generalRegistration',
-        'birthDate',
-        'gender',
-        'race',
-      ])
-    } else if (activeTab === 'address') {
+        "name",
+        "cpf",
+        "sus",
+        "generalRegistration",
+        "birthDate",
+        "gender",
+        "race",
+      ]);
+    } else if (activeTab === "address") {
       isValid = await form.trigger([
-        'addressPatient.zipCode',
-        'addressPatient.state',
-        'addressPatient.city',
-        'addressPatient.neighborhood',
-        'addressPatient.street',
-        'addressPatient.number',
-      ])
+        "addressPatient.zipCode",
+        "addressPatient.state",
+        "addressPatient.city",
+        "addressPatient.neighborhood",
+        "addressPatient.street",
+        "addressPatient.number",
+      ]);
     }
 
     if (isValid) {
-      if (activeTab === 'personal-data') {
-        setActiveTab('address')
-      } else if (activeTab === 'address') {
-        setActiveTab('pathologies')
+      if (activeTab === "personal-data") {
+        setActiveTab("address");
+      } else if (activeTab === "address") {
+        setActiveTab("pathologies");
       }
     } else {
-      console.log('Por favor, preencha os campos obrigatórios.')
+      console.log("Por favor, preencha os campos obrigatórios.");
     }
-  }
+  };
   const handlePrevious = () => {
-    if (activeTab === 'pathologies') {
-      setActiveTab('address')
-    } else if (activeTab === 'address') {
-      setActiveTab('personal-data')
+    if (activeTab === "pathologies") {
+      setActiveTab("address");
+    } else if (activeTab === "address") {
+      setActiveTab("personal-data");
     }
-  }
+  };
 
   const {
     data: addressResult,
@@ -171,52 +171,52 @@ export function NewUserForm() {
     isError: isErrorAddress,
     isFetching: isFetchingAddress,
   } = useQuery({
-    queryKey: ['address', zipCode],
+    queryKey: ["address", zipCode],
     queryFn: () => getAddressByCep(zipCode),
     enabled: zipCode.length === 8,
     staleTime: 1000 * 60 * 5,
-  })
+  });
 
   useEffect(() => {
     if (isSuccessAddress && addressResult) {
-      form.setValue('addressPatient.street', addressResult.logradouro || '')
-      form.setValue('addressPatient.neighborhood', addressResult.bairro || '')
-      form.setValue('addressPatient.city', addressResult.localidade || '')
-      form.setValue('addressPatient.state', addressResult.uf || '')
+      form.setValue("addressPatient.street", addressResult.logradouro || "");
+      form.setValue("addressPatient.neighborhood", addressResult.bairro || "");
+      form.setValue("addressPatient.city", addressResult.localidade || "");
+      form.setValue("addressPatient.state", addressResult.uf || "");
     }
 
     if (isErrorAddress) {
       toast({
-        title: 'Erro ao buscar endereço',
-        description: 'Verifique se o CEP é válido e tente novamente.',
-        variant: 'destructive',
-      })
+        title: "Erro ao buscar endereço",
+        description: "Verifique se o CEP é válido e tente novamente.",
+        variant: "destructive",
+      });
     }
-  }, [isSuccessAddress, isErrorAddress, addressResult, form])
+  }, [isSuccessAddress, isErrorAddress, addressResult, form]);
 
   const { data: pathologiesResult, isFetching: isFetchingPathology } = useQuery(
     {
-      queryKey: ['pathologies', queryPathology],
+      queryKey: ["pathologies", queryPathology],
       queryFn: () =>
-        fetchPathologies({ page: 1, query: queryPathology }, token ?? ''),
+        fetchPathologies({ page: 1, query: queryPathology }, token ?? ""),
       staleTime: 1000,
       refetchOnMount: true,
     },
-  )
+  );
   const { data: statesResult, isFetching: isFetchingStates } = useQuery({
-    queryKey: ['states'],
+    queryKey: ["states"],
     queryFn: () => fetchStates(),
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
 
   const { data: citiesResult, isFetching: isFetchingCities } = useQuery({
-    queryKey: ['cities', form.watch('addressPatient.state')],
-    queryFn: () => fetchCities(form.watch('addressPatient.state')),
-    enabled: !!form.watch('addressPatient.state'),
+    queryKey: ["cities", form.watch("addressPatient.state")],
+    queryFn: () => fetchCities(form.watch("addressPatient.state")),
+    enabled: !!form.watch("addressPatient.state"),
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
 
   async function handleRegisterUser(data: NewUserSchema) {
     try {
@@ -230,18 +230,18 @@ export function NewUserForm() {
         sus: data.sus,
         generalRegistration: data.generalRegistration,
         pathologiesIds: data.pathologiesIds,
-      })
+      });
       toast({
         title: `O usuário ${data.name} foi cadastrado com sucesso!`,
-      })
-      setTimeout(() => navigate('/users'), 2000)
+      });
+      setTimeout(() => navigate("/users"), 2000);
     } catch (error) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Erro ao registrar usuário',
+        title: "Erro ao registrar usuário",
         description: errorMessage,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     }
   }
 
@@ -259,19 +259,19 @@ export function NewUserForm() {
           <TabsList>
             <TabsTrigger
               value="personal-data"
-              disabled={['address', 'pathologies'].includes(activeTab)}
+              disabled={["address", "pathologies"].includes(activeTab)}
             >
               Dados Pessoais
             </TabsTrigger>
             <TabsTrigger
               value="address"
-              disabled={['personal-data', 'pathologies'].includes(activeTab)}
+              disabled={["personal-data", "pathologies"].includes(activeTab)}
             >
               Endereço
             </TabsTrigger>
             <TabsTrigger
               value="pathologies"
-              disabled={['personal-data', 'address'].includes(activeTab)}
+              disabled={["personal-data", "address"].includes(activeTab)}
             >
               Patologias
             </TabsTrigger>
@@ -306,7 +306,7 @@ export function NewUserForm() {
                       mask="999.999.999-99"
                       placeholder="CPF..."
                       onChange={(e: any) =>
-                        field.onChange(e.target.value.replace(/\D/g, ''))
+                        field.onChange(e.target.value.replace(/\D/g, ""))
                       }
                     >
                       {(inputProps: any) => <Input {...inputProps} />}
@@ -329,7 +329,7 @@ export function NewUserForm() {
                       mask="99999.99999.99999"
                       placeholder="SUS..."
                       onChange={(e: any) =>
-                        field.onChange(e.target.value.replace(/\D/g, ''))
+                        field.onChange(e.target.value.replace(/\D/g, ""))
                       }
                     >
                       {(inputProps: any) => <Input {...inputProps} />}
@@ -411,9 +411,9 @@ export function NewUserForm() {
                       mask="99-999-999"
                       placeholder="CEP..."
                       onChange={(e: any) => {
-                        const cleanZip = e.target.value.replace(/\D/g, '')
-                        setZipCode(cleanZip)
-                        form.setValue('addressPatient.zipCode', cleanZip)
+                        const cleanZip = e.target.value.replace(/\D/g, "");
+                        setZipCode(cleanZip);
+                        form.setValue("addressPatient.zipCode", cleanZip);
                       }}
                     >
                       {(inputProps: any) => <Input {...inputProps} />}
@@ -444,8 +444,8 @@ export function NewUserForm() {
                     getItemText={(item) => `${item.sigla} - ${item.nome}`}
                     placeholder="Selecione um estado"
                     onSelect={(item) => {
-                      form.setValue('addressPatient.state', item)
-                      form.setValue('addressPatient.city', '')
+                      form.setValue("addressPatient.state", item);
+                      form.setValue("addressPatient.city", "");
                     }}
                   />
                   <FormMessage />
@@ -470,7 +470,7 @@ export function NewUserForm() {
                     formatItem={(item) => `${item.nome}`}
                     placeholder="Selecione uma cidade"
                     onSelect={(item) =>
-                      form.setValue('addressPatient.city', item)
+                      form.setValue("addressPatient.city", item)
                     }
                   />
                   <FormMessage />
@@ -590,5 +590,5 @@ export function NewUserForm() {
         </Tabs>
       </form>
     </Form>
-  )
+  );
 }

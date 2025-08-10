@@ -1,76 +1,76 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { DialogClose } from '@radix-ui/react-dialog'
-import { useMutation } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import {
-  registerPathology,
-  type RegisterPathologyBody,
-} from '@/api/pharma/auxiliary-records/pharmaceutical-form/pathology/register-pathology'
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button";
 import {
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { useAuth } from '@/contexts/authContext'
-import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/lib/react-query'
-import { handleApiError } from '@/lib/utils/handle-api-error'
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useAuth } from "@/contexts/authContext";
+import { toast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/react-query";
+import { handleApiError } from "@/lib/utils/handle-api-error";
+import {
+  registerPathology,
+  type RegisterPathologyBody,
+} from "@/api/pharma/auxiliary-records/pathology/register-pathology";
 
 const newPathologySchema = z.object({
   name: z
     .string()
     .trim()
-    .min(2, { message: 'O nome deve ter pelo menos 2 caracteres' })
-    .max(50, { message: 'O nome pode ter no máximo 50 caracteres' }),
-})
+    .min(2, { message: "O nome deve ter pelo menos 2 caracteres" })
+    .max(50, { message: "O nome pode ter no máximo 50 caracteres" }),
+});
 
-type NewPathologySchema = z.infer<typeof newPathologySchema>
+type NewPathologySchema = z.infer<typeof newPathologySchema>;
 
 export function NewPathologyDialog() {
-  const { token } = useAuth()
+  const { token } = useAuth();
   const {
     register,
     handleSubmit,
     formState: { isSubmitting },
   } = useForm<NewPathologySchema>({
     resolver: zodResolver(newPathologySchema),
-  })
+  });
 
   const { mutateAsync: registerPathologyFn } = useMutation({
     mutationFn: (data: RegisterPathologyBody) =>
-      registerPathology(data, token ?? ''),
+      registerPathology(data, token ?? ""),
     onSuccess(_, { name }) {
       const cached =
-        queryClient.getQueryData<NewPathologySchema[]>(['pathologies']) || []
+        queryClient.getQueryData<NewPathologySchema[]>(["pathologies"]) || [];
 
       if (cached) {
-        queryClient.setQueryData(['pathologies'], [...cached, { name }])
+        queryClient.setQueryData(["pathologies"], [...cached, { name }]);
       }
     },
-  })
+  });
 
   async function handleRegisterPathology(data: NewPathologySchema) {
     try {
       await registerPathologyFn({
         name: data.name,
-      })
+      });
 
       toast({
-        title: 'Patologia cadastrada com suceso!',
-      })
+        title: "Patologia cadastrada com suceso!",
+      });
     } catch (error) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Error ao cadastrara patologia',
+        title: "Error ao cadastrara patologia",
         description: errorMessage,
-      })
+      });
     }
   }
 
@@ -89,12 +89,12 @@ export function NewPathologyDialog() {
             <Label htmlFor="name" className="text-right">
               Nome
             </Label>
-            <Input id="name" className="col-span-3" {...register('name')} />
+            <Input id="name" className="col-span-3" {...register("name")} />
           </div>
         </div>
         <DialogFooter className="mt-2">
           <DialogClose asChild>
-            <Button variant={'ghost'}>Cancelar</Button>
+            <Button variant={"ghost"}>Cancelar</Button>
           </DialogClose>
           <Button type="submit" disabled={isSubmitting}>
             Cadastrar
@@ -102,5 +102,5 @@ export function NewPathologyDialog() {
         </DialogFooter>
       </form>
     </DialogContent>
-  )
+  );
 }

@@ -1,43 +1,44 @@
-import { useQuery } from '@tanstack/react-query'
-import { Helmet } from 'react-helmet-async'
-import { useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
+import { useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchPathologies } from '@/api/pharma/auxiliary-records/pharmaceutical-form/pathology/fetch-pathology'
-import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { Pagination } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/table";
+import { useAuth } from "@/contexts/authContext";
 
-import { NewPathologyDialog } from './new-pathology-dialog'
-import { PathologyTableFilters } from './pathology-table-filters'
-import { PathologyTableRow } from './pathology-table-row'
+import { NewPathologyDialog } from "./new-pathology-dialog";
+import { PathologyTableFilters } from "./pathology-table-filters";
+import { PathologyTableRow } from "./pathology-table-row";
+import { fetchPathologies } from "@/api/pharma/auxiliary-records/pathology/fetch-pathology";
+import { useState } from "react";
 
 export function Pathologies() {
-  const { token } = useAuth()
+  const { token } = useAuth();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [searchParams, setSearchParams] = useSearchParams()
+  const query = searchParams.get("query");
 
-  const query = searchParams.get('query')
-
-  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const page = z.coerce.number().parse(searchParams.get("page") ?? "1");
   const { data: pathologiesResult } = useQuery({
-    queryKey: ['pathologies', page, query],
-    queryFn: () => fetchPathologies({ page, query }, token ?? ''),
-  })
+    queryKey: ["pathologies", page, query],
+    queryFn: () => fetchPathologies({ page, query }, token ?? ""),
+  });
 
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
-      state.set('page', pageIndex.toString())
-      return state
-    })
+      state.set("page", pageIndex.toString());
+      return state;
+    });
   }
 
   return (
@@ -48,9 +49,9 @@ export function Pathologies() {
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <PathologyTableFilters />
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="" variant={'default'}>
+                <Button className="" variant={"default"}>
                   Nova Patologia
                 </Button>
               </DialogTrigger>
@@ -70,7 +71,7 @@ export function Pathologies() {
               <TableBody>
                 {pathologiesResult &&
                   pathologiesResult.pathologies.map((item) => {
-                    return <PathologyTableRow pathology={item} key={item.id} />
+                    return <PathologyTableRow pathology={item} key={item.id} />;
                   })}
               </TableBody>
             </Table>
@@ -87,5 +88,5 @@ export function Pathologies() {
         </div>
       </div>
     </>
-  )
+  );
 }
