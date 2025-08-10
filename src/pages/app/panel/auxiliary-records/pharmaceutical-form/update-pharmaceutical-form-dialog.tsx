@@ -1,21 +1,21 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { DialogClose } from '@radix-ui/react-dialog'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { getPharmaceuticalForm } from '@/api/pharma/auxiliary-records/pharmaceutical-form/get-pharmaceutical-form'
+import { getPharmaceuticalForm } from "@/api/pharma/auxiliary-records/pharmaceutical-form/get-pharmaceutical-form";
 import {
   updatePharmaceuticalForm,
   type UpdatePharmaceuticalFormBody,
-} from '@/api/pharma/auxiliary-records/pharmaceutical-form/update-pharmaceutical-form'
-import { Button } from '@/components/ui/button'
+} from "@/api/pharma/auxiliary-records/pharmaceutical-form/update-pharmaceutical-form";
+import { Button } from "@/components/ui/button";
 import {
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -23,56 +23,61 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useAuth } from '@/contexts/authContext'
-import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/lib/react-query'
-import { handleApiError } from '@/lib/utils/handle-api-error'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/authContext";
+import { toast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/react-query";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 const updatePharmaceuticalFormSchema = z.object({
   name: z.string().min(3).optional(),
-})
+});
 
 type UpdatePharmaceuticalFormSchema = z.infer<
   typeof updatePharmaceuticalFormSchema
->
+>;
 
 interface UpdatePharmaceuticalFormProps {
-  pharmaceuticalformId: string
-  open: boolean
+  pharmaceuticalformId: string;
+  open: boolean;
+  onSuccess?: () => void;
 }
 
 export function UpdatePharmaceuticalFormDialog({
   pharmaceuticalformId: pharmaceuticalFormId,
   open,
+  onSuccess,
 }: UpdatePharmaceuticalFormProps) {
-  const { token } = useAuth()
+  const { token } = useAuth();
 
   const { data: pharmaceuticalform, isLoading } = useQuery({
-    queryKey: ['pharmaceutical-form', pharmaceuticalFormId],
+    queryKey: ["pharmaceutical-form", pharmaceuticalFormId],
     queryFn: () =>
-      getPharmaceuticalForm({ id: pharmaceuticalFormId }, token ?? ''),
+      getPharmaceuticalForm({ id: pharmaceuticalFormId }, token ?? ""),
     enabled: open,
-  })
+  });
 
   const form = useForm<UpdatePharmaceuticalFormSchema>({
     resolver: zodResolver(updatePharmaceuticalFormSchema),
     values: {
-      name: pharmaceuticalform?.name ?? '',
+      name: pharmaceuticalform?.name ?? "",
     },
-  })
+  });
 
   const { mutateAsync: updatePharmaceuticalFormFn } = useMutation({
     mutationFn: (data: UpdatePharmaceuticalFormBody) =>
-      updatePharmaceuticalForm(data, token ?? ''),
+      updatePharmaceuticalForm(data, token ?? ""),
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ['pharmaceutical-forms'],
-      })
+        queryKey: ["pharmaceutical-forms"],
+      });
+      if (onSuccess) {
+        onSuccess();
+      }
     },
-  })
+  });
 
   async function handleUpdatePharmaceuticalForm(
     data: UpdatePharmaceuticalFormSchema,
@@ -81,18 +86,18 @@ export function UpdatePharmaceuticalFormDialog({
       await updatePharmaceuticalFormFn({
         pharmaceuticalFormId,
         name: data.name,
-      })
+      });
 
       toast({
         title: `Forma farmacêutica atualizada com sucesso!`,
-      })
+      });
     } catch (error) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Erro ao tentar atualizar a forma farmacêutica.',
+        title: "Erro ao tentar atualizar a forma farmacêutica.",
         description: errorMessage,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     }
   }
 
@@ -129,7 +134,7 @@ export function UpdatePharmaceuticalFormDialog({
           <DialogFooter className="col-span-3 grid justify-end">
             <div className="flex gap-2">
               <DialogClose asChild>
-                <Button variant={'ghost'}>Cancelar</Button>
+                <Button variant={"ghost"}>Cancelar</Button>
               </DialogClose>
               <Button type="submit" disabled={form.formState.isSubmitting}>
                 Atualizar
@@ -139,5 +144,5 @@ export function UpdatePharmaceuticalFormDialog({
         </form>
       </Form>
     </DialogContent>
-  )
+  );
 }

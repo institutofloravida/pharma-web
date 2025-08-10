@@ -1,43 +1,45 @@
-import { useQuery } from '@tanstack/react-query'
-import { Helmet } from 'react-helmet-async'
-import { useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
+import { useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchPharmaceuticalForms } from '@/api/pharma/auxiliary-records/pharmaceutical-form/fetch-pharmaceutical-form'
-import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { fetchPharmaceuticalForms } from "@/api/pharma/auxiliary-records/pharmaceutical-form/fetch-pharmaceutical-form";
+import { Pagination } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/table";
+import { useAuth } from "@/contexts/authContext";
 
-import { NewPharmaceuticalFormDialog } from './new-pharmaceutical-form-dialog'
-import { PharmaceuticalFormTableFilters } from './pharmaceutical-form-table-filters'
-import { PharmaceuticalFormTableRow } from './pharmaceutical-form-table-row'
+import { NewPharmaceuticalFormDialog } from "./new-pharmaceutical-form-dialog";
+import { PharmaceuticalFormTableFilters } from "./pharmaceutical-form-table-filters";
+import { PharmaceuticalFormTableRow } from "./pharmaceutical-form-table-row";
+import { useState } from "react";
 
 export function PharmaceuticalForms() {
-  const { token } = useAuth()
+  const { token } = useAuth();
 
-  const [searchParams, setSearchParams] = useSearchParams()
-  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const page = z.coerce.number().parse(searchParams.get("page") ?? "1");
 
-  const query = searchParams.get('query')
+  const query = searchParams.get("query");
 
   const { data: pharmaceuticalformsResult } = useQuery({
-    queryKey: ['pharmaceutical-forms', page, query],
-    queryFn: () => fetchPharmaceuticalForms({ page, query }, token ?? ''),
-  })
+    queryKey: ["pharmaceutical-forms", page, query],
+    queryFn: () => fetchPharmaceuticalForms({ page, query }, token ?? ""),
+  });
 
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
-      state.set('page', pageIndex.toString())
-      return state
-    })
+      state.set("page", pageIndex.toString());
+      return state;
+    });
   }
 
   return (
@@ -50,13 +52,15 @@ export function PharmaceuticalForms() {
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <PharmaceuticalFormTableFilters />
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="" variant={'default'}>
+                <Button className="" variant={"default"}>
                   Nova Forma farmacêutica
                 </Button>
               </DialogTrigger>
-              <NewPharmaceuticalFormDialog />
+              <NewPharmaceuticalFormDialog
+                onSuccess={() => setIsDialogOpen(false)}
+              />
             </Dialog>
           </div>
           <div className="rounded-md border">
@@ -78,7 +82,7 @@ export function PharmaceuticalForms() {
                           pharmaceuticalForm={item}
                           key={item.id}
                         />
-                      )
+                      );
                     },
                   )}
               </TableBody>
@@ -96,5 +100,5 @@ export function PharmaceuticalForms() {
         </div>
       </div>
     </>
-  )
+  );
 }
