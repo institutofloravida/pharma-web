@@ -123,17 +123,17 @@ export function OperatorTableFilters() {
   return (
     <Form {...form}>
       <form
-        className="grid grid-cols-12 grid-rows-3 gap-1 space-x-2 space-y-1 p-2"
+        className="grid grid-cols-12 grid-rows-2 gap-1 space-x-2 space-y-1 p-2"
         onSubmit={form.handleSubmit(handleFilter)}
       >
-        <span className="col-span-12 justify-start self-end text-sm font-semibold">
+        <span className="col-span-1 self-center justify-self-center text-sm font-semibold">
           Filtros:
         </span>
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
-            <FormItem className="col-span-7 h-8">
+            <FormItem className="col-span-6 h-8">
               <FormControl>
                 <Input placeholder="Nome..." {...field} />
               </FormControl>

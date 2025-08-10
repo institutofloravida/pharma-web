@@ -1,42 +1,45 @@
-import { Dialog, DialogTrigger } from '@radix-ui/react-dialog'
-import { useQuery } from '@tanstack/react-query'
-import { Helmet } from 'react-helmet-async'
-import { useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
+import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
+import { useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchUnitsMeasure } from '@/api/pharma/auxiliary-records/unit-measure/fetch-units-measure'
-import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
+import { fetchUnitsMeasure } from "@/api/pharma/auxiliary-records/unit-measure/fetch-units-measure";
+import { Pagination } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/table";
+import { useAuth } from "@/contexts/authContext";
 
-import { NewUnitMeasureDialog } from './new-unit-measure-dialog'
-import { UnitMeasureTableFilters } from './units-measure-table-filters'
-import { UnitMeasureTableRow } from './units-measure-table-row'
+import { NewUnitMeasureDialog } from "./new-unit-measure-dialog";
+import { UnitMeasureTableFilters } from "./units-measure-table-filters";
+import { UnitMeasureTableRow } from "./units-measure-table-row";
+import { useState } from "react";
 
 export function UnitMeasure() {
-  const { token } = useAuth()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const { token } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const query = searchParams.get('query')
+  const page = z.coerce.number().parse(searchParams.get("page") ?? "1");
+
+  const query = searchParams.get("query");
 
   const { data: unitsMeasureResult } = useQuery({
-    queryKey: ['units-measure', page, query],
-    queryFn: () => fetchUnitsMeasure({ page, query }, token ?? ''),
-  })
+    queryKey: ["units-measure", page, query],
+    queryFn: () => fetchUnitsMeasure({ page, query }, token ?? ""),
+  });
 
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
-      state.set('page', pageIndex.toString())
-      return state
-    })
+      state.set("page", pageIndex.toString());
+      return state;
+    });
   }
 
   return (
@@ -49,11 +52,11 @@ export function UnitMeasure() {
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <UnitMeasureTableFilters />
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button variant={'default'}>Nova Unidade de medida</Button>
+                <Button variant={"default"}>Nova Unidade de medida</Button>
               </DialogTrigger>
-              <NewUnitMeasureDialog />
+              <NewUnitMeasureDialog onSuccess={() => setIsDialogOpen(false)} />
             </Dialog>
           </div>
           <div className="rounded-md border">
@@ -94,5 +97,5 @@ export function UnitMeasure() {
         </div>
       </div>
     </>
-  )
+  );
 }
