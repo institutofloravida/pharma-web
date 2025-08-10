@@ -1,44 +1,47 @@
-import { useQuery } from '@tanstack/react-query'
-import { Helmet } from 'react-helmet-async'
-import { useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
+import { useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchManufacturers } from '@/api/pharma/auxiliary-records/manufacturer/fetch-manufacturer'
-import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { fetchManufacturers } from "@/api/pharma/auxiliary-records/manufacturer/fetch-manufacturer";
+import { Pagination } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/table";
+import { useAuth } from "@/contexts/authContext";
 
-import { ManufacturerTableFilters } from './manufacturer-table-filters'
-import { ManufacturerTableRow } from './manufacturer-table-row'
-import { NewManufacturerDialog } from './new-manufacturer-dialog'
+import { ManufacturerTableFilters } from "./manufacturer-table-filters";
+import { ManufacturerTableRow } from "./manufacturer-table-row";
+import { NewManufacturerDialog } from "./new-manufacturer-dialog";
+import { useState } from "react";
 
 export function Manufacturers() {
-  const { token } = useAuth()
+  const { token } = useAuth();
 
-  const [searchParams, setSearchParams] = useSearchParams()
-  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const query = searchParams.get('query') ?? ''
-  const cnpj = searchParams.get('cnpj') ?? ''
+  const page = z.coerce.number().parse(searchParams.get("page") ?? "1");
+
+  const query = searchParams.get("query") ?? "";
+  const cnpj = searchParams.get("cnpj") ?? "";
 
   const { data: manufacturersResult } = useQuery({
-    queryKey: ['manufacturers', page, query, cnpj],
-    queryFn: () => fetchManufacturers({ page, query, cnpj }, token ?? ''),
-  })
+    queryKey: ["manufacturers", page, query, cnpj],
+    queryFn: () => fetchManufacturers({ page, query, cnpj }, token ?? ""),
+  });
 
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
-      state.set('page', pageIndex.toString())
-      return state
-    })
+      state.set("page", pageIndex.toString());
+      return state;
+    });
   }
 
   return (
@@ -49,13 +52,13 @@ export function Manufacturers() {
         <div className="space-y-2.5">
           <div className="mb-8 flex items-center justify-between">
             <ManufacturerTableFilters />
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="" variant={'default'}>
+                <Button className="" variant={"default"}>
                   Novo Fabricante
                 </Button>
               </DialogTrigger>
-              <NewManufacturerDialog />
+              <NewManufacturerDialog onSuccess={() => setIsDialogOpen(false)} />
             </Dialog>
           </div>
           <div className="rounded-md border">
@@ -75,7 +78,7 @@ export function Manufacturers() {
                   manufacturersResult?.manufacturers.map((item) => {
                     return (
                       <ManufacturerTableRow manufacturer={item} key={item.id} />
-                    )
+                    );
                   })}
               </TableBody>
             </Table>
@@ -92,5 +95,5 @@ export function Manufacturers() {
         </div>
       </div>
     </>
-  )
+  );
 }

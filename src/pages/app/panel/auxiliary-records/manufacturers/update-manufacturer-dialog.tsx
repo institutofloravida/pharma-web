@@ -1,23 +1,23 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { DialogClose } from '@radix-ui/react-dialog'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
-import InputMask from 'react-input-mask'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import InputMask from "react-input-mask";
+import { z } from "zod";
 
-import { getManufacturer } from '@/api/pharma/auxiliary-records/manufacturer/get-manufacturer'
+import { getManufacturer } from "@/api/pharma/auxiliary-records/manufacturer/get-manufacturer";
 import {
   updateManufacturer,
   type UpdateManufacturerBody,
-} from '@/api/pharma/auxiliary-records/manufacturer/update-manufacturer'
-import { Button } from '@/components/ui/button'
+} from "@/api/pharma/auxiliary-records/manufacturer/update-manufacturer";
+import { Button } from "@/components/ui/button";
 import {
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -25,81 +25,84 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Textarea } from '@/components/ui/textarea'
-import { useAuth } from '@/contexts/authContext'
-import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/lib/react-query'
-import { handleApiError } from '@/lib/utils/handle-api-error'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/authContext";
+import { toast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/react-query";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 const updateManufacturerSchema = z.object({
   name: z
     .string({
-      required_error: 'O nome é obrigatório.',
+      required_error: "O nome é obrigatório.",
     })
-    .min(3, { message: 'O nome deve ter pelo menos 3 caracteres.' }),
+    .min(3, { message: "O nome deve ter pelo menos 3 caracteres." }),
 
   cnpj: z
     .string({
-      required_error: 'O CNPJ é obrigatório.',
+      required_error: "O CNPJ é obrigatório.",
     })
     .length(14, {
-      message: 'O CNPJ deve ter exatamente 14 dígitos (apenas números).',
+      message: "O CNPJ deve ter exatamente 14 dígitos (apenas números).",
     }),
 
   description: z
     .string({
-      required_error: 'A descrição é obrigatória.',
+      required_error: "A descrição é obrigatória.",
     })
     .optional(),
-})
+});
 
-type UpdateManufacturerSchema = z.infer<typeof updateManufacturerSchema>
+type UpdateManufacturerSchema = z.infer<typeof updateManufacturerSchema>;
 
 interface UpdateManufacturerProps {
-  manufacturerId: string
-  open: boolean
+  manufacturerId: string;
+  open: boolean;
+  onSuccess?: () => void;
 }
 
 export function UpdateManufacturerDialog({
   manufacturerId,
   open,
+  onSuccess,
 }: UpdateManufacturerProps) {
-  const { token } = useAuth()
+  const { token } = useAuth();
 
   const { data: manufacturer, isLoading: isLoadingManufacturer } = useQuery({
-    queryKey: ['manufacturer', manufacturerId],
-    queryFn: () => getManufacturer({ id: manufacturerId }, token ?? ''),
+    queryKey: ["manufacturer", manufacturerId],
+    queryFn: () => getManufacturer({ id: manufacturerId }, token ?? ""),
     enabled: open,
-  })
+  });
 
   const form = useForm<UpdateManufacturerSchema>({
     resolver: zodResolver(updateManufacturerSchema),
     values: {
-      cnpj: manufacturer?.cnpj ?? '',
-      description: manufacturer?.description ?? '',
-      name: manufacturer?.name ?? '',
+      cnpj: manufacturer?.cnpj ?? "",
+      description: manufacturer?.description ?? "",
+      name: manufacturer?.name ?? "",
     },
-  })
+  });
 
   const { mutateAsync: updateManufacturerFn } = useMutation({
     mutationFn: (data: UpdateManufacturerBody) =>
-      updateManufacturer(data, token ?? ''),
+      updateManufacturer(data, token ?? ""),
     onSuccess() {
-      queryClient.invalidateQueries({ queryKey: ['manufacturers'] })
+      queryClient.invalidateQueries({ queryKey: ["manufacturers"] });
       queryClient.invalidateQueries({
-        queryKey: ['manufacturer', manufacturerId],
-      })
+        queryKey: ["manufacturer", manufacturerId],
+      });
+      if (onSuccess) onSuccess();
     },
-  })
+  });
 
   useEffect(() => {
     if (form.formState.isSubmitted) {
-      form.trigger()
+      form.trigger();
     }
-  }, [form.watch('cnpj')])
+  }, [form.watch("cnpj")]);
 
   async function handleUpdateManufacturer(data: UpdateManufacturerSchema) {
     try {
@@ -108,16 +111,16 @@ export function UpdateManufacturerDialog({
         name: data.name,
         cnpj: data.cnpj,
         description: data.description,
-      })
+      });
 
-      toast({ title: `Fabricante atualizado com sucesso!` })
+      toast({ title: `Fabricante atualizado com sucesso!` });
     } catch (error) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Erro ao tentar atualizar o fabricante.',
+        title: "Erro ao tentar atualizar o fabricante.",
         description: errorMessage,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     }
   }
 
@@ -164,7 +167,7 @@ export function UpdateManufacturerDialog({
                       mask="99.999.999/9999-99"
                       placeholder="CNPJ..."
                       onChange={(e: any) =>
-                        field.onChange(e.target.value.replace(/\D/g, ''))
+                        field.onChange(e.target.value.replace(/\D/g, ""))
                       }
                     >
                       {(inputProps: any) => <Input {...inputProps} />}
@@ -197,7 +200,7 @@ export function UpdateManufacturerDialog({
           <DialogFooter className="col-span-3 grid justify-end">
             <div className="flex gap-2">
               <DialogClose asChild>
-                <Button variant={'ghost'}>Cancelar</Button>
+                <Button variant={"ghost"}>Cancelar</Button>
               </DialogClose>
               <Button
                 type="submit"
@@ -212,5 +215,5 @@ export function UpdateManufacturerDialog({
         </form>
       </Form>
     </DialogContent>
-  )
+  );
 }

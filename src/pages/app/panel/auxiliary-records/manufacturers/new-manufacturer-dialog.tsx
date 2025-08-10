@@ -1,22 +1,22 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { DialogClose } from '@radix-ui/react-dialog'
-import { useMutation } from '@tanstack/react-query'
-import { useForm } from 'react-hook-form'
-import InputMask from 'react-input-mask'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import InputMask from "react-input-mask";
+import { z } from "zod";
 
 import {
   registerManufacturer,
   type RegisterManufacturerBody,
-} from '@/api/pharma/auxiliary-records/manufacturer/register-manufacturer'
-import { Button } from '@/components/ui/button'
+} from "@/api/pharma/auxiliary-records/manufacturer/register-manufacturer";
+import { Button } from "@/components/ui/button";
 import {
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -24,56 +24,60 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { useAuth } from '@/contexts/authContext'
-import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/lib/react-query'
-import { handleApiError } from '@/lib/utils/handle-api-error'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/authContext";
+import { toast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/react-query";
+import { handleApiError } from "@/lib/utils/handle-api-error";
+import { on } from "events";
 const newManufacturerSchema = z.object({
   name: z
     .string({
-      required_error: 'O nome é obrigatório.',
+      required_error: "O nome é obrigatório.",
     })
-    .min(3, { message: 'O nome deve ter pelo menos 3 caracteres.' }),
+    .min(3, { message: "O nome deve ter pelo menos 3 caracteres." }),
 
   cnpj: z
     .string({
-      required_error: 'O CNPJ é obrigatório.',
+      required_error: "O CNPJ é obrigatório.",
     })
     .length(14, {
-      message: 'O CNPJ deve ter exatamente 14 dígitos (apenas números).',
+      message: "O CNPJ deve ter exatamente 14 dígitos (apenas números).",
     }),
 
   description: z.string({}).optional(),
-})
+});
 
-type NewManufacturerSchema = z.infer<typeof newManufacturerSchema>
+type NewManufacturerSchema = z.infer<typeof newManufacturerSchema>;
 
-export function NewManufacturerDialog() {
-  const { token } = useAuth()
+interface NewManufacturerDialogProps {
+  onSuccess?: () => void;
+}
+
+export function NewManufacturerDialog({
+  onSuccess,
+}: NewManufacturerDialogProps) {
+  const { token } = useAuth();
 
   const form = useForm<NewManufacturerSchema>({
     resolver: zodResolver(newManufacturerSchema),
-  })
+  });
 
   const { mutateAsync: registerManufacturerFn } = useMutation({
     mutationFn: (data: RegisterManufacturerBody) =>
-      registerManufacturer(data, token ?? ''),
-    onSuccess(_, { name, cnpj, description }) {
-      const cached =
-        queryClient.getQueryData<NewManufacturerSchema[]>(['manufacturers']) ||
-        []
-
-      if (cached) {
-        queryClient.setQueryData(
-          ['manufacturers'],
-          [...cached, { name, cnpj, description }],
-        )
-      }
+      registerManufacturer(data, token ?? ""),
+    onSuccess(_, __) {
+      queryClient.invalidateQueries({ queryKey: ["manufacturers"] });
+      if (onSuccess) onSuccess();
+      form.reset({
+        cnpj: "",
+        description: "",
+        name: "",
+      });
     },
-  })
+  });
 
   async function handleRegisterManufacturer(data: NewManufacturerSchema) {
     try {
@@ -81,16 +85,16 @@ export function NewManufacturerDialog() {
         name: data.name,
         cnpj: data.cnpj,
         description: data.description,
-      })
+      });
       toast({
-        title: 'Fabricante cadastrado com suceso!',
-      })
+        title: "Fabricante cadastrado com suceso!",
+      });
     } catch (error) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Error ao cadastrar o fabricante',
+        title: "Error ao cadastrar o fabricante",
         description: errorMessage,
-      })
+      });
     }
   }
 
@@ -129,7 +133,7 @@ export function NewManufacturerDialog() {
                     mask="99.999.999/9999-99"
                     placeholder="CNPJ..."
                     onChange={(e: any) =>
-                      field.onChange(e.target.value.replace(/\D/g, ''))
+                      field.onChange(e.target.value.replace(/\D/g, ""))
                     }
                   >
                     {(inputProps: any) => <Input {...inputProps} />}
@@ -154,7 +158,7 @@ export function NewManufacturerDialog() {
           />
           <DialogFooter className="mt-2">
             <DialogClose asChild>
-              <Button variant={'ghost'}>Cancelar</Button>
+              <Button variant={"ghost"}>Cancelar</Button>
             </DialogClose>
             <Button type="submit" disabled={form.formState.isSubmitting}>
               Cadastrar
@@ -163,5 +167,5 @@ export function NewManufacturerDialog() {
         </form>
       </Form>
     </DialogContent>
-  )
+  );
 }
