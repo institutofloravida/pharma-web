@@ -1,24 +1,24 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { DialogClose } from '@radix-ui/react-dialog'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { fetchTherapeuticClasses } from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
-import { getMedicine } from '@/api/pharma/medicines/get-medicine'
+import { fetchTherapeuticClasses } from "@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class";
+import { getMedicine } from "@/api/pharma/medicines/get-medicine";
 import {
   updateMedicine,
   type UpdateMedicineBody,
-} from '@/api/pharma/medicines/update-medicine'
-import { ComboboxMany } from '@/components/comboboxes/combobox-many'
-import { Button } from '@/components/ui/button'
+} from "@/api/pharma/medicines/update-medicine";
+import { ComboboxMany } from "@/components/comboboxes/combobox-many";
+import { Button } from "@/components/ui/button";
 import {
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -26,69 +26,72 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Textarea } from '@/components/ui/textarea'
-import { useAuth } from '@/contexts/authContext'
-import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/lib/react-query'
-import { handleApiError } from '@/lib/utils/handle-api-error'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/authContext";
+import { toast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/react-query";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 const updateMedicineSchema = z.object({
   therapeuticClassesIds: z
     .array(z.string())
-    .min(1, 'selecione pelo menos uma opção'),
-  name: z.string().min(1, 'campo obrigatório'),
+    .min(1, "selecione pelo menos uma opção"),
+  name: z.string().min(1, "campo obrigatório"),
   description: z.string().optional(),
-})
-type UpdateMedicineSchema = z.infer<typeof updateMedicineSchema>
+});
+type UpdateMedicineSchema = z.infer<typeof updateMedicineSchema>;
 
 interface UpdateMedicineProps {
-  medicineId: string
-  open: boolean
+  medicineId: string;
+  open: boolean;
+  onSuccess?: () => void;
 }
 
 export function UpdateMedicineDialog({
   medicineId,
   open,
+  onSuccess,
 }: UpdateMedicineProps) {
-  const { token } = useAuth()
+  const { token } = useAuth();
 
-  const [queryTherapeuticClass, setQueryTherapeuticClass] = useState('')
+  const [queryTherapeuticClass, setQueryTherapeuticClass] = useState("");
 
   const { data: medicine, isLoading } = useQuery({
-    queryKey: ['medicine', medicineId],
-    queryFn: () => getMedicine({ id: medicineId }, token ?? ''),
+    queryKey: ["medicine", medicineId],
+    queryFn: () => getMedicine({ id: medicineId }, token ?? ""),
     enabled: open,
-  })
+  });
 
   const {
     data: therapeuticClassesResult,
     isLoading: isLoadingTherapeuticClasses,
   } = useQuery({
-    queryKey: ['therapeutic-classes'],
-    queryFn: () => fetchTherapeuticClasses({ page: 1 }, token ?? ''),
-  })
+    queryKey: ["therapeutic-classes"],
+    queryFn: () => fetchTherapeuticClasses({ page: 1 }, token ?? ""),
+  });
 
   const form = useForm<UpdateMedicineSchema>({
     resolver: zodResolver(updateMedicineSchema),
     values: {
-      name: medicine?.name ?? '',
-      description: medicine?.description ?? '',
+      name: medicine?.name ?? "",
+      description: medicine?.description ?? "",
       therapeuticClassesIds:
         medicine?.therapeuticsClasses.map((item) => item.id) ?? [],
     },
-  })
+  });
 
   const { mutateAsync: updateMedicineFn } = useMutation({
-    mutationFn: (data: UpdateMedicineBody) => updateMedicine(data, token ?? ''),
+    mutationFn: (data: UpdateMedicineBody) => updateMedicine(data, token ?? ""),
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ['medicines'],
-      })
+        queryKey: ["medicines"],
+      });
+      if (onSuccess) onSuccess();
     },
-  })
+  });
 
   async function handleUpdateMedicine(data: UpdateMedicineSchema) {
     try {
@@ -97,23 +100,18 @@ export function UpdateMedicineDialog({
         name: data.name,
         description: data.description,
         therapeuticClassesIds: data.therapeuticClassesIds,
-      })
+      });
 
       toast({
         title: `Medicamento atualizado com sucesso!`,
-        description: (
-          <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-            <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-          </pre>
-        ),
-      })
+      });
     } catch (error) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Erro ao tentar atualizar o medicamento.',
+        title: "Erro ao tentar atualizar o medicamento.",
         description: errorMessage,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     }
   }
 
@@ -179,13 +177,13 @@ export function UpdateMedicineDialog({
                           const therapeuticClass =
                             therapeuticClassesResult?.therapeutic_classes.find(
                               (inst) => inst.id === id,
-                            )
+                            );
                           return {
                             id,
                             value: therapeuticClass
                               ? therapeuticClass.name
-                              : 'Carregando...',
-                          }
+                              : "Carregando...",
+                          };
                         }),
                       }}
                       items={
@@ -199,7 +197,7 @@ export function UpdateMedicineDialog({
                       query={queryTherapeuticClass}
                       isFetching={isLoadingTherapeuticClasses}
                       formatItem={(item) => `${item.name}`}
-                      placeholder="Selecione uma classe terapeutica"
+                      placeholder="Selecione "
                       placeholderAferSelected="classe(s) terapeutica(s)"
                     />
                     <FormMessage />
@@ -212,7 +210,7 @@ export function UpdateMedicineDialog({
           <DialogFooter className="col-span-3 grid justify-end">
             <div className="flex gap-2">
               <DialogClose asChild>
-                <Button variant={'ghost'}>Cancelar</Button>
+                <Button variant={"ghost"}>Cancelar</Button>
               </DialogClose>
               <Button type="submit" disabled={form.formState.isSubmitting}>
                 Atualizar
@@ -222,5 +220,5 @@ export function UpdateMedicineDialog({
         </form>
       </Form>
     </DialogContent>
-  )
+  );
 }

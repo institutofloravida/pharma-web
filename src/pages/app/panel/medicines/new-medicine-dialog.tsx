@@ -1,18 +1,18 @@
-'use client'
+"use client";
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
-import { fetchTherapeuticClasses } from '@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class'
+import { fetchTherapeuticClasses } from "@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class";
 import {
   registerMedicine,
   type RegisterMedicineBody,
-} from '@/api/pharma/medicines/resgister-medicine'
-import { ComboboxMany } from '@/components/comboboxes/combobox-many'
-import { Button } from '@/components/ui/button'
+} from "@/api/pharma/medicines/resgister-medicine";
+import { ComboboxMany } from "@/components/comboboxes/combobox-many";
+import { Button } from "@/components/ui/button";
 import {
   DialogClose,
   DialogContent,
@@ -20,7 +20,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -28,59 +28,60 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { useAuth } from '@/contexts/authContext'
-import { toast } from '@/hooks/use-toast'
-import { queryClient } from '@/lib/react-query'
-import { handleApiError } from '@/lib/utils/handle-api-error'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/contexts/authContext";
+import { toast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/react-query";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 const FormSchema = z.object({
   therapeuticClassesIds: z
     .array(z.string())
-    .min(1, 'selecione pelo menos uma opção'),
-  name: z.string().min(1, 'campo obrigatório'),
+    .min(1, "selecione pelo menos uma opção"),
+  name: z.string().min(1, "campo obrigatório"),
   description: z.string().optional(),
-})
+});
 
-type NewMedicineSchema = z.infer<typeof FormSchema>
+type NewMedicineSchema = z.infer<typeof FormSchema>;
+export interface NewMedicineDialogProps {
+  onSuccess?: () => void;
+}
 
-export function NewMedicineDialog() {
-  const { token } = useAuth()
+export function NewMedicineDialog({ onSuccess }: NewMedicineDialogProps) {
+  const { token } = useAuth();
 
-  const [queryTherapeuticClass, setQueryTherapeuticClass] = useState('')
+  const [queryTherapeuticClass, setQueryTherapeuticClass] = useState("");
 
   const { mutateAsync: registerMedicineFn } = useMutation({
     mutationFn: (data: RegisterMedicineBody) =>
-      registerMedicine(data, token ?? ''),
-    onSuccess(_, { name, description, therapeuticClassesIds }) {
-      const cached =
-        queryClient.getQueryData<NewMedicineSchema[]>(['medicines']) || []
-
-      if (cached) {
-        queryClient.setQueryData(
-          ['medicines'],
-          [...cached, { name, description, therapeuticClassesIds }],
-        )
-      }
+      registerMedicine(data, token ?? ""),
+    onSuccess(_, __) {
+      queryClient.invalidateQueries({ queryKey: ["medicines"] });
+      if (onSuccess) onSuccess();
+      form.reset({
+        therapeuticClassesIds: [],
+        description: "",
+        name: "",
+      });
     },
-  })
+  });
 
   const {
     data: therapeuticClassesResult,
     isLoading: isLoadingTherapeuticClasses,
   } = useQuery({
-    queryKey: ['therapeutic-classes'],
-    queryFn: () => fetchTherapeuticClasses({ page: 1 }, token ?? ''),
-  })
+    queryKey: ["therapeutic-classes"],
+    queryFn: () => fetchTherapeuticClasses({ page: 1 }, token ?? ""),
+  });
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       therapeuticClassesIds: [],
     },
-  })
+  });
 
   async function handleRegisterMedicine(data: z.infer<typeof FormSchema>) {
     try {
@@ -88,18 +89,18 @@ export function NewMedicineDialog() {
         name: data.name,
         description: data.description,
         therapeuticClassesIds: data.therapeuticClassesIds,
-      })
+      });
 
       toast({
-        title: 'Medicamento cadastrado com Sucesso!',
-      })
+        title: "Medicamento cadastrado com Sucesso!",
+      });
     } catch (error) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Error ao cadastrar o medicamento',
+        title: "Error ao cadastrar o medicamento",
         description: errorMessage,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     }
   }
   return (
@@ -157,13 +158,13 @@ export function NewMedicineDialog() {
                       const therapeuticClass =
                         therapeuticClassesResult?.therapeutic_classes.find(
                           (inst) => inst.id === id,
-                        )
+                        );
                       return {
                         id,
                         value: therapeuticClass
                           ? therapeuticClass.name
-                          : 'Carregando...',
-                      }
+                          : "Carregando...",
+                      };
                     }),
                   }}
                   items={therapeuticClassesResult?.therapeutic_classes ?? []}
@@ -175,7 +176,7 @@ export function NewMedicineDialog() {
                   query={queryTherapeuticClass}
                   isFetching={isLoadingTherapeuticClasses}
                   formatItem={(item) => `${item.name}`}
-                  placeholder="Selecione uma classe terapeutica"
+                  placeholder="Selecione"
                   placeholderAferSelected="classe(s) terapeutica(s)"
                 />
                 <FormMessage />
@@ -185,7 +186,7 @@ export function NewMedicineDialog() {
           <DialogFooter className="col-span-3 grid justify-end">
             <div className="flex-gap-2">
               <DialogClose asChild>
-                <Button variant={'ghost'}>Cancelar</Button>
+                <Button variant={"ghost"}>Cancelar</Button>
               </DialogClose>
               <Button type="submit">Enviar</Button>
             </div>
@@ -193,5 +194,5 @@ export function NewMedicineDialog() {
         </form>
       </Form>
     </DialogContent>
-  )
+  );
 }
