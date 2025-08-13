@@ -1,48 +1,50 @@
-import { useQuery } from '@tanstack/react-query'
-import { Helmet } from 'react-helmet-async'
-import { useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
+import { useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchMedicinesVariants } from '@/api/pharma/medicines-variants/fetch-medicines-variants'
-import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { fetchMedicinesVariants } from "@/api/pharma/medicines-variants/fetch-medicines-variants";
+import { Pagination } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/table";
+import { useAuth } from "@/contexts/authContext";
 
-import { MedicineVariantTableFilters } from './medicine-variant-table-filters'
-import { MedicineVariantTableRow } from './medicine-variant-table-row'
-import { NewMedicineVariantDialog } from './new-medicine-variant-dialog'
+import { MedicineVariantTableFilters } from "./medicine-variant-table-filters";
+import { MedicineVariantTableRow } from "./medicine-variant-table-row";
+import { NewMedicineVariantDialog } from "./new-medicine-variant-dialog";
+import { useState } from "react";
 
 export function MedicinesVariants() {
-  const { token } = useAuth()
+  const { token } = useAuth();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const [searchParams, setSearchParams] = useSearchParams()
-  const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageIndex = z.coerce.number().parse(searchParams.get("page") ?? "1");
 
-  const medicineId = searchParams.get('medicineId')
-  const name = searchParams.get('name')
+  const medicineId = searchParams.get("medicineId");
+  const name = searchParams.get("name");
 
   const { data: medicinesVariants } = useQuery({
-    queryKey: ['medicines-variants', pageIndex, name, medicineId],
+    queryKey: ["medicines-variants", pageIndex, name, medicineId],
     queryFn: () =>
       fetchMedicinesVariants(
         { page: pageIndex, query: name, medicineId },
-        token ?? '',
+        token ?? "",
       ),
-  })
+  });
 
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
-      state.set('page', pageIndex.toString())
-      return state
-    })
+      state.set("page", pageIndex.toString());
+      return state;
+    });
   }
 
   return (
@@ -55,13 +57,15 @@ export function MedicinesVariants() {
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <MedicineVariantTableFilters />
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="" variant={'default'}>
+                <Button className="" variant={"default"}>
                   Nova Variante
                 </Button>
               </DialogTrigger>
-              <NewMedicineVariantDialog />
+              <NewMedicineVariantDialog
+                onSuccess={() => setIsDialogOpen(false)}
+              />
             </Dialog>
           </div>
           <div className="rounded-md border">
@@ -84,7 +88,7 @@ export function MedicinesVariants() {
                         medicineVariant={item}
                         key={item.id}
                       />
-                    )
+                    );
                   })}
               </TableBody>
             </Table>
@@ -101,5 +105,5 @@ export function MedicinesVariants() {
         </div>
       </div>
     </>
-  )
+  );
 }

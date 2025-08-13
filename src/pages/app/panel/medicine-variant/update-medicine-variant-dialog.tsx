@@ -6,17 +6,14 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { fetchPharmaceuticalForms } from "@/api/pharma/auxiliary-records/pharmaceutical-form/fetch-pharmaceutical-form";
-import { fetchTherapeuticClasses } from "@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class";
 import { fetchUnitsMeasure } from "@/api/pharma/auxiliary-records/unit-measure/fetch-units-measure";
 import { fetchMedicines } from "@/api/pharma/medicines/fetch-medicines";
-import { getMedicine } from "@/api/pharma/medicines/get-medicine";
 import { getMedicineVariant } from "@/api/pharma/medicines-variants/get-medicine-variant";
 import {
   updateMedicineVariant,
   type UpdateMedicineVariantBody,
 } from "@/api/pharma/medicines-variants/update-medicine-variant";
 import { Combobox } from "@/components/comboboxes/combobox";
-import { ComboboxMany } from "@/components/comboboxes/combobox-many";
 import { Button } from "@/components/ui/button";
 import {
   DialogContent,
@@ -34,11 +31,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/authContext";
 import { toast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/react-query";
 import { handleApiError } from "@/lib/utils/handle-api-error";
+import { ComboboxUp } from "@/components/comboboxes/combobox-up";
 
 const updateMedicineVariantSchema = z.object({
   medicineId: z.string({
@@ -60,11 +57,13 @@ type UpdateMedicineVariantSchema = z.infer<typeof updateMedicineVariantSchema>;
 interface UpdateMedicineVariantProps {
   medicineVariantId: string;
   open: boolean;
+  onSuccess?: () => void;
 }
 
 export function UpdateMedicineVariantDialog({
   medicineVariantId,
   open,
+  onSuccess,
 }: UpdateMedicineVariantProps) {
   const { token } = useAuth();
   const [queryMedicine, setQueryMedicine] = useState("");
@@ -129,6 +128,7 @@ export function UpdateMedicineVariantDialog({
       queryClient.invalidateQueries({
         queryKey: ["medicines-variants"],
       });
+      if (onSuccess) onSuccess();
     },
   });
 
@@ -185,7 +185,8 @@ export function UpdateMedicineVariantDialog({
                 render={({ field }) => (
                   <FormItem className="col-span-3 flex flex-col">
                     <FormLabel>Medicamento</FormLabel>
-                    <Combobox
+                    <ComboboxUp
+                      formatItem={(item) => item.name}
                       isDisable={true}
                       items={medicinesResult?.medicines || []}
                       field={field}
@@ -193,9 +194,9 @@ export function UpdateMedicineVariantDialog({
                       placeholder="Selecione o medicamento "
                       isFetching={isFetchingMedicines}
                       onQueryChange={setQueryMedicine}
-                      onSelect={(id, name) => {
+                      onSelect={(id, item) => {
                         form.setValue("medicineId", id);
-                        setQueryMedicine(name);
+                        setQueryMedicine(item.name);
                       }}
                       itemKey="id"
                       itemValue="name"
@@ -210,7 +211,8 @@ export function UpdateMedicineVariantDialog({
                 render={({ field }) => (
                   <FormItem className="col-span-3 flex flex-col">
                     <FormLabel>Forma Farmacêutica</FormLabel>
-                    <Combobox
+                    <ComboboxUp
+                      formatItem={(item) => item.name}
                       items={
                         pharmaceuticalFormResult?.pharmaceutical_forms || []
                       }
@@ -219,9 +221,9 @@ export function UpdateMedicineVariantDialog({
                       placeholder="Selecione a forma farmacêutica"
                       isFetching={isFetchingPharmaceuticalForm}
                       onQueryChange={setQueryPharmaceuticalForm}
-                      onSelect={(id, name) => {
+                      onSelect={(id, item) => {
                         form.setValue("pharmaceuticalFormId", id);
-                        setQueryPharmaceuticalForm(name);
+                        setQueryPharmaceuticalForm(item.name);
                       }}
                       itemKey="id"
                       itemValue="name"
@@ -234,7 +236,7 @@ export function UpdateMedicineVariantDialog({
                 control={form.control}
                 name="dosage"
                 render={({ field }) => (
-                  <FormItem className="col-span-2 flex flex-col">
+                  <FormItem className="col-span-1 flex flex-col">
                     <FormLabel>Dosagem</FormLabel>
                     <FormControl>
                       <Input placeholder="Dosagem..." {...field} />
@@ -247,18 +249,19 @@ export function UpdateMedicineVariantDialog({
                 control={form.control}
                 name="unitMeasureId"
                 render={({ field }) => (
-                  <FormItem className="col-span-1 flex flex-col">
+                  <FormItem className="col-span-2 flex flex-col">
                     <FormLabel>Unid. de Medida</FormLabel>
-                    <Combobox
+                    <ComboboxUp
+                      formatItem={(item) => item.acronym}
                       items={unitsMeasureResult?.units_measure || []}
                       field={field}
                       query={queryUnitMeasure}
                       placeholder="Selecione a unidade de medida"
                       isFetching={isFetchingUnitsMeasure}
                       onQueryChange={setQueryUnitMeasure}
-                      onSelect={(id, acronym) => {
+                      onSelect={(id, item) => {
                         form.setValue("unitMeasureId", id);
-                        setQueryUnitMeasure(acronym);
+                        setQueryUnitMeasure(item.acronym);
                       }}
                       itemKey="id"
                       itemValue="acronym"
