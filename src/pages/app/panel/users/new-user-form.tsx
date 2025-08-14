@@ -43,7 +43,17 @@ export const newUserSchema = z.object({
     .max(100, { message: "O nome pode ter no máximo 100 caracteres." }),
   cpf: z
     .string()
-    .regex(/^\d{11}$/, { message: "O CPF deve conter exatamente 11 dígitos." })
+    .transform((v) => v.trim())
+    .superRefine((val, ctx) => {
+      if (val.length === 0) return;
+      if (!/^\d{11}$/.test(val)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "O CPF deve conter exatamente 11 dígitos.",
+        });
+      }
+    })
+    .transform((val) => (val.length === 0 ? undefined : val)) // envia como undefined se vazio
     .optional(),
   sus: z
     .string()

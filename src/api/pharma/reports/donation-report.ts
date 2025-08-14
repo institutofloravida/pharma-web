@@ -1,33 +1,34 @@
-import { apiPharma } from '@/lib/axios'
-import type { MovementTypeDirection } from '@/lib/utils/movement-type'
+import { apiPharma } from "@/lib/axios";
+import type { MovementTypeDirection } from "@/lib/utils/movement-type";
 
-import type { MedicineExit } from '../movement/exit/fetch-medicines-exits'
+import type { MedicineExit } from "../movement/exit/fetch-medicines-exits";
 
 export interface GetDonationReportReportQuery {
-  exitId: string
+  exitId: string;
 }
 
 export interface Movimentation {
-  direction: MovementTypeDirection
-  medicine: string
-  batchCode: string
-  complement: string | null | undefined
-  dosage: string
-  pharmaceuticalForm: string
-  unitMeasure: string
-  stock: string
-  movementDate: Date
-  movementType: string
-  operator: string
-  quantity: number
+  id: string;
+  direction: MovementTypeDirection;
+  medicine: string;
+  batchCode: string;
+  complement: string | null | undefined;
+  dosage: string;
+  pharmaceuticalForm: string;
+  unitMeasure: string;
+  stock: string;
+  movementDate: Date;
+  movementType: string;
+  operator: string;
+  quantity: number;
 }
 
 interface GetDonationReportReportResponse {
-  exit: MedicineExit
-  movimentation: Movimentation[]
+  exit: MedicineExit;
+  movimentation: Movimentation[];
   meta: {
-    totalCount: number
-  }
+    totalCount: number;
+  };
 }
 
 export async function getDonationReportReport(
@@ -41,7 +42,7 @@ export async function getDonationReportReport(
         Authorization: `Bearer ${token}`,
       },
     },
-  )
+  );
 
-  return response.data
+  return response.data;
 }

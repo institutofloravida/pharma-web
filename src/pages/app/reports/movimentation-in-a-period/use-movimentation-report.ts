@@ -11,7 +11,6 @@ import { BACKGROUND_LANDSCAPE } from "@/lib/reports/bases-64";
 pdfMake.vfs = (pdfFonts as any).vfs;
 export function useMovimentationReportPdf() {
   const { me } = useAuth();
-
   return (
     movimentation: Movimentation[],
     filters: {
@@ -108,12 +107,7 @@ export function useMovimentationReportPdf() {
     );
 
     const contentArr: any[] = [
-      {
-        text: "Relatório de Movimentação",
-        style: "header",
-        alignment: "center",
-        margin: [0, 115, 0, 10],
-      },
+      // Removido header estático; agora será tratado via header dinâmico no docDefinition
       {
         text: "Filtros",
         bold: true,
@@ -153,13 +147,14 @@ export function useMovimentationReportPdf() {
             mov.quantity,
             new Date(mov.movementDate).toLocaleDateString("pt-BR"),
             mov.movementType,
-            mov.direction,
+            mov.direction === MovementTypeDirection.ENTRY ? "ENTRADA" : "SAÍDA",
             mov.operator,
           ]),
         ],
       },
       layout: {
-        // fillColor: (rowIndex: number) => (rowIndex === 0 ? "#2980b9" : null),
+        fillColor: (rowIndex: number) =>
+          rowIndex % 2 === 0 ? "#EEF6F1" : null,
         hLineColor: () => "#b4b4b4",
         vLineColor: () => "#b4b4b4",
         paddingLeft: () => 6,
@@ -171,6 +166,24 @@ export function useMovimentationReportPdf() {
 
     const docDefinition: TDocumentDefinitions = {
       pageOrientation: "landscape",
+      pageMargins: [40, 140, 40, 40], // reserva 140 no topo para a logo
+      header: (currentPage: number) => {
+        if (currentPage === 1) {
+          return {
+            text: "Relatório de Movimentação",
+            style: "header",
+            alignment: "center",
+            margin: [0, 115, 0, 10], // pequena margem top
+          };
+        }
+        // páginas seguintes: só um espaçador opcional menor
+        return {
+          text: "",
+          style: "header",
+          alignment: "center",
+          margin: [0, 10, 0, 10],
+        };
+      },
       content: contentArr,
       styles: {
         header: {
@@ -182,12 +195,11 @@ export function useMovimentationReportPdf() {
           bold: true,
         },
       },
-      background: function (currentPage: number) {
+      background() {
         return {
           image: "bg",
-          width: 842, // largura da página A4
-          height: 595, // altura da página A4
-          // fit: [842, 595],
+          width: 842,
+          height: 595,
           absolutePosition: { x: 0, y: 0 },
         };
       },

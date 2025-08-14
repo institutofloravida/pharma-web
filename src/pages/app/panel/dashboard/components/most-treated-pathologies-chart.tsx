@@ -1,37 +1,37 @@
-'use client'
+"use client";
 
-import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
-import { Cell, Pie, PieChart } from 'recharts'
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { Cell, Pie, PieChart } from "recharts";
 
-import { fetchMostTreatedPathologies } from '@/api/pharma/dashboard/fetch-most-treated-pathologies'
+import { fetchMostTreatedPathologies } from "@/api/pharma/dashboard/fetch-most-treated-pathologies";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
   ChartTooltip,
-} from '@/components/ui/chart'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/chart";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/authContext";
 
 const COLORS = [
-  'hsl(var(--chart-1))',
-  'hsl(var(--chart-2))',
-  'hsl(var(--chart-3))',
-  'hsl(var(--chart-4))',
-  'hsl(var(--chart-5))',
-]
+  "hsl(var(--chart-1))",
+  "hsl(var(--chart-2))",
+  "hsl(var(--chart-3))",
+  "hsl(var(--chart-4))",
+  "hsl(var(--chart-5))",
+];
 
 const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
-    const data = payload[0].payload
+    const data = payload[0].payload;
     return (
       <div className="rounded-lg border bg-background p-3 shadow-md">
         <div className="flex flex-col gap-2">
@@ -47,59 +47,65 @@ const CustomTooltip = ({ active, payload }: any) => {
           </div>
         </div>
       </div>
-    )
+    );
   }
-  return null
-}
+  return null;
+};
 
 export function MostTreatedPathologiesChart() {
-  const { institutionId, token } = useAuth()
+  const { institutionId, token } = useAuth();
+  const REFRESH_INTERVAL_MS = 30_000;
 
   const { data: mostTreatedPathologiesData, isFetching } = useQuery({
-    queryKey: ['most-treated-pathologies', institutionId],
+    queryKey: ["most-treated-pathologies", institutionId],
     queryFn: () =>
       fetchMostTreatedPathologies(
         {
-          institutionId: institutionId ?? '',
+          institutionId: institutionId ?? "",
         },
-        token ?? '',
+        token ?? "",
       ),
-  })
+    enabled: !!token && !!institutionId,
+    refetchInterval: REFRESH_INTERVAL_MS,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+  });
 
   const { chartConfig, chartData } = useMemo(() => {
     if (!mostTreatedPathologiesData?.mostTreatedPathologies) {
-      return { chartConfig: {}, chartData: [] }
+      return { chartConfig: {}, chartData: [] };
     }
 
     const data = mostTreatedPathologiesData.mostTreatedPathologies.map(
       (item, idx) => ({
         ...item,
         fill:
-          item.pathologyId === 'others'
+          item.pathologyId === "others"
             ? COLORS[4]
             : COLORS[idx % COLORS.length],
       }),
-    )
+    );
 
     const config = data.reduce(
       (acc, item, idx) => {
         const color =
-          item.pathologyId === 'others'
+          item.pathologyId === "others"
             ? COLORS[4]
-            : COLORS[idx % COLORS.length]
+            : COLORS[idx % COLORS.length];
 
         acc[item.pathologyName] = {
           label: item.pathologyName,
           color,
-        }
+        };
 
-        return acc
+        return acc;
       },
       {} as Record<string, { label: string; color: string }>,
-    )
+    );
 
-    return { chartConfig: config, chartData: data }
-  }, [mostTreatedPathologiesData])
+    return { chartConfig: config, chartData: data };
+  }, [mostTreatedPathologiesData]);
 
   return (
     <Card className="col-span-3 flex flex-col">
@@ -152,5 +158,5 @@ export function MostTreatedPathologiesChart() {
         </ChartContainer>
       </CardContent>
     </Card>
-  )
+  );
 }

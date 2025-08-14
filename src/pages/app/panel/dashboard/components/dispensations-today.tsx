@@ -1,21 +1,27 @@
-import { useQuery } from '@tanstack/react-query'
-import { Loader2, Pill } from 'lucide-react'
+import { useQuery } from "@tanstack/react-query";
+import { Loader2, Pill } from "lucide-react";
 
-import { GetDispenseMetrics } from '@/api/pharma/dashboard/get-dispense-metrics'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuth } from '@/contexts/authContext'
+import { GetDispenseMetrics } from "@/api/pharma/dashboard/get-dispense-metrics";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/authContext";
 
-import { CardSkeleton } from './card-skeleton'
+import { CardSkeleton } from "./card-skeleton";
 
 export function DispensationsTodayCard() {
-  const { institutionId, token } = useAuth()
+  const { institutionId, token } = useAuth();
+
+  const REFRESH_INTERVAL_MS = 30_000;
 
   const { data: dispenseMetrics, isLoading } = useQuery({
     queryFn: () =>
-      GetDispenseMetrics({ institutionId: institutionId ?? '' }, token ?? ''),
-    queryKey: ['metrics', 'dispense', institutionId],
+      GetDispenseMetrics({ institutionId: institutionId ?? "" }, token ?? ""),
+    queryKey: ["metrics", "dispense", institutionId],
     enabled: !!institutionId && !!token,
-  })
+    refetchInterval: REFRESH_INTERVAL_MS,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+  });
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -38,20 +44,20 @@ export function DispensationsTodayCard() {
               <span
                 className={
                   dispenseMetrics.today.percentageAboveAverage > 0
-                    ? 'text-emerald-500'
+                    ? "text-emerald-500"
                     : dispenseMetrics.today.percentageAboveAverage < 0
-                      ? 'text-red-500'
-                      : 'text-muted-foreground'
+                      ? "text-red-500"
+                      : "text-muted-foreground"
                 }
               >
                 {dispenseMetrics.today.percentageAboveAverage > 0
                   ? `+${dispenseMetrics.today.percentageAboveAverage}`
                   : dispenseMetrics.today.percentageAboveAverage}
                 %
-              </span>{' '}
+              </span>{" "}
               {dispenseMetrics.today.percentageAboveAverage >= 0
-                ? 'acima da média'
-                : 'abaixo da média'}
+                ? "acima da média"
+                : "abaixo da média"}
             </p>
           </>
         ) : (
@@ -59,5 +65,5 @@ export function DispensationsTodayCard() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -9,12 +9,17 @@ import { CardSkeleton } from "./card-skeleton";
 
 export function InventoryTodayCard() {
   const { institutionId, token } = useAuth();
+  const REFRESH_INTERVAL_MS = 30_000;
 
   const { data: inventoryMetrics, isLoading } = useQuery({
     queryFn: () =>
       GetInventoryMetrics({ institutionId: institutionId ?? "" }, token ?? ""),
     queryKey: ["metrics", "inventory", institutionId],
     enabled: !!institutionId && !!token,
+    refetchInterval: REFRESH_INTERVAL_MS,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
   });
 
   return (

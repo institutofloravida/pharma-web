@@ -1,21 +1,27 @@
-import { useQuery } from '@tanstack/react-query'
-import { Loader2, Pill } from 'lucide-react'
+import { useQuery } from "@tanstack/react-query";
+import { Loader2, Pill } from "lucide-react";
 
-import { GetDispenseMetrics } from '@/api/pharma/dashboard/get-dispense-metrics'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuth } from '@/contexts/authContext'
+import { GetDispenseMetrics } from "@/api/pharma/dashboard/get-dispense-metrics";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/authContext";
 
-import { CardSkeleton } from './card-skeleton'
+import { CardSkeleton } from "./card-skeleton";
 
 export function DispensationsMonthCard() {
-  const { institutionId, token } = useAuth()
+  const { institutionId, token } = useAuth();
+
+  const REFRESH_INTERVAL_MS = 30_000;
 
   const { data: dispenseMetrics, isLoading } = useQuery({
     queryFn: () =>
-      GetDispenseMetrics({ institutionId: institutionId ?? '' }, token ?? ''),
-    queryKey: ['metrics', 'dispense', institutionId],
+      GetDispenseMetrics({ institutionId: institutionId ?? "" }, token ?? ""),
+    queryKey: ["metrics", "dispense", institutionId],
     enabled: !!institutionId && !!token,
-  })
+    refetchInterval: REFRESH_INTERVAL_MS,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+  });
 
   return (
     <Card>
@@ -39,15 +45,15 @@ export function DispensationsMonthCard() {
               <span
                 className={
                   dispenseMetrics.month.percentageComparedToLastMonth > 0
-                    ? 'text-emerald-500'
-                    : 'text-red-500'
+                    ? "text-emerald-500"
+                    : "text-red-500"
                 }
               >
                 {dispenseMetrics.month.percentageComparedToLastMonth > 0
                   ? `+${dispenseMetrics.month.percentageComparedToLastMonth}`
                   : dispenseMetrics.month.percentageComparedToLastMonth}
                 %
-              </span>{' '}
+              </span>{" "}
               em relação ao mês passado
             </p>
           </>
@@ -56,5 +62,5 @@ export function DispensationsMonthCard() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

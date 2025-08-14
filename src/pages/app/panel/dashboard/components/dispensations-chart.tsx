@@ -4,7 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import { subDays } from "date-fns";
 import * as React from "react";
 import { useSearchParams } from "react-router-dom";
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+} from "recharts";
 
 import { fetchDispensesPerDay } from "@/api/pharma/dashboard/fetch-dispenses-per-day";
 import {
@@ -47,6 +54,7 @@ export function DispensationsChart() {
 
   const startDate = searchParams.get("startDate") ?? subDays(new Date(), 7);
   const endDate = searchParams.get("endDate") ?? new Date();
+  const REFRESH_INTERVAL_MS = 30_000;
 
   const { data: dispensesPerDayData, isFetching } = useQuery({
     queryKey: ["dispenses-per-day", institutionId, timeRange],
@@ -59,6 +67,11 @@ export function DispensationsChart() {
         },
         token ?? "",
       ),
+    enabled: !!token && !!institutionId,
+    refetchInterval: REFRESH_INTERVAL_MS,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
   });
 
   function trimesterFilterSelected() {
@@ -144,68 +157,70 @@ export function DispensationsChart() {
         </Select>
       </CardHeader>
       {isFetching ? (
-        <Skeleton className="h-[250px] w-full rounded-xl" />
+        <Skeleton className="h-[clamp(180px,35vh,360px)] w-full rounded-xl" />
       ) : (
         <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
           <ChartContainer
             config={chartConfig}
-            className="aspect-auto h-[250px] w-full"
+            className="h-[clamp(180px,35vh,360px)] w-full"
           >
-            <AreaChart data={dispensesPerDayData?.dispenses ?? []}>
-              <defs>
-                <linearGradient id="fillTotal" x1="0" y1="0" x2="0" y2="1">
-                  <stop
-                    offset="5%"
-                    stopColor="var(--color-total)"
-                    stopOpacity={0.8}
-                  />
-                  <stop
-                    offset="95%"
-                    stopColor="var(--color-total)"
-                    stopOpacity={0.1}
-                  />
-                </linearGradient>
-              </defs>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="dispensationDate"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={16}
-                minTickGap={32}
-                tickFormatter={(value) => {
-                  const [year, month, day] = value.split("-");
-                  return `${day}/${month}`;
-                }}
-              />
-              <YAxis
-                dataKey="total"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={16}
-                minTickGap={32}
-              />
-              <ChartTooltip
-                cursor={false}
-                content={
-                  <ChartTooltipContent
-                    labelFormatter={(value) => {
-                      const [year, month, day] = value.split("-");
-                      return `${day}/${month}/${year}`;
-                    }}
-                    indicator="dot"
-                  />
-                }
-              />
-              <Area
-                dataKey="total"
-                type="natural"
-                fill="url(#fillTotal)"
-                stroke="var(--color-total)"
-                stackId="a"
-              />
-              <ChartLegend content={<ChartLegendContent />} />
-            </AreaChart>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={dispensesPerDayData?.dispenses ?? []}>
+                <defs>
+                  <linearGradient id="fillTotal" x1="0" y1="0" x2="0" y2="1">
+                    <stop
+                      offset="5%"
+                      stopColor="var(--color-total)"
+                      stopOpacity={0.8}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="var(--color-total)"
+                      stopOpacity={0.1}
+                    />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="dispensationDate"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={16}
+                  minTickGap={32}
+                  tickFormatter={(value) => {
+                    const [year, month, day] = value.split("-");
+                    return `${day}/${month}`;
+                  }}
+                />
+                <YAxis
+                  dataKey="total"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={16}
+                  minTickGap={32}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={
+                    <ChartTooltipContent
+                      labelFormatter={(value) => {
+                        const [year, month, day] = value.split("-");
+                        return `${day}/${month}/${year}`;
+                      }}
+                      indicator="dot"
+                    />
+                  }
+                />
+                <Area
+                  dataKey="total"
+                  type="natural"
+                  fill="url(#fillTotal)"
+                  stroke="var(--color-total)"
+                  stackId="a"
+                />
+                <ChartLegend content={<ChartLegendContent />} />
+              </AreaChart>
+            </ResponsiveContainer>
           </ChartContainer>
         </CardContent>
       )}

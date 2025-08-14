@@ -1,21 +1,26 @@
-import { useQuery } from '@tanstack/react-query'
-import { Loader2, Pill, UserPlus } from 'lucide-react'
+import { useQuery } from "@tanstack/react-query";
+import { Loader2, Pill, UserPlus } from "lucide-react";
 
-import { GetUserMetrics } from '@/api/pharma/dashboard/get-users-metrics'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuth } from '@/contexts/authContext'
+import { GetUserMetrics } from "@/api/pharma/dashboard/get-users-metrics";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/contexts/authContext";
 
-import { CardSkeleton } from './card-skeleton'
+import { CardSkeleton } from "./card-skeleton";
 
 export function UsersCard() {
-  const { institutionId, token } = useAuth()
+  const { institutionId, token } = useAuth();
 
+  const REFRESH_INTERVAL_MS = 60_000;
   const { data: usersMetrics, isLoading } = useQuery({
     queryFn: () =>
-      GetUserMetrics({ institutionId: institutionId ?? '' }, token ?? ''),
-    queryKey: ['metrics', 'users', institutionId],
+      GetUserMetrics({ institutionId: institutionId ?? "" }, token ?? ""),
+    queryKey: ["metrics", "users", institutionId],
     enabled: !!institutionId && !!token,
-  })
+    refetchInterval: REFRESH_INTERVAL_MS,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
+    staleTime: 0,
+  });
 
   return (
     <Card>
@@ -35,14 +40,14 @@ export function UsersCard() {
               <span
                 className={
                   usersMetrics.receiveMonth > 0
-                    ? 'text-emerald-500'
-                    : 'text-red-500'
+                    ? "text-emerald-500"
+                    : "text-red-500"
                 }
               >
                 {usersMetrics.receiveMonth > 0
                   ? `${usersMetrics.receiveMonth}`
                   : usersMetrics.receiveMonth}
-              </span>{' '}
+              </span>{" "}
               receberam esse mês.
             </p>
           </>
@@ -51,5 +56,5 @@ export function UsersCard() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
