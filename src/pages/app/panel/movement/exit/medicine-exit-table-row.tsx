@@ -1,4 +1,4 @@
-import { FileText, PenLine, Search, Trash } from "lucide-react";
+import { FileText, PenLine, RotateCcw, Search, Trash } from "lucide-react";
 import { useState } from "react";
 
 import { MedicineExit } from "@/api/pharma/movement/exit/fetch-medicines-exits";
@@ -16,6 +16,17 @@ import {
 import { dateFormatter } from "@/lib/utils/formatter";
 import { useDonationReportPdf } from "@/pages/app/reports/donation-report/use-donation-report";
 import { getExitTypeTranslation } from "@/lib/utils/translations-mappers/exit-type-translation";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialogConfirm } from "@/components/dialog/alert-confirm-content";
+import { useAuth } from "@/contexts/authContext";
+import {
+  reverseExit,
+  type ReverseExitParams,
+} from "@/api/pharma/movement/exit/reverse-exit";
+import { queryClient } from "@/lib/react-query";
+import { toast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 export interface MedicinesExitsTableRowProps {
   medicineExit: MedicineExit;
@@ -26,7 +37,28 @@ export function MedicineExitTableRow({
 }: MedicinesExitsTableRowProps) {
   const { downloadPdf } = useDonationReportPdf();
   const [loading, setLoading] = useState(false);
+  const [isReverseOpen, setIsReverseOpen] = useState(false);
+  const { token } = useAuth();
 
+  const { mutateAsync: reverseExitFn, isPending: isPendingReverse } =
+    useMutation({
+      mutationFn: (data: ReverseExitParams) => reverseExit(data, token ?? ""),
+      onSuccess() {
+        queryClient.invalidateQueries({ queryKey: ["medicines-exits"] });
+        toast({ title: "Saída revertida com sucesso!" });
+        setIsReverseOpen(false);
+      },
+      onError(error) {
+        toast({
+          title: "Erro ao reverter saída",
+          description: handleApiError(error),
+          variant: "destructive",
+        });
+      },
+    });
+  const handleReverse = () => {
+    reverseExitFn({ exitId: medicineExit.id });
+  };
   async function handleDownload() {
     setLoading(true);
     try {
@@ -66,6 +98,13 @@ export function MedicineExitTableRow({
       <TableCell className="font-mono text-xs font-medium">
         {dateFormatter.format(new Date(medicineExit.exitDate))}
       </TableCell>
+      <TableCell className="flex-col items-center justify-center gap-2 align-middle font-mono text-xs font-medium">
+        {medicineExit.reverseAt && <Badge variant={"outline"}>Revertido</Badge>}
+        <p className="text-xs text-muted-foreground">
+          {medicineExit.reverseAt &&
+            dateFormatter.format(new Date(medicineExit.reverseAt))}
+        </p>
+      </TableCell>
       <TableCell>
         <TooltipProvider>
           <div className="">
@@ -75,7 +114,9 @@ export function MedicineExitTableRow({
                   variant={"outline"}
                   size={"xs"}
                   disabled={
-                    loading || !(medicineExit.exitType === ExitType.DONATION)
+                    loading ||
+                    !(medicineExit.exitType === ExitType.DONATION) ||
+                    medicineExit.reverseAt !== null
                   }
                   onClick={handleDownload}
                 >
@@ -90,9 +131,41 @@ export function MedicineExitTableRow({
         </TooltipProvider>
       </TableCell>
       <TableCell>
-        <Button variant={"outline"} size={"xs"}>
-          <Trash className="h-3 w-3" />
-        </Button>
+        <AlertDialog open={isReverseOpen} onOpenChange={setIsReverseOpen}>
+          <TooltipProvider>
+            <div className="">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      size={"xs"}
+                      disabled={
+                        loading ||
+                        (medicineExit.reverseAt !== null &&
+                          medicineExit.reverseAt !== undefined)
+                      }
+                    >
+                      <RotateCcw className="h-3 w-3" />
+                    </Button>
+                  </AlertDialogTrigger>
+                </TooltipTrigger>
+                <TooltipContent className="bg-primary text-primary-foreground">
+                  <p>Reverter</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <AlertDialogConfirm
+              title="Deseja reverter essa saída?"
+              description="Esta ação não pode ser desfeita. Todos os itens serão devolvidos ao estoque."
+              isPending={isPendingReverse}
+              variant="destructive"
+              cancelLabel="Cancelar"
+              confirmLabel="Reverter"
+              onConfirm={handleReverse}
+            />
+          </TooltipProvider>
+        </AlertDialog>
       </TableCell>
     </TableRow>
   );
