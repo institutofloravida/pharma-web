@@ -340,10 +340,10 @@ export default function MedicineExitPage() {
               </Button>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">
-                  Entrada de Medicamentos
+                  Saída de Medicamentos
                 </h1>
                 <p className="text-muted-foreground">
-                  Gerencie a entrada de medicamentos e seus respectivos lotes
+                  Gerencie a saída de medicamentos e seus respectivos lotes
                 </p>
               </div>
             </div>

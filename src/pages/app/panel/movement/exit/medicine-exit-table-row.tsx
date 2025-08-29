@@ -68,7 +68,10 @@ export function MedicineExitTableRow({
     }
   }
   return (
-    <TableRow>
+    <TableRow
+      aria-disabled={medicineExit.reverseAt !== null}
+      className={`${medicineExit.reverseAt !== null ? "opacity-50" : ""}`}
+    >
       <TableCell>
         <Dialog>
           <DialogTrigger asChild>

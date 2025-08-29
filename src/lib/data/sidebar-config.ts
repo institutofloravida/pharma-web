@@ -110,11 +110,11 @@ export const sidebarSections: SidebarSection[] = [
   {
     label: "Área do Operador",
     singleItems: [
-      {
-        name: "Teste",
-        url: "/test",
-        icon: FlaskConical,
-      },
+      // {
+      //   name: "Teste",
+      //   url: "/test",
+      //   icon: FlaskConical,
+      // },
     ],
     groupedItems: [
       {
@@ -150,6 +150,11 @@ export const sidebarSections: SidebarSection[] = [
             name: "Dispensas",
             url: "/dispensation",
             role: OperatorRole.COMMON,
+          },
+          {
+            name: "Nova Dispensa",
+            url: "/dispensation/new",
+            role: [],
           },
         ],
       },

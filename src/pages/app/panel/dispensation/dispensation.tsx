@@ -75,8 +75,8 @@ export function Dispensations() {
                   <TableHead>Usuário</TableHead>
                   <TableHead>Operador</TableHead>
                   <TableHead className="w-[180px]">Dispensado em</TableHead>
-                  <TableHead className="w-[180px]">Items</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
+                  <TableHead className="w-[180px]">Lotes</TableHead>
+                  <TableHead className="w-[100px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>

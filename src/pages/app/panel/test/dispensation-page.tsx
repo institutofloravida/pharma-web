@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { Save, FileText, AlertCircle, Users, Calendar } from "lucide-react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { Save, FileText, AlertCircle, Users } from "lucide-react";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -17,13 +16,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { PatientSearch } from "./components/patient-search";
@@ -33,13 +25,7 @@ import {
   dispensationFormSchema,
   type DispensationFormSchema,
 } from "./schemas/dispensation";
-import type {
-  Patient,
-  MedicineStock,
-  Stock,
-  DispensationMedicine,
-  BatchPreview,
-} from "./types/dispensation";
+import type { Stock, DispensationMedicine } from "./types/dispensation";
 import { DispensationConfirmationModal } from "./components/dispensation-confirmation-modal";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchStocks } from "@/api/pharma/auxiliary-records/stock/fetch-stocks";
@@ -54,6 +40,7 @@ import {
   type RegisterDispensationBody,
 } from "@/api/pharma/dispensation/register-dispensation";
 import { queryClient } from "@/lib/react-query";
+import { useNavigate } from "react-router-dom";
 
 export default function DispensationPage() {
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
@@ -70,6 +57,7 @@ export default function DispensationPage() {
   const [previewQuantity, setPreviewQuantity] = useState<number | null>(null);
   const { toast } = useToast();
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   const form = useForm<DispensationFormSchema>({
     resolver: zodResolver(dispensationFormSchema),
@@ -82,7 +70,7 @@ export default function DispensationPage() {
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: "medicines",
   });
@@ -219,25 +207,34 @@ export default function DispensationPage() {
       };
       await registerDispensationFn(apiData);
 
-      const totalMedicines = data.medicines.length;
-      const totalQuantity = data.medicines.reduce(
-        (sum, medicine) =>
-          sum +
-          medicine.batchesStocks.reduce(
-            (batchSum, batch) => batchSum + batch.quantity,
-            0,
-          ),
-        0,
-      );
-
       toast({
         title: "✅ Dispensação registrada com sucesso!",
-        description: `${totalMedicines} medicamento(s) dispensados totalizando ${totalQuantity} unidades para ${selectedPatient?.name}.`,
+        description: `${data.medicines.length} medicamento(s) dispensados totalizando ${data.medicines.reduce(
+          (sum, medicine) =>
+            sum +
+            medicine.batchesStocks.reduce(
+              (batchSum, batch) => batchSum + batch.quantity,
+              0,
+            ),
+          0,
+        )} unidades para ${selectedPatient?.name}.`,
       });
 
-      form.reset();
-      setSelectedPatient(null);
+      // Limpa o estado do formulário e os estados relacionados
+      replace([]); // Limpa o campo medicines
+      form.setValue("medicines", []);
+      form.clearErrors();
+      await Promise.resolve(); // Garante a propagação do estado interno
+      form.reset({
+        patientId: "",
+        stockId: "",
+        medicines: [],
+        dispensationDate: new Date(),
+      });
+
       setSelectedMedicines([]);
+      setSelectedPatient(null);
+      setSelectedStock(null);
       setShowConfirmationModal(false);
     } catch (error) {
       console.error("Erro ao registrar:", error);
@@ -280,6 +277,13 @@ export default function DispensationPage() {
     console.log("Form submitted with data:", data);
   };
 
+  useEffect(() => {
+    // Força a atualização do campo 'stockId' após o reset do formulário
+    if (form.watch("medicines").length === 0) {
+      form.setValue("stockId", "");
+    }
+  }, [form.watch("medicines")]);
+
   return (
     <div className="container mx-auto max-w-7xl p-4">
       <Form {...form}>
@@ -289,13 +293,23 @@ export default function DispensationPage() {
         >
           {/* Header */}
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                Dispensação de Medicamentos
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                Realize as dispensas com atenção!
-              </p>
+            <div className="mb-2 flex items-center">
+              <Button
+                type="button"
+                variant="outline"
+                className="mr-4"
+                onClick={() => navigate("/dispensation")}
+              >
+                Voltar
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight">
+                  Dispensação de Medicamentos
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  Realize as dispensas com atenção!
+                </p>
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="gap-1 px-2 py-1 text-xs">
@@ -359,9 +373,11 @@ export default function DispensationPage() {
                     <FormItem className="col-span-3 grid flex-col">
                       <FormLabel>Estoque</FormLabel>
                       <ComboboxUp
-                        isDisable={form.watch("medicines").length > 0}
+                        key={form.watch("medicines").length}
+                        isDisable={selectedMedicines.length > 0}
                         items={stocksResult?.stocks ?? []}
                         field={field}
+                        itemValue="id"
                         query={queryStock}
                         placeholder="Selecione um estoque"
                         isFetching={isFetchingStocks}

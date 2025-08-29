@@ -1,28 +1,27 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { format } from 'date-fns'
-import { ptBR } from 'date-fns/locale'
-import { CalendarIcon } from 'lucide-react'
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
-import { z } from 'zod'
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { CalendarIcon } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchStocks } from '@/api/pharma/auxiliary-records/stock/fetch-stocks'
-import { dispensationPreview } from '@/api/pharma/dispensation/dispensation-preview'
+import { fetchStocks } from "@/api/pharma/auxiliary-records/stock/fetch-stocks";
+import { dispensationPreview } from "@/api/pharma/dispensation/dispensation-preview";
 import {
   registerDispensation,
   type RegisterDispensationBody,
-} from '@/api/pharma/dispensation/register-dispensation'
-import { fetchBatchesOnStock } from '@/api/pharma/stock/bacth-stock/fetch-batches-stock'
+} from "@/api/pharma/dispensation/register-dispensation";
 import {
   fetchMedicinesOnStock,
   type MedicineStockDetails,
-} from '@/api/pharma/stock/medicine-stock/fetch-medicines-stock'
-import { fetchUsers } from '@/api/pharma/users/fetch-users'
-import { ComboboxUp } from '@/components/comboboxes/combobox-up'
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
+} from "@/api/pharma/stock/medicine-stock/fetch-medicines-stock";
+import { fetchUsers } from "@/api/pharma/users/fetch-users";
+import { ComboboxUp } from "@/components/comboboxes/combobox-up";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -31,13 +30,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
+} from "@/components/ui/popover";
 import {
   Table,
   TableBody,
@@ -45,234 +44,234 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useAuth } from '@/contexts/authContext'
-import { toast } from '@/hooks/use-toast'
-import { cn } from '@/lib/utils'
-import { Formatter } from '@/lib/utils/formaters/formaters'
-import { dateFormatter } from '@/lib/utils/formatter'
-import { handleApiError } from '@/lib/utils/handle-api-error'
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/contexts/authContext";
+import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { Formatter } from "@/lib/utils/formaters/formaters";
+import { dateFormatter } from "@/lib/utils/formatter";
+import { handleApiError } from "@/lib/utils/handle-api-error";
 
 export const newDispensationSchema = z.object({
   medicineStockId: z.string({
-    required_error: 'O medicamento é obrigatório.',
+    required_error: "O medicamento é obrigatório.",
   }),
   stockId: z.string({
-    required_error: 'O estoque é obrigatório.',
+    required_error: "O estoque é obrigatório.",
   }),
   quantityToDispensation: z
-    .number({ required_error: 'Campo obrigatório' })
-    .min(1, 'A quantidade deve ser pelo menos 1.'),
+    .number({ required_error: "Campo obrigatório" })
+    .min(1, "A quantidade deve ser pelo menos 1."),
   patientId: z.string({
-    required_error: 'O paciente é obrigatório.',
+    required_error: "O paciente é obrigatório.",
   }),
   batchesStocks: z
     .array(
       z.object({
         batchStockId: z.string({
-          required_error: 'O lote é obrigatório.',
+          required_error: "O lote é obrigatório.",
         }),
         quantity: z
           .number({
-            required_error: 'A quantidade é obrigatória.',
+            required_error: "A quantidade é obrigatória.",
           })
-          .min(1, 'A quantidade deve ser pelo menos 1.'),
+          .min(1, "A quantidade deve ser pelo menos 1."),
       }),
     )
-    .min(1, 'Pelo menos um lote deve ser selecionado.'),
+    .min(1, "Pelo menos um lote deve ser selecionado."),
   dispensationDate: z.date({
-    required_error: 'A data da dispensação é obrigatória.',
+    required_error: "A data da dispensação é obrigatória.",
   }),
-})
+});
 
-export type NewDispensationSchema = z.infer<typeof newDispensationSchema>
+export type NewDispensationSchema = z.infer<typeof newDispensationSchema>;
 
 export function NewDispensationForm() {
-  const queryClient = useQueryClient()
-  const { token } = useAuth()
-  const [queryUsers, setQueryUsers] = useState('')
-  const [queryStock, setQueryStock] = useState('')
-  const [queryMedicineStock, setQueryMedicineStock] = useState('')
-  const [activeTab, setActiveTab] = useState('patient')
+  const queryClient = useQueryClient();
+  const { token } = useAuth();
+  const [queryUsers, setQueryUsers] = useState("");
+  const [queryStock, setQueryStock] = useState("");
+  const [queryMedicineStock, setQueryMedicineStock] = useState("");
+  const [activeTab, setActiveTab] = useState("patient");
   const [selectedMedicine, setSelectedMedicine] =
-    useState<MedicineStockDetails | null>(null)
+    useState<MedicineStockDetails | null>(null);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof newDispensationSchema>>({
     resolver: zodResolver(newDispensationSchema),
     defaultValues: {},
-  })
+  });
 
   const { data: usersResult, isFetching: isFetchingUsers } = useQuery({
-    queryKey: ['users'],
-    queryFn: () => fetchUsers({ page: 1 }, token ?? ''),
+    queryKey: ["users"],
+    queryFn: () => fetchUsers({ page: 1 }, token ?? ""),
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
 
   const { data: stocksResult, isFetching: isFetchingStocks } = useQuery({
-    queryKey: ['stocks'],
-    queryFn: () => fetchStocks({ page: 1 }, token ?? ''),
+    queryKey: ["stocks"],
+    queryFn: () => fetchStocks({ page: 1 }, token ?? ""),
     staleTime: 1000,
     refetchOnMount: true,
-  })
+  });
   const { data: medicinesStockResult, isFetching: isFetchingMedicinesStock } =
     useQuery({
-      queryKey: ['medicines-stock', form.watch('stockId'), queryMedicineStock],
+      queryKey: ["medicines-stock", form.watch("stockId"), queryMedicineStock],
       queryFn: () =>
         fetchMedicinesOnStock(
           {
             page: 1,
-            stockId: form.watch('stockId'),
+            stockId: form.watch("stockId"),
             medicineName: queryMedicineStock,
           },
-          token ?? '',
+          token ?? "",
         ),
       staleTime: 1000,
-      enabled: !!form.watch('stockId'),
+      enabled: !!form.watch("stockId"),
       refetchOnMount: true,
-    })
+    });
 
   const {
     data: dispensationPreviewResult,
     isFetching: isFetchingDispensationPreview,
     refetch: refetchDispensationPreview,
   } = useQuery({
-    queryKey: ['dispensation-preview'],
+    queryKey: ["dispensation-preview"],
     queryFn: () => {
-      const medicineStockId = form.getValues('medicineStockId')
-      const quantityRequired = form.getValues('quantityToDispensation')
+      const medicineStockId = form.getValues("medicineStockId");
+      const quantityRequired = form.getValues("quantityToDispensation");
       return dispensationPreview(
         { medicineStockId, quantityRequired },
-        token ?? '',
-      )
+        token ?? "",
+      );
     },
     enabled: false,
     staleTime: 1000,
-  })
+  });
 
   const {
     mutateAsync: registerDispensationFn,
     isPending: isPendingRegisterDispensation,
   } = useMutation({
     mutationFn: (data: RegisterDispensationBody) =>
-      registerDispensation(data, token ?? ''),
+      registerDispensation(data, token ?? ""),
     onSuccess() {
       queryClient.invalidateQueries({
-        queryKey: ['dispensations'],
-      })
+        queryKey: ["dispensations"],
+      });
     },
-  })
+  });
 
   const handleNext = async () => {
     try {
-      if (activeTab === 'patient') {
-        const isValid = await form.trigger(['patientId', 'dispensationDate'])
+      if (activeTab === "patient") {
+        const isValid = await form.trigger(["patientId", "dispensationDate"]);
         if (isValid) {
-          setActiveTab('medicine')
+          setActiveTab("medicine");
         }
-      } else if (activeTab === 'medicine') {
+      } else if (activeTab === "medicine") {
         const isValid = await form.trigger([
-          'stockId',
-          'medicineStockId',
-          'quantityToDispensation',
-        ])
+          "stockId",
+          "medicineStockId",
+          "quantityToDispensation",
+        ]);
 
         if (isValid) {
-          const quantity = Number(form.getValues('quantityToDispensation'))
+          const quantity = Number(form.getValues("quantityToDispensation"));
           const availableQuantity = Number(
             selectedMedicine?.quantity.available ?? 0,
-          )
+          );
 
           if (quantity <= 0) {
-            form.setError('quantityToDispensation', {
-              type: 'manual',
-              message: 'A quantidade deve ser maior que zero',
-            })
-            return
+            form.setError("quantityToDispensation", {
+              type: "manual",
+              message: "A quantidade deve ser maior que zero",
+            });
+            return;
           }
 
           if (quantity > availableQuantity) {
-            form.setError('quantityToDispensation', {
-              type: 'manual',
+            form.setError("quantityToDispensation", {
+              type: "manual",
               message: `Quantidade indisponível. Estoque: ${availableQuantity}`,
-            })
-            return
+            });
+            return;
           }
 
-          const previewResponse = await refetchDispensationPreview()
-          const batches = previewResponse.data ?? []
+          const previewResponse = await refetchDispensationPreview();
+          const batches = previewResponse.data ?? [];
 
           form.setValue(
-            'batchesStocks',
+            "batchesStocks",
             batches.map((batch) => ({
               batchStockId: batch.batchStockId,
               quantity: batch.quantity.toDispensation,
             })),
-          )
+          );
 
-          setActiveTab('batches')
+          setActiveTab("batches");
         }
       }
     } catch (error) {
       toast({
-        title: 'Erro',
-        description: 'Ocorreu um erro ao tentar avançar',
-        variant: 'destructive',
-      })
+        title: "Erro",
+        description: "Ocorreu um erro ao tentar avançar",
+        variant: "destructive",
+      });
     }
-  }
+  };
   const handlePrevious = () => {
-    if (activeTab === 'batches') {
-      setActiveTab('medicine')
-    } else if (activeTab === 'medicine') {
-      setActiveTab('patient')
+    if (activeTab === "batches") {
+      setActiveTab("medicine");
+    } else if (activeTab === "medicine") {
+      setActiveTab("patient");
     }
-  }
+  };
 
   async function handleRegisterDispensation(data: NewDispensationSchema) {
     try {
       const availableQuantity = Number(
         selectedMedicine?.quantity.available ?? 0,
-      )
-      const requestedQuantity = Number(data.quantityToDispensation)
+      );
+      const requestedQuantity = Number(data.quantityToDispensation);
 
       if (requestedQuantity > availableQuantity) {
         toast({
-          title: 'Erro na dispensa',
-          description: 'A quantidade solicitada excede o estoque disponível',
-          variant: 'destructive',
-        })
-        return
+          title: "Erro na dispensa",
+          description: "A quantidade solicitada excede o estoque disponível",
+          variant: "destructive",
+        });
+        return;
       }
       await registerDispensationFn({
         batchesStocks: data.batchesStocks,
         dispensationDate: data.dispensationDate,
         medicineStockId: data.medicineStockId,
         patientId: data.patientId,
-      })
+      });
       toast({
         title: `Dispensa registrada com sucesso!`,
-      })
+      });
 
       form.reset({
         batchesStocks: [],
         dispensationDate: new Date(),
-        medicineStockId: '',
-        patientId: '',
-        stockId: '',
-      })
+        medicineStockId: "",
+        patientId: "",
+        stockId: "",
+      });
 
-      setActiveTab('patient')
+      setActiveTab("patient");
     } catch (error) {
-      const errorMessage = handleApiError(error)
+      const errorMessage = handleApiError(error);
       toast({
-        title: 'Erro ao registrar dispensa',
+        title: "Erro ao registrar dispensa",
         description: errorMessage,
-        variant: 'destructive',
-      })
+        variant: "destructive",
+      });
     }
   }
 
@@ -290,19 +289,19 @@ export function NewDispensationForm() {
           <TabsList>
             <TabsTrigger
               value="patient"
-              disabled={['medicine', 'batches'].includes(activeTab)}
+              disabled={["medicine", "batches"].includes(activeTab)}
             >
               Usuário
             </TabsTrigger>
             <TabsTrigger
               value="medicine"
-              disabled={['patient', 'batches'].includes(activeTab)}
+              disabled={["patient", "batches"].includes(activeTab)}
             >
               Medicamento
             </TabsTrigger>
             <TabsTrigger
               value="batches"
-              disabled={['patient', 'medicine'].includes(activeTab)}
+              disabled={["patient", "medicine"].includes(activeTab)}
             >
               Lotes
             </TabsTrigger>
@@ -322,18 +321,18 @@ export function NewDispensationForm() {
                     query={queryUsers}
                     isFetching={isFetchingUsers}
                     formatItem={(item) =>
-                      `${Formatter.cpf(item.cpf ?? '')} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
+                      `${Formatter.cpf(item.cpf ?? "")} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
                     }
                     getItemText={(item) =>
-                      `${Formatter.cpf(item.cpf ?? '')} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
+                      `${Formatter.cpf(item.cpf ?? "")} - ${item.name} - ${dateFormatter.format(new Date(item.birthDate))}`
                     }
                     placeholder="Pesquise por um usuário"
                     onSelect={(item) => {
-                      form.setValue('patientId', item)
+                      form.setValue("patientId", item);
                     }}
                   />
                   <FormDescription>
-                    Pesquise por cpf, nome ou data de nascimento{' '}
+                    Pesquise por cpf, nome ou data de nascimento{" "}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -351,14 +350,14 @@ export function NewDispensationForm() {
                       <FormControl>
                         <Button
                           type="button"
-                          variant={'outline'}
+                          variant={"outline"}
                           className={cn(
-                            'w-[240px] pl-3 text-left font-normal',
-                            !field.value && 'text-muted-foreground',
+                            "w-[240px] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground",
                           )}
                         >
                           {field.value ? (
-                            format(field.value, 'PPP', { locale: ptBR })
+                            format(field.value, "PPP", { locale: ptBR })
                           ) : (
                             <span>Selecione uma data</span>
                           )}
@@ -407,14 +406,14 @@ export function NewDispensationForm() {
                     isFetching={isFetchingStocks}
                     onQueryChange={setQueryStock}
                     onSelect={(id, _) => {
-                      form.setValue('stockId', id)
+                      form.setValue("stockId", id);
                     }}
                     itemKey="id"
                     formatItem={(item) => {
-                      return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
+                      return `${item.name} - ${item.status ? "ATIVO" : "INATIVO"}`;
                     }}
                     getItemText={(item) => {
-                      return `${item.name} - ${item.status ? 'ATIVO' : 'INATIVO'}`
+                      return `${item.name} - ${item.status ? "ATIVO" : "INATIVO"}`;
                     }}
                   />
                   <FormMessage />
@@ -435,9 +434,9 @@ export function NewDispensationForm() {
                     isFetching={isFetchingMedicinesStock}
                     onQueryChange={setQueryMedicineStock}
                     onSelect={(id, item) => {
-                      form.setValue('medicineStockId', id)
-                      form.setValue('quantityToDispensation', 0)
-                      setSelectedMedicine(item)
+                      form.setValue("medicineStockId", id);
+                      form.setValue("quantityToDispensation", 0);
+                      setSelectedMedicine(item);
                     }}
                     itemKey="id"
                     getItemText={(item) =>
@@ -446,7 +445,7 @@ export function NewDispensationForm() {
                     formatItem={(item) => (
                       <div className="flex gap-2">
                         <span>
-                          {item.medicine} - {item.pharmaceuticalForm} -{' '}
+                          {item.medicine} - {item.pharmaceuticalForm} -{" "}
                           {item.dosage}
                           {item.unitMeasure}
                         </span>
@@ -653,5 +652,5 @@ export function NewDispensationForm() {
         </Tabs>
       </form>
     </Form>
-  )
+  );
 }

@@ -1,11 +1,11 @@
 import { apiPharma } from "@/lib/axios";
 
-export interface ReverseExitBodyAndParams {
+export interface ReverseExitParams {
   exitId: string;
 }
 
 export async function reverseExit(
-  { exitId }: ReverseExitBodyAndParams,
+  { exitId }: ReverseExitParams,
   token: string,
 ) {
   await apiPharma.post(
