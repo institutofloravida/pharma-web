@@ -4,10 +4,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 
 import { fetchMedicinesExits } from "@/api/pharma/movement/exit/fetch-medicines-exits";
-import { ExitType } from "@/api/pharma/movement/exit/register-medicine-exit";
 import { Pagination } from "@/components/pagination";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -19,7 +17,7 @@ import { useAuth } from "@/contexts/authContext";
 
 import { MedicineExitTableRow } from "./medicine-exit-table-row";
 import { MedicineExitTableFilters } from "./medicine-exits-table-filters";
-import { NewMedicineExitDialog } from "./new-medicine-exit-dialog";
+import type { ExitType } from "@/api/pharma/movement/exit/register-medicine-exit";
 
 export function MedicinesExits() {
   const { token, institutionId } = useAuth();
@@ -27,10 +25,8 @@ export function MedicinesExits() {
   const [searchParams, setSearchParams] = useSearchParams();
   const pageIndex = z.coerce.number().parse(searchParams.get("page") ?? "1");
 
-  const medicineId = searchParams.get("medicineId");
   const operatorId = searchParams.get("operatorId");
-  const batch = searchParams.get("batch");
-  const movementTypeId = searchParams.get("movementTypeId");
+  const exitType = searchParams.get("exitType");
   const exitDate = searchParams.get("exitDate");
 
   const { data: medicinesExitsResult } = useQuery({
@@ -38,10 +34,8 @@ export function MedicinesExits() {
       "medicines-exits",
       "data-on-institution",
       pageIndex,
-      medicineId,
       operatorId,
-      batch,
-      movementTypeId,
+      exitType,
       exitDate,
     ],
     queryFn: () =>
@@ -50,7 +44,8 @@ export function MedicinesExits() {
           page: pageIndex,
           institutionId: institutionId ?? "",
           exitDate: exitDate ? new Date(exitDate) : undefined,
-          operatorId,
+          exitType: exitType as ExitType | undefined,
+          operatorId: operatorId ?? undefined,
         },
         token ?? "",
       ),

@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -14,24 +14,19 @@ import { fetchOperators } from "@/api/pharma/operators/fetch-operators";
 import { getMovimentationInAPeriodReport } from "@/api/pharma/reports/movimentation-in-a-period-report";
 import { fetchBatchesOnStock } from "@/api/pharma/stock/bacth-stock/fetch-batches-stock";
 import { fetchMedicinesOnStock } from "@/api/pharma/stock/medicine-stock/fetch-medicines-stock";
-import { fetchUsers } from "@/api/pharma/users/fetch-users";
-import { Combobox } from "@/components/comboboxes/combobox";
 import { ComboboxUp } from "@/components/comboboxes/combobox-up";
-import { DatePicker } from "@/components/date-picker";
 import { SelectDirection } from "@/components/selects/locate/select-direction";
 import { SelectExitType } from "@/components/selects/locate/select-exit-type";
 import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { useAuth } from "@/contexts/authContext";
-import { Formatter } from "@/lib/utils/formaters/formaters";
 import { dateFormatter } from "@/lib/utils/formatter";
 import { MovementTypeDirection } from "@/lib/utils/movement-type";
 import { getOperatorRoleTranslation } from "@/lib/utils/translations-mappers/operator-role-translation";
