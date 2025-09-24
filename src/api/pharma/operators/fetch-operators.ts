@@ -1,38 +1,39 @@
-import { apiPharma } from '@/lib/axios'
+import { apiPharma } from "@/lib/axios";
 
-import { OperatorRole } from './register-operator'
+import { OperatorRole } from "./register-operator";
 export interface GetOperatorsQuery {
-  page?: number | null
-  name?: string | null
-  email?: string | null
-  institutionId?: string | null
-  role?: OperatorRole
+  page?: number | null;
+  name?: string | null;
+  email?: string | null;
+  institutionId?: string | null;
+  role?: OperatorRole;
 }
 
 export interface Operator {
-  id: string
-  name: string
-  email: string
-  role: OperatorRole
+  id: string;
+  name: string;
+  email: string;
+  role: OperatorRole;
+  status: boolean;
   institutions: {
-    id: string
-    name: string
-  }[]
+    id: string;
+    name: string;
+  }[];
 }
 
 interface GetOperatorsResponse {
-  operators: Operator[]
+  operators: Operator[];
   meta: {
-    page: number
-    totalCount: number
-  }
+    page: number;
+    totalCount: number;
+  };
 }
 
 export async function fetchOperators(
   { page, email, institutionId, name, role }: GetOperatorsQuery,
   token: string,
 ) {
-  const response = await apiPharma.get<GetOperatorsResponse>('/operator', {
+  const response = await apiPharma.get<GetOperatorsResponse>("/operator", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -43,7 +44,7 @@ export async function fetchOperators(
       name,
       role,
     },
-  })
+  });
 
-  return response.data
+  return response.data;
 }

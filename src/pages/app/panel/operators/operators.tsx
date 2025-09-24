@@ -11,7 +11,6 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -21,7 +20,6 @@ import { useAuth } from "@/contexts/authContext";
 import { NewOperatorDialog } from "./new-operator-dialog";
 import { OperatorTableFilters } from "./operator-table-filters";
 import { OperatorTableRow } from "./operator-table-row";
-import { Skeleton } from "@/components/ui/skeleton";
 import { TableSkeleton } from "@/components/skeletons/table";
 
 export function Operators() {
@@ -83,6 +81,7 @@ export function Operators() {
                     {"Instituições associado(a)"}
                   </TableHead>
                   <TableHead className="w-[140px]">Tipo de usuário</TableHead>
+                  <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
