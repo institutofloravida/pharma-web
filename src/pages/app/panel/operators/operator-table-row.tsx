@@ -26,6 +26,14 @@ import {
   updateOperator,
   type UpdateOperatorBody,
 } from "@/api/pharma/operators/update-operator";
+import {
+  activateOperator,
+  type ActivateOperatorParams,
+} from "@/api/pharma/operators/activate-operator";
+import {
+  deactivateOperator,
+  type DeactivateOperatorParams,
+} from "@/api/pharma/operators/deactivate-operator";
 
 export interface OperatorTableRowProps {
   operator: Operator;
@@ -58,42 +66,70 @@ export function OperatorTableRow({ operator }: OperatorTableRowProps) {
     deleteOperatorFn({ operatorId: operator.id });
   };
 
-  //  const { mutateAsync: updateOperatorFn } = useMutation({
-  //      mutationFn: (data: UpdateOperatorBody) => updateOperator(data, token ?? ''),
-  //      onSuccess() {
-  //        queryClient.invalidateQueries({
-  //          queryKey: ['operators'],
-  //        })
-  //      },
-  //    })
+  const { mutateAsync: activateOperatorFn } = useMutation({
+    mutationFn: (data: ActivateOperatorParams) =>
+      activateOperator(data, token ?? ""),
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ["operators"],
+      });
+    },
+  });
 
-  //    async function handleUpdateOperator(data: UpdateOperatorSchema) {
-  //      try {
-  //        await updateOperatorFn({
-  //          operatorId,
-  //          name: data.name,
-  //          email: data.email,
-  //          role: data.role ? OperatorRole[data.role] : undefined,
-  //          institutionsIds: isSuperAdmin ? [] : data.institutionsIds,
-  //        })
+  async function handleActivateOperator(data: ActivateOperatorParams) {
+    try {
+      await activateOperatorFn({
+        operatorId: data.operatorId,
+      });
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast({
+        title: "Erro ao tentar ativar o operador.",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+    toast({
+      title: `Operador ativado com sucesso!`,
+    });
+  }
 
-  //        toast({
-  //          title: `Operador atualizada com sucesso!`,
-  //        })
-  //      } catch (error) {
-  //        const errorMessage = handleApiError(error)
-  //        toast({
-  //          title: 'Erro ao tentar atualizar a operador.',
-  //          description: errorMessage,
-  //          variant: 'destructive',
-  //        })
-  //      }
-  //    }
+  const { mutateAsync: deactivateOperatorFn } = useMutation({
+    mutationFn: (data: DeactivateOperatorParams) =>
+      deactivateOperator(data, token ?? ""),
+    onSuccess() {
+      queryClient.invalidateQueries({
+        queryKey: ["operators"],
+      });
+    },
+  });
 
-  // const handleStatusChange = (checked: boolean) => {
-  //   // Implement status change logic here
-  //   setIsActive(checked);
-  // };
+  async function handleDeactivateOperator(data: DeactivateOperatorParams) {
+    try {
+      await deactivateOperatorFn({
+        operatorId: data.operatorId,
+      });
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast({
+        title: "Erro ao tentar desativar o operador.",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+    toast({
+      title: `Operador desativado com sucesso!`,
+    });
+  }
+
+  const handleStatusChange = (checked: boolean) => {
+    if (checked) {
+      handleActivateOperator({ operatorId: operator.id });
+    } else {
+      handleDeactivateOperator({ operatorId: operator.id });
+    }
+    setIsActive(checked);
+  };
 
   return (
     <TableRow>
