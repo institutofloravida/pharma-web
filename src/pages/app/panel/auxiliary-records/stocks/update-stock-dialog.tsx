@@ -90,7 +90,6 @@ export function UpdateStockDialog({ stockId, open }: UpdateStockProps) {
       await updateStockFn({
         stockId,
         name: data.name,
-        status: data.status,
       });
 
       toast({
@@ -149,28 +148,6 @@ export function UpdateStockDialog({ stockId, open }: UpdateStockProps) {
                       <Input placeholder="Nome..." {...field} />
                     </FormControl>
                     <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem className="col-span-3 flex flex-row items-center justify-between rounded-lg border p-2 shadow-sm">
-                    <div className="space-y-0.5">
-                      <FormLabel>Status (Ativo/Inativo)</FormLabel>
-                      <FormDescription>
-                        Defina o status do seu estoque.
-                      </FormDescription>
-                    </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        aria-readonly
-                      />
-                    </FormControl>
                   </FormItem>
                 )}
               />
