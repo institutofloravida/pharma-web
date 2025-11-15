@@ -203,6 +203,10 @@ export const sidebarSections: SidebarSection[] = [
             name: "Utilização",
             url: "/reports/monthly-utilization",
           },
+          {
+            name: "Inventário",
+            url: "/reports/inventory",
+          },
         ],
       },
     ],
