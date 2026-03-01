@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -18,6 +19,7 @@ import { useAuth } from "@/contexts/authContext";
 import { MedicineExitTableRow } from "./medicine-exit-table-row";
 import { MedicineExitTableFilters } from "./medicine-exits-table-filters";
 import type { ExitType } from "@/api/pharma/movement/exit/register-medicine-exit";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function MedicinesExits() {
   const { token, institutionId } = useAuth();
@@ -29,7 +31,7 @@ export function MedicinesExits() {
   const exitType = searchParams.get("exitType");
   const exitDate = searchParams.get("exitDate");
 
-  const { data: medicinesExitsResult } = useQuery({
+  const { data: medicinesExitsResult, isLoading } = useQuery({
     queryKey: [
       "medicines-exits",
       "data-on-institution",
@@ -93,12 +95,22 @@ export function MedicinesExits() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {medicinesExitsResult &&
-                  medicinesExitsResult.medicines_exits.map((item) => {
-                    return (
-                      <MedicineExitTableRow medicineExit={item} key={item.id} />
-                    );
-                  })}
+                {isLoading && <TableSkeleton />}
+                {!isLoading &&
+                  medicinesExitsResult?.medicines_exits?.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={9}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        Nenhuma saída de medicamento encontrada.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                {!isLoading &&
+                  medicinesExitsResult?.medicines_exits?.map((item) => (
+                    <MedicineExitTableRow medicineExit={item} key={item.id} />
+                  ))}
               </TableBody>
             </Table>
           </div>

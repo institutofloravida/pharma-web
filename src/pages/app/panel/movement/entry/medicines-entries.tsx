@@ -1,45 +1,47 @@
-import { useQuery } from '@tanstack/react-query'
-import { Helmet } from 'react-helmet-async'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchMedicinesEntries } from '@/api/pharma/movement/entry/fetch-medicines-entries'
-import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
+import { fetchMedicinesEntries } from "@/api/pharma/movement/entry/fetch-medicines-entries";
+import { Pagination } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/table";
+import { useAuth } from "@/contexts/authContext";
 
-import { MedicineEntryTableRow } from './medicine-entry-table-row'
-import { MedicineVariantTableFilters } from './medicine-variant-table-filters'
+import { MedicineEntryTableRow } from "./medicine-entry-table-row";
+import { MedicineVariantTableFilters } from "./medicine-variant-table-filters";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function MedicinesEntries() {
-  const { token, institutionId } = useAuth()
+  const { token, institutionId } = useAuth();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const [searchParams, setSearchParams] = useSearchParams()
-  const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: medicinesEntriesResult } = useQuery({
-    queryKey: ['medicines-entries', 'data-on-institution', pageIndex],
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageIndex = z.coerce.number().parse(searchParams.get("page") ?? "1");
+  const { data: medicinesEntriesResult, isLoading } = useQuery({
+    queryKey: ["medicines-entries", "data-on-institution", pageIndex],
     queryFn: () =>
       fetchMedicinesEntries(
-        { page: pageIndex, institutionId: institutionId ?? '' },
-        token ?? '',
+        { page: pageIndex, institutionId: institutionId ?? "" },
+        token ?? "",
       ),
     enabled: Boolean(institutionId),
-  })
+  });
 
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
-      state.set('page', pageIndex.toString())
-      return state
-    })
+      state.set("page", pageIndex.toString());
+      return state;
+    });
   }
 
   return (
@@ -55,8 +57,8 @@ export function MedicinesEntries() {
 
             <Button
               className=""
-              variant={'default'}
-              onClick={() => navigate('/movement/entries/new')}
+              variant={"default"}
+              onClick={() => navigate("/movement/entries/new")}
             >
               Nova Entrada
             </Button>
@@ -75,15 +77,25 @@ export function MedicinesEntries() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {medicinesEntriesResult &&
-                  medicinesEntriesResult.medicines_entries.map((item) => {
-                    return (
-                      <MedicineEntryTableRow
-                        medicineEntry={item}
-                        key={item.entryId}
-                      />
-                    )
-                  })}
+                {isLoading && <TableSkeleton />}
+                {!isLoading &&
+                  medicinesEntriesResult?.medicines_entries?.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={7}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        Nenhuma entrada de medicamento encontrada.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                {!isLoading &&
+                  medicinesEntriesResult?.medicines_entries?.map((item) => (
+                    <MedicineEntryTableRow
+                      medicineEntry={item}
+                      key={item.entryId}
+                    />
+                  ))}
               </TableBody>
             </Table>
           </div>
@@ -99,5 +111,5 @@ export function MedicinesEntries() {
         </div>
       </div>
     </>
-  )
+  );
 }

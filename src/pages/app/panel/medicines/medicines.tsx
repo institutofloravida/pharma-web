@@ -10,6 +10,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -21,6 +22,7 @@ import { MedicineTableRow } from "./medicine-table-row";
 import { NewMedicineDialog } from "./new-medicine-dialog";
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function Medicines() {
   const { token } = useAuth();
@@ -35,7 +37,7 @@ export function Medicines() {
     : [];
 
   const pageIndex = z.coerce.number().parse(searchParams.get("page") ?? "1");
-  const { data: medicinesResult } = useQuery({
+  const { data: medicinesResult, isLoading } = useQuery({
     queryKey: ["medicines", pageIndex, name, therapeuticClassesIds],
     queryFn: () =>
       fetchMedicines(
@@ -57,7 +59,7 @@ export function Medicines() {
       <div className="flex flex-col gap-4">
         <h1 className="text-3xl font-bold tracking-tight">Medicamentos</h1>
         <div className="space-y-2.5">
-          <Card className="flex items-center justify-between gap-2 p-4">
+          <div className="flex items-center justify-between gap-2 p-4">
             <MedicineTableFilters />
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
@@ -67,8 +69,8 @@ export function Medicines() {
               </DialogTrigger>
               <NewMedicineDialog onSuccess={() => setIsDialogOpen(false)} />
             </Dialog>
-          </Card>
-          <Card className="rounded-md border">
+          </div>
+          <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -80,13 +82,24 @@ export function Medicines() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {medicinesResult &&
-                  medicinesResult.medicines.map((item) => {
-                    return <MedicineTableRow medicine={item} key={item.id} />;
-                  })}
+                {isLoading && <TableSkeleton />}
+                {!isLoading && medicinesResult?.medicines?.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={5}
+                      className="h-24 text-center text-muted-foreground"
+                    >
+                      Nenhum medicamento encontrado.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {!isLoading &&
+                  medicinesResult?.medicines?.map((item) => (
+                    <MedicineTableRow medicine={item} key={item.id} />
+                  ))}
               </TableBody>
             </Table>
-          </Card>
+          </div>
           {medicinesResult && (
             <Pagination
               pageIndex={medicinesResult.meta.page}

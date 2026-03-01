@@ -9,6 +9,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -20,6 +21,7 @@ import { PathologyTableFilters } from "./pathology-table-filters";
 import { PathologyTableRow } from "./pathology-table-row";
 import { fetchPathologies } from "@/api/pharma/auxiliary-records/pathology/fetch-pathology";
 import { useState } from "react";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function Pathologies() {
   const { token } = useAuth();
@@ -29,7 +31,7 @@ export function Pathologies() {
   const query = searchParams.get("query");
 
   const page = z.coerce.number().parse(searchParams.get("page") ?? "1");
-  const { data: pathologiesResult } = useQuery({
+  const { data: pathologiesResult, isLoading } = useQuery({
     queryKey: ["pathologies", page, query],
     queryFn: () => fetchPathologies({ page, query }, token ?? ""),
   });
@@ -63,16 +65,28 @@ export function Pathologies() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[64px]"></TableHead>
+                  <TableHead className="w-[120px]">CID</TableHead>
                   <TableHead>Nome</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pathologiesResult &&
-                  pathologiesResult.pathologies.map((item) => {
-                    return <PathologyTableRow pathology={item} key={item.id} />;
-                  })}
+                {isLoading && <TableSkeleton />}
+                {!isLoading && pathologiesResult?.pathologies?.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
+                      className="h-24 text-center text-muted-foreground"
+                    >
+                      Nenhuma patologia encontrada.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {!isLoading &&
+                  pathologiesResult?.pathologies?.map((item) => (
+                    <PathologyTableRow pathology={item} key={item.id} />
+                  ))}
               </TableBody>
             </Table>
           </div>

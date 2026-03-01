@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -19,6 +20,7 @@ import { useAuth } from "@/contexts/authContext";
 import { NewStockDialog } from "./new-stock-dialog";
 import { StockTableFilters } from "./stock-table-filters";
 import { StockTableRow } from "./stock-table-row";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function Stocks() {
   const { token } = useAuth();
@@ -32,7 +34,7 @@ export function Stocks() {
     : [];
 
   const pageIndex = z.coerce.number().parse(searchParams.get("page") ?? "1");
-  const { data: stocksResult } = useQuery({
+  const { data: stocksResult, isLoading } = useQuery({
     queryKey: ["stocks", pageIndex, name, institutionsIds],
     queryFn: () =>
       fetchStocks(
@@ -77,13 +79,21 @@ export function Stocks() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {stocksResult?.stocks ? (
-                  stocksResult.stocks.map((item) => (
-                    <StockTableRow stock={item} key={item.id} />
-                  ))
-                ) : (
-                  <div>Nenhum estoque encontrado</div>
+                {isLoading && <TableSkeleton />}
+                {!isLoading && stocksResult?.stocks?.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
+                      className="h-24 text-center text-muted-foreground"
+                    >
+                      Nenhum estoque encontrado.
+                    </TableCell>
+                  </TableRow>
                 )}
+                {!isLoading &&
+                  stocksResult?.stocks?.map((item) => (
+                    <StockTableRow stock={item} key={item.id} />
+                  ))}
               </TableBody>
             </Table>
           </div>

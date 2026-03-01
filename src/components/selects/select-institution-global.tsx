@@ -79,7 +79,7 @@ export function SelectInstitutionGlobal() {
           <div className="p-4 text-center text-muted-foreground">
             Carregando...
           </div>
-        ) : institutionsResult ? (
+        ) : institutionsResult?.institutions?.length ? (
           institutionsResult.institutions.map((institution, index) => (
             <DropdownMenuItem
               key={institution.id}

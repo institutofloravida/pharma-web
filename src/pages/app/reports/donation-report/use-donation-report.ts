@@ -4,7 +4,7 @@ import type { TDocumentDefinitions } from "pdfmake/interfaces";
 
 import { getDonationReportReport } from "@/api/pharma/reports/donation-report";
 import { useAuth } from "@/contexts/authContext";
-import { BACKGROUND_PORTRAIT } from "@/lib/reports/bases-64";
+import { BACKGROUND_PORTRAIT, CARIMBO } from "@/lib/reports/bases-64";
 
 pdfMake.vfs = (pdfFonts as any).vfs;
 
@@ -84,6 +84,12 @@ export function useDonationReportPdf() {
         margin: [30, 0, 0, 30],
       },
       {
+        image: "carimbo",
+        width: 150,
+        alignment: "center",
+        margin: [0, 0, 0, -10],
+      },
+      {
         canvas: [{ type: "line", x1: 0, y1: 0, x2: 300, y2: 0, lineWidth: 1 }],
         alignment: "center",
         margin: [0, 20, 0, 10],
@@ -140,6 +146,7 @@ export function useDonationReportPdf() {
       },
       images: {
         bg: BACKGROUND_PORTRAIT,
+        carimbo: CARIMBO,
       },
       // footer: function (currentPage: number, pageCount: number) {
       //   return [

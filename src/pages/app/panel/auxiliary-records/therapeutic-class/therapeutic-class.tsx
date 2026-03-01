@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -20,6 +21,7 @@ import { NewTherapeuticClassDialog } from "./new-therapeutic-class-dialog";
 import { TherapeuticClassTableFilters } from "./therapeutic-class-table-filters";
 import { TherapeuticClassTableRow } from "./therapeutic-class-table-row";
 import { useState } from "react";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function TherapeuticClass() {
   const { token } = useAuth();
@@ -29,7 +31,7 @@ export function TherapeuticClass() {
 
   const pageIndex = z.coerce.number().parse(searchParams.get("page") ?? "1");
 
-  const { data: therapeuticClassesResult } = useQuery({
+  const { data: therapeuticClassesResult, isLoading } = useQuery({
     queryKey: ["therapeutic-classes", pageIndex, query],
     queryFn: () =>
       fetchTherapeuticClasses({ page: pageIndex, query }, token ?? ""),
@@ -73,16 +75,26 @@ export function TherapeuticClass() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {therapeuticClassesResult ? (
-                  therapeuticClassesResult.therapeutic_classes.map((item) => (
+                {isLoading && <TableSkeleton />}
+                {!isLoading &&
+                  therapeuticClassesResult?.therapeutic_classes?.length ===
+                    0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        Nenhuma classe terapêutica encontrada.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                {!isLoading &&
+                  therapeuticClassesResult?.therapeutic_classes?.map((item) => (
                     <TherapeuticClassTableRow
-                      therapeuticClass={item ?? []}
+                      therapeuticClass={item}
                       key={item.id}
                     />
-                  ))
-                ) : (
-                  <div>Nenhum estoque encontrado</div>
-                )}
+                  ))}
               </TableBody>
             </Table>
           </div>

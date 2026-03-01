@@ -1,45 +1,47 @@
-import { useQuery } from '@tanstack/react-query'
-import { Helmet } from 'react-helmet-async'
-import { useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
+import { useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchInstitutions } from '@/api/pharma/auxiliary-records/institution/fetch-institutions'
-import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogTrigger } from '@/components/ui/dialog'
+import { fetchInstitutions } from "@/api/pharma/auxiliary-records/institution/fetch-institutions";
+import { Pagination } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/table";
+import { useAuth } from "@/contexts/authContext";
 
-import { InstitutionTableFilters } from './institution-table-filters'
-import { InstitutionTableRow } from './institution-table-row'
-import { NewInstitutionDialog } from './new-institution-dialog'
+import { InstitutionTableFilters } from "./institution-table-filters";
+import { InstitutionTableRow } from "./institution-table-row";
+import { NewInstitutionDialog } from "./new-institution-dialog";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function Institutions() {
-  const { token } = useAuth()
+  const { token } = useAuth();
 
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const query = searchParams.get('query')
-  const cnpj = searchParams.get('cnpj')
+  const query = searchParams.get("query");
+  const cnpj = searchParams.get("cnpj");
 
-  const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const { data: institutionsResult } = useQuery({
-    queryKey: ['institutions', pageIndex, query, cnpj],
+  const pageIndex = z.coerce.number().parse(searchParams.get("page") ?? "1");
+  const { data: institutionsResult, isLoading } = useQuery({
+    queryKey: ["institutions", pageIndex, query, cnpj],
     queryFn: () =>
-      fetchInstitutions({ page: pageIndex, cnpj, query }, token ?? ''),
-  })
+      fetchInstitutions({ page: pageIndex, cnpj, query }, token ?? ""),
+  });
 
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
-      state.set('page', pageIndex.toString())
-      return state
-    })
+      state.set("page", pageIndex.toString());
+      return state;
+    });
   }
 
   return (
@@ -52,7 +54,7 @@ export function Institutions() {
             <InstitutionTableFilters />
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="" variant={'default'}>
+                <Button className="" variant={"default"}>
                   Nova Instituição
                 </Button>
               </DialogTrigger>
@@ -73,12 +75,22 @@ export function Institutions() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {institutionsResult &&
-                  institutionsResult.institutions.map((item) => {
-                    return (
-                      <InstitutionTableRow institution={item} key={item.id} />
-                    )
-                  })}
+                {isLoading && <TableSkeleton />}
+                {!isLoading &&
+                  institutionsResult?.institutions?.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={7}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        Nenhuma instituição encontrada.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                {!isLoading &&
+                  institutionsResult?.institutions?.map((item) => (
+                    <InstitutionTableRow institution={item} key={item.id} />
+                  ))}
               </TableBody>
             </Table>
           </div>
@@ -93,5 +105,5 @@ export function Institutions() {
         </div>
       </div>
     </>
-  )
+  );
 }

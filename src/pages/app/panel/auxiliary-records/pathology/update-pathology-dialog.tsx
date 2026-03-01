@@ -32,19 +32,8 @@ import {
 } from "@/api/pharma/auxiliary-records/pathology/update-pathology";
 
 const updatePathologySchema = z.object({
+  code: z.string().trim().min(1).max(10).optional(),
   name: z.string().min(3).optional(),
-  cnpj: z
-    .string({
-      required_error: " campos orbigatório",
-    })
-    .min(14, {
-      message: "O campo deve conter 14 caracteres",
-    })
-    .max(14, {
-      message: "O campo deve conter 14 caracteres",
-    })
-    .optional(),
-  description: z.string().optional(),
 });
 type UpdatePathologySchema = z.infer<typeof updatePathologySchema>;
 
@@ -68,6 +57,7 @@ export function UpdatePathologyDialog({
   const form = useForm<UpdatePathologySchema>({
     resolver: zodResolver(updatePathologySchema),
     values: {
+      code: pathology?.code ?? "",
       name: pathology?.name ?? "",
     },
   });
@@ -86,6 +76,7 @@ export function UpdatePathologyDialog({
     try {
       await updatePathologyFn({
         pathologyId,
+        code: data.code,
         name: data.name,
       });
 
@@ -115,19 +106,34 @@ export function UpdatePathologyDialog({
           {isLoading ? (
             <Skeleton className="col-span-3 h-8" />
           ) : (
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem className="col-span-3">
-                  <FormLabel>Nome</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Nome..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <>
+              <FormField
+                control={form.control}
+                name="code"
+                render={({ field }) => (
+                  <FormItem className="col-span-3">
+                    <FormLabel>CID</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: E11" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="col-span-3">
+                    <FormLabel>Nome</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Nome..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
           )}
 
           <DialogFooter className="col-span-3 grid justify-end">

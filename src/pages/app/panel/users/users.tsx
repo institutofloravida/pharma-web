@@ -1,36 +1,38 @@
-import { useQuery } from '@tanstack/react-query'
-import { Helmet } from 'react-helmet-async'
-import { useNavigate, useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchUsers } from '@/api/pharma/users/fetch-users'
-import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
+import { fetchUsers } from "@/api/pharma/users/fetch-users";
+import { Pagination } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/table";
+import { useAuth } from "@/contexts/authContext";
 
-import { UserTableFilters } from './user-table-filters'
-import { UserTableRow } from './user-table-row'
+import { UserTableFilters } from "./user-table-filters";
+import { UserTableRow } from "./user-table-row";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function Users() {
-  const { token } = useAuth()
-  const navigate = useNavigate()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const page = z.coerce.number().parse(searchParams.get('page') ?? '1')
-  const name = searchParams.get('name')
-  const sus = searchParams.get('sus')
-  const cpf = searchParams.get('cpf')
-  const birthDate = searchParams.get('birthDate')
-  const generalRegistration = searchParams.get('generalRegistration')
+  const { token } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = z.coerce.number().parse(searchParams.get("page") ?? "1");
+  const name = searchParams.get("name");
+  const sus = searchParams.get("sus");
+  const cpf = searchParams.get("cpf");
+  const birthDate = searchParams.get("birthDate");
+  const generalRegistration = searchParams.get("generalRegistration");
 
-  const { data: usersResult } = useQuery({
-    queryKey: ['users', page, name, sus, cpf, generalRegistration, birthDate],
+  const { data: usersResult, isLoading } = useQuery({
+    queryKey: ["users", page, name, sus, cpf, generalRegistration, birthDate],
     queryFn: () =>
       fetchUsers(
         {
@@ -41,15 +43,15 @@ export function Users() {
           name,
           sus,
         },
-        token ?? '',
+        token ?? "",
       ),
-  })
+  });
 
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
-      state.set('page', pageIndex.toString())
-      return state
-    })
+      state.set("page", pageIndex.toString());
+      return state;
+    });
   }
 
   return (
@@ -62,8 +64,8 @@ export function Users() {
             <UserTableFilters />
             <Button
               className=""
-              variant={'default'}
-              onClick={() => navigate('/users/new')}
+              variant={"default"}
+              onClick={() => navigate("/users/new")}
             >
               Novo Usuário
             </Button>
@@ -86,10 +88,21 @@ export function Users() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {usersResult?.patients &&
-                  usersResult.patients.map((item) => {
-                    return <UserTableRow user={item} key={item.id} />
-                  })}
+                {isLoading && <TableSkeleton />}
+                {!isLoading && usersResult?.patients?.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={9}
+                      className="h-24 text-center text-muted-foreground"
+                    >
+                      Nenhum usuário encontrado.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {!isLoading &&
+                  usersResult?.patients?.map((item) => (
+                    <UserTableRow user={item} key={item.id} />
+                  ))}
               </TableBody>
             </Table>
           </div>
@@ -105,5 +118,5 @@ export function Users() {
         </div>
       </div>
     </>
-  )
+  );
 }

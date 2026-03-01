@@ -31,6 +31,7 @@ import { AlertDialogConfirm } from "@/components/dialog/alert-confirm-content";
 export interface PathologyTableRowProps {
   pathology: {
     id: string;
+    code: string;
     name: string;
   };
 }
@@ -72,6 +73,9 @@ export function PathologyTableRow({ pathology }: PathologyTableRowProps) {
           </DialogTrigger>
           {/* <OrderDetails /> */}
         </Dialog>
+      </TableCell>
+      <TableCell className="font-mono text-xs font-medium">
+        {pathology.code}
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
         {pathology.name}

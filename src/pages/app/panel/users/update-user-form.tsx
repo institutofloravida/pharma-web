@@ -164,7 +164,7 @@ export function UpdateUserForm() {
       race: user?.race ?? Race.MIXED,
       sus: user?.sus ?? "",
       pathologiesIds: user?.pathologies
-        ? user.pathologies.map((p) => ({ id: p.id, value: p.name }))
+        ? user.pathologies.map((p) => ({ id: p.id, value: `${p.code} - ${p.name}` }))
         : [],
     },
   });
@@ -627,7 +627,7 @@ export function UpdateUserForm() {
                           );
                           return {
                             id: idOrObj,
-                            value: pathology ? pathology.name : "Carregando...",
+                            value: pathology ? `${pathology.code} - ${pathology.name}` : "Carregando...",
                           };
                         }
                         return idOrObj;
@@ -639,7 +639,7 @@ export function UpdateUserForm() {
                     onQueryChange={setQueryPathology}
                     query={queryPathology}
                     isFetching={isFetchingPathology}
-                    formatItem={(item) => `${item.name}`}
+                    formatItem={(item) => `${item.code} - ${item.name}`}
                   />
                   <FormMessage />
                 </FormItem>

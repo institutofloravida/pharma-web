@@ -7,6 +7,7 @@ export interface FetchPathologiesQuery {
 
 export interface Pathology {
   id: string
+  code: string
   name: string
 }
 

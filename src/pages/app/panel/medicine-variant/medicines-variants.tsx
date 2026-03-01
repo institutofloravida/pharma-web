@@ -10,6 +10,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -20,6 +21,7 @@ import { MedicineVariantTableFilters } from "./medicine-variant-table-filters";
 import { MedicineVariantTableRow } from "./medicine-variant-table-row";
 import { NewMedicineVariantDialog } from "./new-medicine-variant-dialog";
 import { useState } from "react";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function MedicinesVariants() {
   const { token } = useAuth();
@@ -31,7 +33,7 @@ export function MedicinesVariants() {
   const medicineId = searchParams.get("medicineId");
   const name = searchParams.get("name");
 
-  const { data: medicinesVariants } = useQuery({
+  const { data: medicinesVariants, isLoading } = useQuery({
     queryKey: ["medicines-variants", pageIndex, name, medicineId],
     queryFn: () =>
       fetchMedicinesVariants(
@@ -81,15 +83,25 @@ export function MedicinesVariants() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {medicinesVariants &&
-                  medicinesVariants.medicines_variants.map((item) => {
-                    return (
-                      <MedicineVariantTableRow
-                        medicineVariant={item}
-                        key={item.id}
-                      />
-                    );
-                  })}
+                {isLoading && <TableSkeleton />}
+                {!isLoading &&
+                  medicinesVariants?.medicines_variants?.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={6}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        Nenhuma variante de medicamento encontrada.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                {!isLoading &&
+                  medicinesVariants?.medicines_variants?.map((item) => (
+                    <MedicineVariantTableRow
+                      medicineVariant={item}
+                      key={item.id}
+                    />
+                  ))}
               </TableBody>
             </Table>
           </div>

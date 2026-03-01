@@ -10,6 +10,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -20,6 +21,7 @@ import { NewPharmaceuticalFormDialog } from "./new-pharmaceutical-form-dialog";
 import { PharmaceuticalFormTableFilters } from "./pharmaceutical-form-table-filters";
 import { PharmaceuticalFormTableRow } from "./pharmaceutical-form-table-row";
 import { useState } from "react";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function PharmaceuticalForms() {
   const { token } = useAuth();
@@ -30,7 +32,7 @@ export function PharmaceuticalForms() {
 
   const query = searchParams.get("query");
 
-  const { data: pharmaceuticalformsResult } = useQuery({
+  const { data: pharmaceuticalformsResult, isLoading } = useQuery({
     queryKey: ["pharmaceutical-forms", page, query],
     queryFn: () => fetchPharmaceuticalForms({ page, query }, token ?? ""),
   });
@@ -74,16 +76,27 @@ export function PharmaceuticalForms() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pharmaceuticalformsResult?.pharmaceutical_forms &&
-                  pharmaceuticalformsResult?.pharmaceutical_forms.map(
-                    (item) => {
-                      return (
-                        <PharmaceuticalFormTableRow
-                          pharmaceuticalForm={item}
-                          key={item.id}
-                        />
-                      );
-                    },
+                {isLoading && <TableSkeleton />}
+                {!isLoading &&
+                  pharmaceuticalformsResult?.pharmaceutical_forms?.length ===
+                    0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={4}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        Nenhuma forma farmacêutica encontrada.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                {!isLoading &&
+                  pharmaceuticalformsResult?.pharmaceutical_forms?.map(
+                    (item) => (
+                      <PharmaceuticalFormTableRow
+                        pharmaceuticalForm={item}
+                        key={item.id}
+                      />
+                    ),
                   )}
               </TableBody>
             </Table>

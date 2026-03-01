@@ -1,16 +1,17 @@
 import { apiPharma } from '@/lib/axios'
 
 export interface RegisterPathologyBody {
+  code: string
   name: string
 }
 
 export async function registerPathology(
-  { name }: RegisterPathologyBody,
+  { code, name }: RegisterPathologyBody,
   token: string,
 ) {
   await apiPharma.post(
     '/pathology',
-    { name },
+    { code, name },
     {
       headers: {
         Authorization: `Bearer ${token}`,

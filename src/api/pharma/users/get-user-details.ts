@@ -30,6 +30,7 @@ interface GetUserDetailsResponse {
     }
     pathologies: {
       id: string
+      code: string
       name: string
       createdAt: Date
       updatedAt: Date | null | undefined

@@ -11,6 +11,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -96,11 +97,23 @@ export function Operators() {
                 {/* Skeletons enquanto carrega */}
                 {isLoading && <TableSkeleton />}
 
+                {/* Estado vazio */}
+                {!isLoading && operatorsResult?.operators?.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={8}
+                      className="h-24 text-center text-muted-foreground"
+                    >
+                      Nenhum operador encontrado.
+                    </TableCell>
+                  </TableRow>
+                )}
+
                 {/* Dados reais quando disponíveis */}
                 {!isLoading &&
-                  operatorsResult?.operators?.map((item) => {
-                    return <OperatorTableRow operator={item} key={item.id} />;
-                  })}
+                  operatorsResult?.operators?.map((item) => (
+                    <OperatorTableRow operator={item} key={item.id} />
+                  ))}
               </TableBody>
             </Table>
           </div>

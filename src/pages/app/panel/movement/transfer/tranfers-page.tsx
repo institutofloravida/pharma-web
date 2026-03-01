@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -16,6 +17,7 @@ import { useAuth } from "@/contexts/authContext";
 
 import { fetchTransfers } from "@/api/pharma/movement/transfer/fetch-transfer";
 import { TransferTableRow } from "./transfer-tabel-row";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function TransfersPage() {
   const { token, institutionId } = useAuth();
@@ -29,7 +31,7 @@ export function TransfersPage() {
   const movementTypeId = searchParams.get("movementTypeId");
   const exitDate = searchParams.get("exitDate");
 
-  const { data: transfersResult } = useQuery({
+  const { data: transfersResult, isLoading } = useQuery({
     queryKey: [
       "transfers",
       "data-on-institution",
@@ -83,12 +85,21 @@ export function TransfersPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {transfersResult &&
-                  transfersResult.transfers.map((item) => {
-                    return (
-                      <TransferTableRow transfer={item} key={item.transferId} />
-                    );
-                  })}
+                {isLoading && <TableSkeleton />}
+                {!isLoading && transfersResult?.transfers?.length === 0 && (
+                  <TableRow>
+                    <TableCell
+                      colSpan={7}
+                      className="h-24 text-center text-muted-foreground"
+                    >
+                      Nenhuma transferência encontrada.
+                    </TableCell>
+                  </TableRow>
+                )}
+                {!isLoading &&
+                  transfersResult?.transfers?.map((item) => (
+                    <TransferTableRow transfer={item} key={item.transferId} />
+                  ))}
               </TableBody>
             </Table>
           </div>

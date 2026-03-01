@@ -10,6 +10,7 @@ import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -20,6 +21,7 @@ import { ManufacturerTableFilters } from "./manufacturer-table-filters";
 import { ManufacturerTableRow } from "./manufacturer-table-row";
 import { NewManufacturerDialog } from "./new-manufacturer-dialog";
 import { useState } from "react";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function Manufacturers() {
   const { token } = useAuth();
@@ -32,7 +34,7 @@ export function Manufacturers() {
   const query = searchParams.get("query") ?? "";
   const cnpj = searchParams.get("cnpj") ?? "";
 
-  const { data: manufacturersResult } = useQuery({
+  const { data: manufacturersResult, isLoading } = useQuery({
     queryKey: ["manufacturers", page, query, cnpj],
     queryFn: () => fetchManufacturers({ page, query, cnpj }, token ?? ""),
   });
@@ -74,12 +76,22 @@ export function Manufacturers() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {manufacturersResult?.manufacturers &&
-                  manufacturersResult?.manufacturers.map((item) => {
-                    return (
-                      <ManufacturerTableRow manufacturer={item} key={item.id} />
-                    );
-                  })}
+                {isLoading && <TableSkeleton />}
+                {!isLoading &&
+                  manufacturersResult?.manufacturers?.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={6}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        Nenhum fabricante encontrado.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                {!isLoading &&
+                  manufacturersResult?.manufacturers?.map((item) => (
+                    <ManufacturerTableRow manufacturer={item} key={item.id} />
+                  ))}
               </TableBody>
             </Table>
           </div>

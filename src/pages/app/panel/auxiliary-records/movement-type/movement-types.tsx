@@ -1,40 +1,41 @@
-import { Dialog, DialogTrigger } from '@radix-ui/react-dialog'
-import { useQuery } from '@tanstack/react-query'
-import { Helmet } from 'react-helmet-async'
-import { useSearchParams } from 'react-router-dom'
-import { z } from 'zod'
+import { Dialog, DialogTrigger } from "@radix-ui/react-dialog";
+import { useQuery } from "@tanstack/react-query";
+import { Helmet } from "react-helmet-async";
+import { useSearchParams } from "react-router-dom";
+import { z } from "zod";
 
-import { fetchMovementTypes } from '@/api/pharma/auxiliary-records/movement-type/fetch-movement-types'
-import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
+import { fetchMovementTypes } from "@/api/pharma/auxiliary-records/movement-type/fetch-movement-types";
+import { Pagination } from "@/components/pagination";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { useAuth } from '@/contexts/authContext'
+} from "@/components/ui/table";
+import { useAuth } from "@/contexts/authContext";
 
-import { MovementTypeTableFilters } from './movement-type-table-filters'
-import { MovementTypeTableRow } from './movement-type-table-row'
-import { NewMovementTypeDialog } from './new-movement-type-dialog'
+import { MovementTypeTableFilters } from "./movement-type-table-filters";
+import { MovementTypeTableRow } from "./movement-type-table-row";
+import { NewMovementTypeDialog } from "./new-movement-type-dialog";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function MovementTypes() {
-  const { token } = useAuth()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const pageIndex = z.coerce.number().parse(searchParams.get('page') ?? '1')
+  const { token } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageIndex = z.coerce.number().parse(searchParams.get("page") ?? "1");
 
   const { data: movementTypesResult } = useQuery({
-    queryKey: ['movement-types', pageIndex],
-    queryFn: () => fetchMovementTypes({ page: pageIndex }, token ?? ''),
-  })
+    queryKey: ["movement-types", pageIndex],
+    queryFn: () => fetchMovementTypes({ page: pageIndex }, token ?? ""),
+  });
 
   function handlePagination(pageIndex: number) {
     setSearchParams((state) => {
-      state.set('page', pageIndex.toString())
-      return state
-    })
+      state.set("page", pageIndex.toString());
+      return state;
+    });
   }
 
   return (
@@ -49,7 +50,7 @@ export function MovementTypes() {
             <MovementTypeTableFilters />
             <Dialog>
               <DialogTrigger asChild>
-                <Button variant={'default'}>Novo Tipo de Movimentção</Button>
+                <Button variant={"default"}>Novo Tipo de Movimentção</Button>
               </DialogTrigger>
               <NewMovementTypeDialog />
             </Dialog>
@@ -71,7 +72,7 @@ export function MovementTypes() {
                     <MovementTypeTableRow movementType={item} key={item.id} />
                   ))
                 ) : (
-                  <div>Nenhum estoque encontrado</div>
+                  <TableSkeleton />
                 )}
               </TableBody>
             </Table>
@@ -88,5 +89,5 @@ export function MovementTypes() {
         </div>
       </div>
     </>
-  )
+  );
 }

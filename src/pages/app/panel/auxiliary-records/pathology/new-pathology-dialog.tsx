@@ -24,6 +24,11 @@ import {
 } from "@/api/pharma/auxiliary-records/pathology/register-pathology";
 
 const newPathologySchema = z.object({
+  code: z
+    .string()
+    .trim()
+    .min(1, { message: "O CID é obrigatório" })
+    .max(10, { message: "O CID pode ter no máximo 10 caracteres" }),
   name: z
     .string()
     .trim()
@@ -59,6 +64,7 @@ export function NewPathologyDialog() {
   async function handleRegisterPathology(data: NewPathologySchema) {
     try {
       await registerPathologyFn({
+        code: data.code,
         name: data.name,
       });
 
@@ -85,6 +91,12 @@ export function NewPathologyDialog() {
 
       <form onSubmit={handleSubmit(handleRegisterPathology)}>
         <div className="grid gap-2">
+          <div className="flex-col gap-2">
+            <Label htmlFor="code" className="text-right">
+              CID
+            </Label>
+            <Input id="code" className="col-span-3" placeholder="Ex: E11" {...register("code")} />
+          </div>
           <div className="flex-col gap-2">
             <Label htmlFor="name" className="text-right">
               Nome

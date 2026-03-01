@@ -574,7 +574,7 @@ export function NewUserForm() {
                     onQueryChange={setQueryPathology}
                     query={queryPathology}
                     isFetching={isFetchingPathology}
-                    formatItem={(item) => `${item.name}`}
+                    formatItem={(item) => `${item.code} - ${item.name}`}
                     placeholder="Selecione uma patologia"
                     placeholderAferSelected="patologia(s) selecionada(s)"
                   />

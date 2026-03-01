@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -17,6 +18,7 @@ import { useAuth } from "@/contexts/authContext";
 
 import { DispensationTableFilters } from "./dispensation-table-filters";
 import { DispensationTableRow } from "./dispensation-table-row";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function Dispensations() {
   const { token } = useAuth();
@@ -27,7 +29,7 @@ export function Dispensations() {
   const patientId = searchParams.get("patientId");
   const dispensationDate = searchParams.get("dispensationDate");
 
-  const { data: dispensationsResult } = useQuery({
+  const { data: dispensationsResult, isLoading } = useQuery({
     queryKey: ["dispensations", patientId, dispensationDate],
     queryFn: () =>
       fetchDispensations(
@@ -81,15 +83,25 @@ export function Dispensations() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {dispensationsResult &&
-                  dispensationsResult.dispensations.map((dispensation) => {
-                    return (
-                      <DispensationTableRow
-                        dispensation={dispensation}
-                        key={dispensation.id}
-                      />
-                    );
-                  })}
+                {isLoading && <TableSkeleton />}
+                {!isLoading &&
+                  dispensationsResult?.dispensations?.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={7}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        Nenhuma dispensa encontrada.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                {!isLoading &&
+                  dispensationsResult?.dispensations?.map((dispensation) => (
+                    <DispensationTableRow
+                      dispensation={dispensation}
+                      key={dispensation.id}
+                    />
+                  ))}
               </TableBody>
             </Table>
           </div>

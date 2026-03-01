@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableRow,
@@ -20,6 +21,7 @@ import { NewUnitMeasureDialog } from "./new-unit-measure-dialog";
 import { UnitMeasureTableFilters } from "./units-measure-table-filters";
 import { UnitMeasureTableRow } from "./units-measure-table-row";
 import { useState } from "react";
+import { TableSkeleton } from "@/components/skeletons/table";
 
 export function UnitMeasure() {
   const { token } = useAuth();
@@ -30,7 +32,7 @@ export function UnitMeasure() {
 
   const query = searchParams.get("query");
 
-  const { data: unitsMeasureResult } = useQuery({
+  const { data: unitsMeasureResult, isLoading } = useQuery({
     queryKey: ["units-measure", page, query],
     queryFn: () => fetchUnitsMeasure({ page, query }, token ?? ""),
   });
@@ -71,18 +73,22 @@ export function UnitMeasure() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {unitsMeasureResult?.units_measure ? (
-                  unitsMeasureResult.units_measure.map((item) => (
-                    <UnitMeasureTableRow
-                      unitMeasure={item ?? []}
-                      key={item.id}
-                    />
-                  ))
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <p>Nenhuma Unidade de Medida encontrada</p>
-                  </div>
-                )}
+                {isLoading && <TableSkeleton />}
+                {!isLoading &&
+                  unitsMeasureResult?.units_measure?.length === 0 && (
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="h-24 text-center text-muted-foreground"
+                      >
+                        Nenhuma unidade de medida encontrada.
+                      </TableCell>
+                    </TableRow>
+                  )}
+                {!isLoading &&
+                  unitsMeasureResult?.units_measure?.map((item) => (
+                    <UnitMeasureTableRow unitMeasure={item} key={item.id} />
+                  ))}
               </TableBody>
             </Table>
           </div>
