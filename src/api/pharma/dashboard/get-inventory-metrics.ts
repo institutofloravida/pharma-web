@@ -12,6 +12,7 @@ interface GetInventoryMetricsResponse {
       unavailable: number
       zero: number
       expired: number
+      closeToExpiration: number
     }
   }
   // dispense: {

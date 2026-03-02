@@ -52,9 +52,13 @@ export function InventoryTodayCard() {
             </p>
             <p className="text-xs text-muted-foreground">
               <span
-                className={Number(4) > 0 ? "text-yellow-500" : "text-red-500"}
+                className={
+                  Number(inventoryMetrics?.quantity.closeToExpiration) > 0
+                    ? "text-yellow-500"
+                    : "text-muted-foreground"
+                }
               >
-                0
+                {inventoryMetrics?.quantity.closeToExpiration ?? 0}
               </span>{" "}
               próximo(s) da validade.
             </p>

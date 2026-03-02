@@ -9,12 +9,14 @@ import {
   Layers2,
   Package,
   Pill,
+  ShieldAlert,
   XCircle,
 } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { inventoryMedicineDetails } from "@/api/pharma/inventory/inventory-medicine-details";
+import { UpdateMinimumLevelDialog } from "./update-minimum-level-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -229,6 +231,21 @@ export function InventoryMedicineDetails() {
                     Não há dados suficientes para exibir a barra de progresso.
                   </div>
                 )}
+
+                {/* Nível mínimo */}
+                <div className="flex items-center gap-2 pt-1">
+                  <ShieldAlert className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">
+                    Nível mínimo:{" "}
+                    <span className="font-medium text-foreground">
+                      {medicine.minimumLevel}
+                    </span>
+                  </span>
+                  <UpdateMinimumLevelDialog
+                    medicineStockId={medicine.medicineStockId}
+                    currentMinimumLevel={medicine.minimumLevel}
+                  />
+                </div>
 
                 {/* Badges */}
                 <div className="mt-2 flex gap-2">

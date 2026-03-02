@@ -211,21 +211,21 @@ export const sidebarSections: SidebarSection[] = [
       },
     ],
   },
-  {
-    label: "Mais",
-    singleItems: [
-      {
-        name: "Configurações",
-        url: "#",
-        icon: Settings,
-      },
-      {
-        name: "Notificações",
-        url: "#",
-        icon: Bell,
-      },
-    ],
-  },
+  // {
+  //   label: "Mais",
+  //   singleItems: [
+  //     {
+  //       name: "Configurações",
+  //       url: "#",
+  //       icon: Settings,
+  //     },
+  //     {
+  //       name: "Notificações",
+  //       url: "#",
+  //       icon: Bell,
+  //     },
+  //   ],
+  // },
 ];
 
 export function convertSidebarToNavItems(
