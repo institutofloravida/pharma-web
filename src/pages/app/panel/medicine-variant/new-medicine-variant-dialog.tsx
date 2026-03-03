@@ -85,9 +85,9 @@ export function NewMedicineVariantDialog({
     queryKey: ["medicines", queryMedicine],
     queryFn: () =>
       fetchMedicines({ page: 1, query: queryMedicine }, token ?? ""),
-    enabled: queryMedicine !== null,
+    enabled: queryMedicine !== null && queryMedicine.length > 0,
     staleTime: 1000,
-    refetchOnMount: true,
+    refetchOnMount: false,
   });
 
   const {
@@ -100,9 +100,10 @@ export function NewMedicineVariantDialog({
         { page: 1, query: queryPharmaceuticalForm },
         token ?? "",
       ),
-    enabled: queryPharmaceuticalForm !== null,
+    enabled:
+      queryPharmaceuticalForm !== null && queryPharmaceuticalForm.length > 0,
     staleTime: 1000,
-    refetchOnMount: true,
+    refetchOnMount: false,
   });
 
   const { data: unitsMeasureResult, isFetching: isFetchingUnitsMeasure } =
@@ -110,9 +111,9 @@ export function NewMedicineVariantDialog({
       queryKey: ["units-measure", queryUnitMeasure],
       queryFn: () =>
         fetchUnitsMeasure({ page: 1, query: queryUnitMeasure }, token ?? ""),
-      enabled: queryUnitMeasure !== null,
+      enabled: queryUnitMeasure !== null && queryUnitMeasure.length > 0,
       staleTime: 1000,
-      refetchOnMount: true,
+      refetchOnMount: false,
     });
 
   const form = useForm<z.infer<typeof FormSchema>>({

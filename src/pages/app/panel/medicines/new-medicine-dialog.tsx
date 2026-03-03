@@ -72,8 +72,15 @@ export function NewMedicineDialog({ onSuccess }: NewMedicineDialogProps) {
     data: therapeuticClassesResult,
     isLoading: isLoadingTherapeuticClasses,
   } = useQuery({
-    queryKey: ["therapeutic-classes"],
-    queryFn: () => fetchTherapeuticClasses({ page: 1 }, token ?? ""),
+    queryKey: ["therapeutic-classes", queryTherapeuticClass],
+    queryFn: () =>
+      fetchTherapeuticClasses(
+        { page: 1, query: queryTherapeuticClass },
+        token ?? "",
+      ),
+    enabled: queryTherapeuticClass !== null && queryTherapeuticClass.length > 0,
+    staleTime: 1000,
+    refetchOnMount: false,
   });
 
   const form = useForm<z.infer<typeof FormSchema>>({
