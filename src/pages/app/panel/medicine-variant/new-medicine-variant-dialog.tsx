@@ -163,7 +163,6 @@ export function NewMedicineVariantDialog({
                 <FormLabel>Medicamento</FormLabel>
                 <ComboboxUp
                   formatItem={(item) => item.name}
-                  isDisable={true}
                   items={medicinesResult?.medicines || []}
                   field={field}
                   query={queryMedicine}
