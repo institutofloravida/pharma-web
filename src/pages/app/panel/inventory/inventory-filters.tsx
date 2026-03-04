@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { Search, View, X } from "lucide-react";
+import { LayoutGrid, List, Search, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
@@ -24,11 +24,6 @@ import { ComboboxMany } from "@/components/comboboxes/combobox-many";
 import { fetchTherapeuticClasses } from "@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class";
 import { Checkbox } from "@/components/ui/checkbox";
 
-enum ViewMode {
-  LIST = "LIST",
-  GRID = "GRID",
-}
-
 const inventoryFiltersSchema = z.object({
   stockId: z.string().optional(),
   medicineName: z.string().optional(),
@@ -38,7 +33,12 @@ const inventoryFiltersSchema = z.object({
 
 type InventoryFiltersSchema = z.infer<typeof inventoryFiltersSchema>;
 
-export function InventoryTableFilters() {
+interface InventoryTableFiltersProps {
+  viewMode: 'grid' | 'list'
+  onViewModeChange: (mode: 'grid' | 'list') => void
+}
+
+export function InventoryTableFilters({ viewMode, onViewModeChange }: InventoryTableFiltersProps) {
   const { token } = useAuth();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -257,6 +257,29 @@ export function InventoryTableFilters() {
           <X className="mr-2 h-4 w-4" />
           Remover Filtros
         </Button>
+
+        <div className="col-span-1 flex items-center gap-1 rounded-md border p-0.5">
+          <Button
+            type="button"
+            variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+            size="icon"
+            className="h-7 w-7"
+            onClick={() => onViewModeChange('grid')}
+            title="Grade"
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Button>
+          <Button
+            type="button"
+            variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+            size="icon"
+            className="h-7 w-7"
+            onClick={() => onViewModeChange('list')}
+            title="Lista"
+          >
+            <List className="h-4 w-4" />
+          </Button>
+        </div>
       </form>
     </Form>
   );

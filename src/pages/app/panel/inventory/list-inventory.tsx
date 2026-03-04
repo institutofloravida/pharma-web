@@ -1,14 +1,13 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { LayoutGrid, List, Package } from 'lucide-react'
+import { Package } from 'lucide-react'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchInventory } from '@/api/pharma/inventory/fetch-inventory'
 import { Pagination } from '@/components/pagination'
-import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -83,29 +82,11 @@ export function Inventory() {
                 Visualize seu estoque de medicamentos
               </CardDescription>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="icon"
-                onClick={() => setViewMode('grid')}
-                title="Visualização em grade"
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="icon"
-                onClick={() => setViewMode('list')}
-                title="Visualização em lista"
-              >
-                <List className="h-4 w-4" />
-              </Button>
-              <Package className="ml-2 h-8 w-8 text-secondary-foreground" />
-            </div>
+            <Package className="h-8 w-8 text-secondary-foreground" />
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          <InventoryTableFilters />
+          <InventoryTableFilters viewMode={viewMode} onViewModeChange={setViewMode} />
 
           {isFetchingInventory ? (
             <h1>aguarde....</h1>

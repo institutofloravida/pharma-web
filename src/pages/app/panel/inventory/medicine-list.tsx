@@ -77,7 +77,7 @@ export function MedicationList({ inventory }: MedicationListProps) {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="flex items-center gap-1"
+                    className="mx-auto flex items-center gap-1"
                     onClick={(e) => {
                       e.stopPropagation()
                     }}
