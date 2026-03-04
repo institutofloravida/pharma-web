@@ -1,5 +1,5 @@
 import { Check, ChevronsUpDown } from "lucide-react";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -48,14 +48,10 @@ export function ComboboxUp<T extends Record<string, any>>({
   isDisable,
   itemValue,
   formatItem,
-  getItemText = (item) => String(item[itemKey]),
+  getItemText = (item) => String(itemValue ? item[itemValue] : item[itemKey]),
   getItemDisabled = () => false,
 }: ComboboxProps<T>) {
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    console.log("isDisable value:", isDisable);
-  }, [isDisable]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>

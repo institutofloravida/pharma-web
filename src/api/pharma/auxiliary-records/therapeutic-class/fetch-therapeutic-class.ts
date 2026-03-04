@@ -1,20 +1,20 @@
-import { apiPharma } from '@/lib/axios'
+import { apiPharma } from "@/lib/axios";
 
-import { Meta } from '../../_types/meta'
+import { Meta } from "../../_types/meta";
 export interface FetchTherapeuticClassesQuery {
-  page?: number | null
-  query?: string | null
+  page?: number | null;
+  query?: string | null;
 }
 
 export interface TherapeuticClass {
-  id: string
-  name: string
-  description: string
+  id: string;
+  name: string;
+  description: string;
 }
 
 interface FetchTherapeuticClassesResponse {
-  therapeutic_classes: TherapeuticClass[]
-  meta: Meta
+  therapeutic_classes: TherapeuticClass[];
+  meta: Meta;
 }
 
 export async function fetchTherapeuticClasses(
@@ -22,17 +22,20 @@ export async function fetchTherapeuticClasses(
   token: string,
 ) {
   const response = await apiPharma.get<FetchTherapeuticClassesResponse>(
-    '/therapeutic-class',
+    "/therapeutic-class",
     {
       headers: {
         Authorization: `Bearer ${token}`,
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
       },
       params: {
         page,
         query,
+        _ts: Date.now(),
       },
     },
-  )
+  );
 
-  return response.data
+  return response.data;
 }
