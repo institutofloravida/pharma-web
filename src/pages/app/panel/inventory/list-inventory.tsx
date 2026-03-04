@@ -1,19 +1,14 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { Package } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { LayoutGrid, List, Package } from 'lucide-react'
+import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { z } from 'zod'
 
 import { fetchInventory } from '@/api/pharma/inventory/fetch-inventory'
-import { fetchMedicinesOnStock } from '@/api/pharma/stock/medicine-stock/fetch-medicines-stock'
-// import { BatchDetails } from '@/components/medication/batch-details'
-// import { LoadingState } from '@/components/medication/loading-state'
-// import { MedicationFilters } from '@/components/medication/medication-filters'
-// import { MedicationGrid } from '@/components/medication/medication-grid'
-// import { MedicationList } from '@/components/medication/medication-list'
-// import { PaginationControls } from '@/components/medication/pagination-controls'
+import { Pagination } from '@/components/pagination'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
@@ -29,7 +24,7 @@ import { MedicationList } from './medicine-list'
 
 export function Inventory() {
   const { token, institutionId } = useAuth()
-  const [viewMode, setViewMode] = useState('grid')
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [searchParams, setSearchParams] = useSearchParams()
 
   const medicineName = searchParams.get('medicineName')
@@ -67,6 +62,14 @@ export function Inventory() {
         token ?? '',
       ),
   })
+
+  function handlePagination(page: number) {
+    setSearchParams((state) => {
+      state.set('page', page.toString())
+      return state
+    })
+  }
+
   return (
     <div className="container mx-auto py-6">
       <Card className="border-none shadow-md">
@@ -80,38 +83,58 @@ export function Inventory() {
                 Visualize seu estoque de medicamentos
               </CardDescription>
             </div>
-            <Package className="h-8 w-8 text-secondary-foreground" />
+            <div className="flex items-center gap-2">
+              <Button
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                size="icon"
+                onClick={() => setViewMode('grid')}
+                title="Visualização em grade"
+              >
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'outline'}
+                size="icon"
+                onClick={() => setViewMode('list')}
+                title="Visualização em lista"
+              >
+                <List className="h-4 w-4" />
+              </Button>
+              <Package className="ml-2 h-8 w-8 text-secondary-foreground" />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="p-6">
-          <>
-            <InventoryTableFilters />
-            {isFetchingInventory ? (
-              <h1>aguarde....</h1>
-            ) : (
-              <>
-                {viewMode === 'list' ? (
-                  <MedicationList
-                    inventory={inventoryResult?.inventory ?? []}
-                  />
-                ) : (
-                  <MedicationGrid
-                    inventory={inventoryResult?.inventory ?? []}
-                  />
-                )}
-              </>
-            )}
-          </>
+          <InventoryTableFilters />
 
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-3 w-3 rounded-full bg-destructive"></span>
-              <span>Estoque Baixo</span>
+          {isFetchingInventory ? (
+            <h1>aguarde....</h1>
+          ) : viewMode === 'list' ? (
+            <MedicationList inventory={inventoryResult?.inventory ?? []} />
+          ) : (
+            <MedicationGrid inventory={inventoryResult?.inventory ?? []} />
+          )}
+
+          <div className="mt-6 flex flex-col gap-4">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-3 w-3 rounded-full bg-destructive"></span>
+                <span>Estoque Baixo</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block h-3 w-3 rounded-full bg-amber-500 dark:bg-amber-600"></span>
+                <span>Próximo da Validade</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-block h-3 w-3 rounded-full bg-amber-500 dark:bg-amber-600"></span>
-              <span>Próximo da Validade</span>
-            </div>
+
+            {inventoryResult?.meta && (
+              <Pagination
+                pageIndex={inventoryResult.meta.page}
+                totalCount={inventoryResult.meta.totalCount}
+                perPage={10}
+                onPageChange={handlePagination}
+              />
+            )}
           </div>
         </CardContent>
       </Card>

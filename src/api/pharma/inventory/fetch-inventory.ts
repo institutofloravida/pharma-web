@@ -31,6 +31,10 @@ export interface InventorySingle {
 
 export interface FetchInventoryResponse {
   inventory: InventorySingle[];
+  meta: {
+    page: number;
+    totalCount: number;
+  };
 }
 
 export async function fetchInventory(
