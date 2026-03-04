@@ -361,9 +361,13 @@ export default function NewMedicineEntryPage() {
                   <h2 className="text-xl font-semibold">
                     Medicamentos Selecionados
                   </h2>
-                  <Button type="submit" className="gap-2">
+                  <Button
+                    type="submit"
+                    className="gap-2"
+                    disabled={form.formState.isSubmitting}
+                  >
                     <Save className="h-4 w-4" />
-                    Salvar Entrada
+                    {form.formState.isSubmitting ? 'Salvando...' : 'Salvar Entrada'}
                   </Button>
                 </div>
                 <Separator />
