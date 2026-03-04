@@ -32,7 +32,6 @@ export async function fetchTherapeuticClasses(
       params: {
         page,
         query,
-        _ts: Date.now(),
       },
     },
   );
