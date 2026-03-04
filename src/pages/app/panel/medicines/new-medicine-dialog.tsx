@@ -44,7 +44,6 @@ const FormSchema = z.object({
   description: z.string().optional(),
 });
 
-type NewMedicineSchema = z.infer<typeof FormSchema>;
 export interface NewMedicineDialogProps {
   onSuccess?: () => void;
 }
@@ -75,10 +74,12 @@ export function NewMedicineDialog({ onSuccess }: NewMedicineDialogProps) {
     queryKey: ["therapeutic-classes", queryTherapeuticClass],
     queryFn: () =>
       fetchTherapeuticClasses(
-        { page: 1, query: queryTherapeuticClass },
+        {
+          page: 1,
+          query: queryTherapeuticClass.trim() || undefined,
+        },
         token ?? "",
       ),
-    enabled: queryTherapeuticClass !== null && queryTherapeuticClass.length > 0,
     staleTime: 1000,
     refetchOnMount: false,
   });
