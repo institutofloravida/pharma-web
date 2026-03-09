@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Settings } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { fetchStocks } from "@/api/pharma/auxiliary-records/stock/fetch-stocks";
@@ -41,9 +41,13 @@ function StockSettingRow({
     enabled: !!token,
   });
 
-  const [days, setDays] = useState<number | "">(
-    settings?.expirationWarningDays ?? 30,
-  );
+  const [days, setDays] = useState<number | "">("");
+
+  useEffect(() => {
+    if (settings?.expirationWarningDays !== undefined) {
+      setDays(settings.expirationWarningDays);
+    }
+  }, [settings?.expirationWarningDays]);
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: (expirationWarningDays: number) =>
@@ -58,7 +62,7 @@ function StockSettingRow({
   });
 
   const displayDays =
-    days === "" ? settings?.expirationWarningDays ?? 30 : days;
+    days === "" ? (settings?.expirationWarningDays ?? 30) : days;
 
   return (
     <div className="flex items-center gap-3">

@@ -65,7 +65,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarProvider,
-  SidebarRail,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -336,7 +335,6 @@ export default function PanelLayout() {
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarFooter>
-            <SidebarRail />
           </Sidebar>
           <SidebarInset>
             <header className="border-b-1 flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
