@@ -1,8 +1,8 @@
 import { PenLine, RotateCcw, Search, Trash } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { Dispensation } from "@/api/pharma/dispensation/fetch-dispensations";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { dateFormatter } from "@/lib/utils/formatter";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +34,7 @@ export function DispensationTableRow({
 }: DispensationsTableRowProps) {
   const [isReverseOpen, setIsReverseOpen] = useState(false);
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   const { mutateAsync: reverseExitFn, isPending: isPendingReverse } =
     useMutation({
@@ -60,15 +61,14 @@ export function DispensationTableRow({
       className={`${dispensation.reversedAt !== null ? "opacity-50" : ""}`}
     >
       <TableCell>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant={"outline"} size={"xs"}>
-              <Search className="h-3 w-3" />
-              <span className="sr-only">Detalhes do pedido</span>
-            </Button>
-          </DialogTrigger>
-          {/* <OrderDetails /> */}
-        </Dialog>
+        <Button
+          variant={"outline"}
+          size={"xs"}
+          onClick={() => navigate(`/dispensation/${dispensation.id}`)}
+        >
+          <Search className="h-3 w-3" />
+          <span className="sr-only">Detalhes da dispensa</span>
+        </Button>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
         {dispensation.patient}

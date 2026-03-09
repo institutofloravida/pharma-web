@@ -1,11 +1,11 @@
 import { FileText, PenLine, RotateCcw, Search, Trash } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { MedicineExit } from "@/api/pharma/movement/exit/fetch-medicines-exits";
 import { ExitType } from "@/api/pharma/movement/exit/register-medicine-exit";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { TableCell, TableRow } from "@/components/ui/table";
 import {
   Tooltip,
@@ -39,6 +39,7 @@ export function MedicineExitTableRow({
   const [loading, setLoading] = useState(false);
   const [isReverseOpen, setIsReverseOpen] = useState(false);
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   const { mutateAsync: reverseExitFn, isPending: isPendingReverse } =
     useMutation({
@@ -73,15 +74,14 @@ export function MedicineExitTableRow({
       className={`${medicineExit.reverseAt !== null ? "opacity-50" : ""}`}
     >
       <TableCell>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant={"outline"} size={"xs"}>
-              <Search className="h-3 w-3" />
-              <span className="sr-only">Detalhes da saída</span>
-            </Button>
-          </DialogTrigger>
-          {/* <OrderDetails /> */}
-        </Dialog>
+        <Button
+          variant={"outline"}
+          size={"xs"}
+          onClick={() => navigate(`/movement/exits/${medicineExit.id}`)}
+        >
+          <Search className="h-3 w-3" />
+          <span className="sr-only">Detalhes da saída</span>
+        </Button>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
         {medicineExit.stock}

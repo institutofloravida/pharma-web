@@ -16,14 +16,17 @@ import { TherapeuticClass } from "./pages/app/panel/auxiliary-records/therapeuti
 import { UnitMeasure } from "./pages/app/panel/auxiliary-records/unit-measure/units-measure";
 import { Dashboard } from "./pages/app/panel/dashboard/dashboard";
 import { Dispensations } from "./pages/app/panel/dispensation/dispensation";
+import { DispensationDetails } from "./pages/app/panel/dispensation/dispensation-details";
 import { NewDispensation } from "./pages/app/panel/dispensation/new-dispensation";
 import { InventoryMedicineDetails } from "./pages/app/panel/inventory/inventory-medicine-details";
 import { Inventory } from "./pages/app/panel/inventory/list-inventory";
 import { MedicinesVariants } from "./pages/app/panel/medicine-variant/medicines-variants";
 import { Medicines } from "./pages/app/panel/medicines/medicines";
+import { EntryDetails } from "./pages/app/panel/movement/entry/entry-details";
 import { MedicinesEntries } from "./pages/app/panel/movement/entry/medicines-entries";
 import NewMedicineEntryPage from "./pages/app/panel/movement/entry/new-medicine-entry";
 import MedicationEntryPage from "./pages/app/panel/movement/entry/teste";
+import { ExitDetails } from "./pages/app/panel/movement/exit/exit-details";
 import { MedicinesExits } from "./pages/app/panel/movement/exit/medicines-exits";
 import { Operators } from "./pages/app/panel/operators/operators";
 import NewExitPage from "./pages/app/panel/movement/exit/new-exit";
@@ -254,6 +257,14 @@ export const router = createBrowserRouter([
               </PrivateRoute>
             ),
           },
+          {
+            path: ":id",
+            element: (
+              <PrivateRoute>
+                <EntryDetails />
+              </PrivateRoute>
+            ),
+          },
         ],
       },
       // ... outros filhos
@@ -274,6 +285,14 @@ export const router = createBrowserRouter([
             element: (
               <PrivateRoute>
                 <NewExitPage />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: ":id",
+            element: (
+              <PrivateRoute>
+                <ExitDetails />
               </PrivateRoute>
             ),
           },
@@ -332,6 +351,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <DispensationPage />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: ":id",
+        element: (
+          <PrivateRoute>
+            <DispensationDetails />
           </PrivateRoute>
         ),
       },
