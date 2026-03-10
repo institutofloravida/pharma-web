@@ -26,7 +26,8 @@ interface PatientSearchProps {
   selectedPatient?: User;
 }
 
-const formatSUS = (cpf: string) => {
+const formatSUS = (cpf: string | null | undefined) => {
+  if (!cpf) return '-';
   return cpf.replace(/(\d{5})(\d{5})(\d{5})/, "$1.$2.$3");
 };
 
