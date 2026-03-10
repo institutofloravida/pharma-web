@@ -22,8 +22,8 @@ export interface FetchUsersQuery {
 export interface User {
   id: string;
   name: string;
-  sus: string;
-  cpf?: string;
+  sus?: string | null;
+  cpf?: string | null;
   birthDate: string;
   gender: Gender;
   race: Race;

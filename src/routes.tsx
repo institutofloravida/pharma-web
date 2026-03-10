@@ -5,6 +5,8 @@ import { AuthLayout } from "./pages/_layouts/auth";
 import PanelLayout from "./pages/_layouts/panel";
 import { PrivateRoute } from "./pages/_private/private-route";
 import Unauthorized from "./pages/_private/unauthorized";
+import { ErrorPage } from "./pages/error";
+import { NotFound } from "./pages/not-found";
 import { SignIn } from "./pages/app/auth/sign-in";
 import { Institutions } from "./pages/app/panel/auxiliary-records/institutions/institutions";
 import { Manufacturers } from "./pages/app/panel/auxiliary-records/manufacturers/manufacturers";
@@ -45,7 +47,7 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <PanelLayout />,
-
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "",
@@ -60,11 +62,13 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <AuthLayout />,
+    errorElement: <ErrorPage />,
     children: [{ path: "sign-in", element: <SignIn /> }],
   },
   {
     path: "/",
     element: <PanelLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "",
@@ -214,6 +218,7 @@ export const router = createBrowserRouter([
   {
     path: "/medicines",
     element: <PanelLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "",
@@ -236,6 +241,7 @@ export const router = createBrowserRouter([
   {
     path: "/movement",
     element: <PanelLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "entries",
@@ -307,6 +313,7 @@ export const router = createBrowserRouter([
   {
     path: "/users",
     element: <PanelLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "",
@@ -337,6 +344,7 @@ export const router = createBrowserRouter([
   {
     path: "/dispensation",
     element: <PanelLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "",
@@ -367,6 +375,7 @@ export const router = createBrowserRouter([
   {
     path: "/inventory",
     element: <PanelLayout />,
+    errorElement: <ErrorPage />,
     children: [
       {
         path: "",
@@ -389,5 +398,9 @@ export const router = createBrowserRouter([
   {
     path: "/unauthorized",
     element: <Unauthorized />,
+  },
+  {
+    path: "*",
+    element: <NotFound />,
   },
 ]);

@@ -4,6 +4,7 @@ import { RouterProvider } from "react-router-dom";
 
 import { ThemeProvider } from "./components/theme/theme-provider";
 import { Toaster } from "./components/ui/sonner";
+import { Toaster as ShadcnToaster } from "./components/ui/toaster";
 import { queryClient } from "./lib/react-query";
 import { router } from "./routes";
 
@@ -13,6 +14,7 @@ export function App() {
       <ThemeProvider storageKey="pharma-theme" defaultTheme="dark">
         <Helmet titleTemplate="%s | FarmaVida" />
         <Toaster richColors closeButton position="top-right" />
+        <ShadcnToaster />
         <RouterProvider router={router} />
       </ThemeProvider>
     </HelmetProvider>

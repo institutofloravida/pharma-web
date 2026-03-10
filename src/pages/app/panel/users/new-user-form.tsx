@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import InputMask from "react-input-mask";
+import { maskCep, maskCpf, maskSus } from "@/lib/utils/masks";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
@@ -57,7 +57,18 @@ export const newUserSchema = z.object({
     .optional(),
   sus: z
     .string()
-    .regex(/^\d{15}$/, { message: "O SUS deve conter exatamente 15 dígitos." }),
+    .transform((v) => v.trim())
+    .superRefine((val, ctx) => {
+      if (val.length === 0) return;
+      if (!/^\d{15}$/.test(val)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "O SUS deve conter exatamente 15 dígitos.",
+        });
+      }
+    })
+    .transform((val) => (val.length === 0 ? undefined : val))
+    .optional(),
   birthDate: z.date({ required_error: "Campo obrigatório" }),
   gender: z.enum(["M", "F", "O"], {
     errorMap: () => ({ message: "Campo obrigatório" }),
@@ -311,16 +322,16 @@ export function NewUserForm() {
                 <FormItem className="col-span-2">
                   <FormLabel>CPF</FormLabel>
                   <FormControl>
-                    <InputMask
-                      {...field}
-                      mask="999.999.999-99"
+                    <Input
                       placeholder="CPF..."
-                      onChange={(e: any) =>
+                      value={maskCpf(field.value ?? "")}
+                      onChange={(e) =>
                         field.onChange(e.target.value.replace(/\D/g, ""))
                       }
-                    >
-                      {(inputProps: any) => <Input {...inputProps} />}
-                    </InputMask>
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -334,16 +345,16 @@ export function NewUserForm() {
                 <FormItem className="col-span-2">
                   <FormLabel>SUS</FormLabel>
                   <FormControl>
-                    <InputMask
-                      {...field}
-                      mask="99999.99999.99999"
+                    <Input
                       placeholder="SUS..."
-                      onChange={(e: any) =>
+                      value={maskSus(field.value ?? "")}
+                      onChange={(e) =>
                         field.onChange(e.target.value.replace(/\D/g, ""))
                       }
-                    >
-                      {(inputProps: any) => <Input {...inputProps} />}
-                    </InputMask>
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -416,18 +427,18 @@ export function NewUserForm() {
                 <FormItem className="col-span-6">
                   <FormLabel>CEP</FormLabel>
                   <FormControl>
-                    <InputMask
-                      {...field}
-                      mask="99-999-999"
+                    <Input
                       placeholder="CEP..."
-                      onChange={(e: any) => {
+                      value={maskCep(field.value ?? "")}
+                      onChange={(e) => {
                         const cleanZip = e.target.value.replace(/\D/g, "");
                         setZipCode(cleanZip);
                         form.setValue("addressPatient.zipCode", cleanZip);
                       }}
-                    >
-                      {(inputProps: any) => <Input {...inputProps} />}
-                    </InputMask>
+                      onBlur={field.onBlur}
+                      name={field.name}
+                      ref={field.ref}
+                    />
                   </FormControl>
                   <FormDescription>
                     {isFetchingAddress && <span>Carregando...</span>}

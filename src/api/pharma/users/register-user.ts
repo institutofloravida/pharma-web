@@ -5,8 +5,8 @@ import type { Gender } from './fetch-users'
 
 export interface RegisterUserBody {
   name: string
-  sus: string
-  cpf?: string
+  sus?: string | null
+  cpf?: string | null
   birthDate: Date
   gender: Gender
   race: Race

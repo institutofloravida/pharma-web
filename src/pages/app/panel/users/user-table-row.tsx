@@ -35,7 +35,7 @@ export function UserTableRow({ user }: UserTableRowProps) {
         {user.cpf ? Formatter.cpf(user.cpf) : '-------------'}
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        {user.sus}
+        {user.sus ?? '-'}
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
         {user.gender}

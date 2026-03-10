@@ -12,7 +12,7 @@ interface GetUserDetailsResponse {
     id: string
     name: string
     cpf: string | null
-    sus: string
+    sus: string | null
     race: Race
     gender: Gender
     birthDate: Date
