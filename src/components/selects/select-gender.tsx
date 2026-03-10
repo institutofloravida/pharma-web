@@ -9,13 +9,13 @@ import {
 import { cn } from '@/lib/utils'
 
 interface SelectGenderProps {
-  value: Gender
+  value: Gender | undefined
   onChange: (value: Gender) => void
 }
 
 export function SelectGender({ value, onChange }: SelectGenderProps) {
   return (
-    <Select value={value} onValueChange={onChange}>
+    <Select value={value ?? ''} onValueChange={onChange}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Selecione um gênero" />
       </SelectTrigger>

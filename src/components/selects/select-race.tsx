@@ -8,13 +8,13 @@ import {
 import { Race } from '@/lib/utils/race'
 
 interface SelectRaceProps {
-  value: Race
+  value: Race | undefined
   onChange: (value: Race) => void
 }
 
 export function SelectRace({ value, onChange }: SelectRaceProps) {
   return (
-    <Select value={value} onValueChange={onChange}>
+    <Select value={value ?? ''} onValueChange={onChange}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Selecione uma cor/raça" />
       </SelectTrigger>
