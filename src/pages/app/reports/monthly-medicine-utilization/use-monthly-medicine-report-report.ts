@@ -51,12 +51,6 @@ export function useMonthlyMedicineUtilizationReportPdf() {
 
     const contentArr: any[] = [
       {
-        text: "Relatório de Utilização de Medicamentos Mensal",
-        style: "header",
-        alignment: "center",
-        margin: [0, 115, 0, 10],
-      },
-      {
         text: "Filtros",
         bold: true,
         alignment: "left",
@@ -114,6 +108,18 @@ export function useMonthlyMedicineUtilizationReportPdf() {
 
     const docDefinition: TDocumentDefinitions = {
       pageOrientation: "portrait",
+      pageMargins: [40, 140, 40, 40],
+      header: (currentPage: number) => {
+        if (currentPage === 1) {
+          return {
+            text: "Relatório de Utilização de Medicamentos Mensal",
+            style: "header",
+            alignment: "center",
+            margin: [0, 115, 0, 10],
+          };
+        }
+        return { text: "", margin: [0, 10, 0, 0] };
+      },
       content: contentArr,
       styles: {
         header: {

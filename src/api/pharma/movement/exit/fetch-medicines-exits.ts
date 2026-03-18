@@ -20,6 +20,7 @@ export interface MedicineExit {
   reverseAt?: Date | null;
   stock: string;
   items: number;
+  transferStatus?: string | null;
 }
 
 export interface FetchMedicinesExitsResponse {

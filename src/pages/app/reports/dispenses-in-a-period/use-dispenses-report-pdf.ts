@@ -38,12 +38,6 @@ export function useDispensesReportPdf() {
 
     const contentArr: any[] = [
       {
-        text: "Relatório de Dispensações",
-        style: "header",
-        alignment: "center",
-        margin: [0, 115, 0, 10],
-      },
-      {
         text: "Filtros",
         bold: true,
         alignment: "left",
@@ -114,6 +108,18 @@ export function useDispensesReportPdf() {
     });
 
     const docDefinition: TDocumentDefinitions = {
+      pageMargins: [40, 140, 40, 40],
+      header: (currentPage: number) => {
+        if (currentPage === 1) {
+          return {
+            text: "Relatório de Dispensações",
+            style: "header",
+            alignment: "center",
+            margin: [0, 115, 0, 10],
+          };
+        }
+        return { text: "", margin: [0, 10, 0, 0] };
+      },
       content: contentArr,
       styles: {
         header: {

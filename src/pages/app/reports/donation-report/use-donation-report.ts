@@ -35,7 +35,7 @@ export function useDonationReportPdf() {
           { text: "Assunto: ", bold: true },
           "Doação de Medicamento\n",
         ],
-        margin: [0, 115, 0, 10],
+        margin: [0, 0, 0, 10],
       },
       {
         text: "O Instituto Floravida, mediante aos medicamentos doados pela Ache Laboratórios Farmacêuticos S.A entrega a medicação abaixo especificada a caráter de doação, para atendimento de demanda da solicitante, a ser destinada em conformidade pela instituição recebedora.",
@@ -119,6 +119,7 @@ export function useDonationReportPdf() {
 
     const docDefinition: TDocumentDefinitions = {
       pageOrientation: "portrait",
+      pageMargins: [40, 140, 40, 40],
       content: contentArr,
       styles: {
         header: {
@@ -148,25 +149,20 @@ export function useDonationReportPdf() {
         bg: BACKGROUND_PORTRAIT,
         carimbo: CARIMBO,
       },
-      // footer: function (currentPage: number, pageCount: number) {
-      //   return [
-      //     {
-      //       columns: [
-      //         {
-      //           text: `Emitido por: ${me?.name ?? ''}`,
-      //           fontSize: 9,
-      //           margin: [14, 0, 0, 0],
-      //         },
-      //         {
-      //           text: `Página ${currentPage} de ${pageCount}`,
-      //           alignment: 'right',
-      //           fontSize: 9,
-      //           margin: [0, 0, 14, 0],
-      //         },
-      //       ],
-      //     },
-      //   ]
-      // },
+      footer: function (currentPage: number, pageCount: number) {
+        return [
+          {
+            columns: [
+              {
+                text: `Página ${currentPage} de ${pageCount}`,
+                alignment: "right",
+                fontSize: 9,
+                margin: [0, 0, 14, 0],
+              },
+            ],
+          },
+        ];
+      },
     };
 
     pdfMake.createPdf(docDefinition).download("Termo de Doação");

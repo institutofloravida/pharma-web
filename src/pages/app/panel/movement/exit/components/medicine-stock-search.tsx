@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ChevronsUpDown, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { fetchMedicinesOnStock } from "@/api/pharma/stock/medicine-stock/fetch-medicines-stock";
 import { Button } from "@/components/ui/button";
@@ -29,34 +29,6 @@ interface MedicineStockSearchProps {
   stockId: string;
 }
 
-// Mock data - substitua pela sua API
-const mockMedicinesStock: MedicineStock[] = [
-  {
-    id: "1",
-    medicine: "Paracetamol",
-    pharmaceuticalForm: "Comprimido",
-    dosage: "500mg",
-    unitMeasure: "mg",
-    quantity: { available: 100, unavailable: 0 },
-  },
-  {
-    id: "2",
-    medicine: "Ibuprofeno",
-    pharmaceuticalForm: "Comprimido",
-    dosage: "600mg",
-    unitMeasure: "mg",
-    quantity: { available: 50, unavailable: 10 },
-  },
-  {
-    id: "3",
-    medicine: "Amoxicilina",
-    pharmaceuticalForm: "Cápsula",
-    dosage: "500mg",
-    unitMeasure: "mg",
-    quantity: { available: 75, unavailable: 5 },
-  },
-];
-
 export function MedicineStockSearch({
   onSelect,
   selectedMedicines,
@@ -66,6 +38,13 @@ export function MedicineStockSearch({
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [queryMedicineStock, setQueryMedicineStock] = useState("");
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setQueryMedicineStock(searchValue);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchValue]);
 
   const { data: medicinesStockResult, isFetching: isFetchingMedicinesStock } =
     useQuery({
@@ -132,7 +111,7 @@ export function MedicineStockSearch({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
-        <Command>
+        <Command shouldFilter={false}>
           <CommandInput
             placeholder="Digite o nome do medicamento..."
             value={searchValue}

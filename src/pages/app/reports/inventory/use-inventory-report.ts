@@ -38,12 +38,6 @@ export function useInventoryReportPdf() {
 
     const contentArr: any[] = [
       {
-        text: 'Relatório de Inventário',
-        style: 'header',
-        alignment: 'center',
-        margin: [0, 115, 0, 10],
-      },
-      {
         text: 'Filtros',
         bold: true,
         alignment: 'left',
@@ -109,6 +103,18 @@ export function useInventoryReportPdf() {
     }
 
     const docDefinition: TDocumentDefinitions = {
+      pageMargins: [40, 140, 40, 40],
+      header: (currentPage: number) => {
+        if (currentPage === 1) {
+          return {
+            text: 'Relatório de Inventário',
+            style: 'header',
+            alignment: 'center',
+            margin: [0, 115, 0, 10],
+          }
+        }
+        return { text: '', margin: [0, 10, 0, 0] }
+      },
       content: contentArr,
       styles: {
         header: {
@@ -196,14 +202,7 @@ useInventoryReportPdf.grouped = function () {
     const formattedDate = currentDate.toLocaleDateString('pt-BR')
     const formattedTime = currentDate.toLocaleTimeString('pt-BR')
 
-    const contentArr: any[] = [
-      {
-        text: 'Relatório de Inventário (Agrupado)',
-        style: 'header',
-        alignment: 'center',
-        margin: [0, 115, 0, 10],
-      },
-    ]
+    const contentArr: any[] = []
 
     if (!stocks || stocks.length === 0) {
       contentArr.push({
@@ -323,6 +322,18 @@ useInventoryReportPdf.grouped = function () {
     }
 
     const docDefinition: TDocumentDefinitions = {
+      pageMargins: [40, 140, 40, 40],
+      header: (currentPage: number) => {
+        if (currentPage === 1) {
+          return {
+            text: 'Relatório de Inventário (Agrupado)',
+            style: 'header',
+            alignment: 'center',
+            margin: [0, 115, 0, 10],
+          }
+        }
+        return { text: '', margin: [0, 10, 0, 0] }
+      },
       content: contentArr,
       styles: {
         header: {

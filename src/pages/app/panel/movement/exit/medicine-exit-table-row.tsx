@@ -118,7 +118,11 @@ export function MedicineExitTableRow({
                   size={"xs"}
                   disabled={
                     loading ||
-                    !(medicineExit.exitType === ExitType.DONATION) ||
+                    !(
+                      medicineExit.exitType === ExitType.DONATION ||
+                      (medicineExit.exitType === ExitType.TRANSFER &&
+                        medicineExit.transferStatus === 'CONFIRMED')
+                    ) ||
                     medicineExit.reverseAt !== null
                   }
                   onClick={handleDownload}
