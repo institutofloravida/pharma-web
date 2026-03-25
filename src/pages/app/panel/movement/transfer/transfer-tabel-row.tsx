@@ -1,5 +1,6 @@
 import { CheckCircle, Search } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,10 +24,13 @@ export interface TransferTableRowProps {
 
 export function TransferTableRow({ transfer }: TransferTableRowProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isConfirming, setIsConfirming] = useState(false);
   const { token, institutionId } = useAuth();
+  const navigate = useNavigate();
 
   const handleOnConfirm = async (transferId: string) => {
     try {
+      setIsConfirming(true);
       await confirmTransfer({ transferId }, token ?? "");
       queryClient.invalidateQueries({
         queryKey: ["transfers"],
@@ -44,21 +48,22 @@ export function TransferTableRow({ transfer }: TransferTableRowProps) {
         description: errorMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsConfirming(false);
     }
   };
 
   return (
     <TableRow>
       <TableCell>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant={"outline"} size={"xs"}>
-              <Search className="h-3 w-3" />
-              <span className="sr-only">Detalhes da saída</span>
-            </Button>
-          </DialogTrigger>
-          {/* <OrderDetails /> */}
-        </Dialog>
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={() => navigate(`/movement/transfer/${transfer.transferId}`)}
+        >
+          <Search className="h-3 w-3" />
+          <span className="sr-only">Detalhes da transferência</span>
+        </Button>
       </TableCell>
       <TableCell>
         {new Date(transfer.transferDate).toLocaleDateString("pt-BR")}
@@ -111,6 +116,7 @@ export function TransferTableRow({ transfer }: TransferTableRowProps) {
                 onConfirm={() => handleOnConfirm(transfer.transferId)}
                 onClose={() => setIsOpen(false)}
                 transferId={transfer.transferId}
+                isConfirming={isConfirming}
               />
             </Dialog>
           )}

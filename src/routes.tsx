@@ -41,6 +41,7 @@ import { MonthlyMedicineUtilizationReportForm } from "./pages/app/reports/monthl
 import { MovimentationReport } from "./pages/app/reports/movimentation-in-a-period/movimentation-report";
 import DispensationPage from "./pages/app/panel/test/dispensation-page";
 import { TransfersPage } from "./pages/app/panel/movement/transfer/tranfers-page";
+import { TransferDetails } from "./pages/app/panel/movement/transfer/transfer-details";
 import { InventoryReport } from "./pages/app/reports/inventory/inventory-report";
 
 export const router = createBrowserRouter([
@@ -306,7 +307,25 @@ export const router = createBrowserRouter([
       },
       {
         path: "transfer",
-        element: <TransfersPage />,
+        element: <Outlet />,
+        children: [
+          {
+            path: "",
+            element: (
+              <PrivateRoute>
+                <TransfersPage />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: ":id",
+            element: (
+              <PrivateRoute>
+                <TransferDetails />
+              </PrivateRoute>
+            ),
+          },
+        ],
       },
     ],
   },

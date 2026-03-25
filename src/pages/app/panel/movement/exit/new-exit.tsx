@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { formatters } from "date-fns";
 import { AlertCircle, FileText, Save } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 
 import { fetchInstitutions } from "@/api/pharma/auxiliary-records/institution/fetch-institutions";
@@ -85,9 +85,6 @@ export default function MedicineExitPage() {
   const [queryMovementType, setQueryMovementType] = useState("");
   const [queryInstitution, setQueryInstitution] = useState("");
 
-  const [selectedMedicines, setSelectedMedicines] = useState<MedicineStock[]>(
-    [],
-  );
   const [showErrors, setShowErrors] = useState(false);
   const { toast } = useToast();
 
@@ -109,6 +106,11 @@ export default function MedicineExitPage() {
     control: form.control,
     name: "medicines",
   });
+
+  // Ref synchronously maps medicineStockId → MedicineStock display data.
+  // Using a ref (not state) avoids the render-timing desync between
+  // react-hook-form's fields and a parallel useState array.
+  const medicinesMapRef = useRef<Record<string, MedicineStock>>({});
 
   const { data: stocksResult, isFetching: isFetchingStocks } = useQuery({
     queryKey: ["stocks", queryStock],
@@ -195,13 +197,15 @@ export default function MedicineExitPage() {
     },
   });
 
-  const addMedicine = (medicine: MedicineStock) => {
-    append({
-      medicineStockId: medicine.id,
-      batches: [],
-    });
+  // Derive from fields using the ref — always in sync with react-hook-form
+  const selectedMedicines = fields
+    .map((f) => medicinesMapRef.current[f.medicineStockId])
+    .filter(Boolean) as MedicineStock[];
 
-    setSelectedMedicines([...selectedMedicines, medicine]);
+  const addMedicine = (medicine: MedicineStock) => {
+    // Update ref BEFORE append so the data is available on the very next render
+    medicinesMapRef.current[medicine.id] = medicine;
+    append({ medicineStockId: medicine.id, batches: [] });
 
     toast({
       title: "Medicamento adicionado",
@@ -210,13 +214,12 @@ export default function MedicineExitPage() {
   };
 
   const removeMedicine = (index: number) => {
-    const medicine = selectedMedicines[index];
+    const medicine = medicinesMapRef.current[fields[index]?.medicineStockId];
     remove(index);
-    setSelectedMedicines(selectedMedicines.filter((_, i) => i !== index));
 
     toast({
       title: "Medicamento removido",
-      description: `${medicine.medicine} foi removido da lista.`,
+      description: `${medicine?.medicine} foi removido da lista.`,
       variant: "destructive",
     });
   };
@@ -281,9 +284,9 @@ export default function MedicineExitPage() {
         });
       }
 
-      // Reset form
+      // Reset form and medicine map
       form.reset();
-      setSelectedMedicines([]);
+      medicinesMapRef.current = {};
     } catch (error) {
       const errorMessage = handleApiError(error);
       toast({
@@ -592,7 +595,7 @@ export default function MedicineExitPage() {
                     key={field.id}
                     control={form.control}
                     medicineIndex={index}
-                    medicine={selectedMedicines[index]}
+                    medicine={medicinesMapRef.current[field.medicineStockId]}
                     onRemove={() => removeMedicine(index)}
                   />
                 ))}

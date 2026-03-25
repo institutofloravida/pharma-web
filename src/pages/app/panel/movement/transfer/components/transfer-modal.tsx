@@ -25,6 +25,7 @@ import {
   Calendar,
   CheckCircle,
   Hash,
+  Loader2,
   Package,
   User,
 } from "lucide-react";
@@ -41,6 +42,7 @@ interface TransferModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (transferId: string) => void;
+  isConfirming?: boolean;
 }
 
 export function TransferModal({
@@ -48,6 +50,7 @@ export function TransferModal({
   isOpen,
   onClose,
   onConfirm,
+  isConfirming = false,
 }: TransferModalProps) {
   const { token } = useAuth();
   if (!transferId) return null;
@@ -61,7 +64,6 @@ export function TransferModal({
     if (transfer) {
       onConfirm(transfer.transferId);
     }
-    onClose();
   };
 
   return (
@@ -301,11 +303,16 @@ export function TransferModal({
                 serão adicionados ao estoque de destino.
               </p>
               <div className="flex gap-3">
-                <Button variant="outline" onClick={onClose}>
+                <Button variant="outline" onClick={onClose} disabled={isConfirming}>
                   Cancelar
                 </Button>
-                <Button onClick={handleConfirm}>
-                  <CheckCircle className="mr-2 h-4 w-4" /> Confirmar Recebimento
+                <Button onClick={handleConfirm} disabled={isConfirming}>
+                  {isConfirming ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                  )}
+                  {isConfirming ? "Confirmando..." : "Confirmar Recebimento"}
                 </Button>
               </div>
             </div>
