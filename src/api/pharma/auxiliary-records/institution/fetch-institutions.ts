@@ -6,6 +6,7 @@ export interface FetchInstitutionsQuery {
   page?: number | null
   query?: string | null
   cnpj?: string | null
+  controlStock?: boolean | null
 }
 
 export interface Institution {
@@ -24,7 +25,7 @@ interface FetchInstitutionsResponse {
 }
 
 export async function fetchInstitutions(
-  { page, cnpj, query }: FetchInstitutionsQuery,
+  { page, cnpj, query, controlStock }: FetchInstitutionsQuery,
   token: string,
 ) {
   const response = await apiPharma.get<FetchInstitutionsResponse>(
@@ -37,8 +38,9 @@ export async function fetchInstitutions(
         page,
         query,
         cnpj,
+        controlStock,
       },
-    },
+    },  
   )
 
   return response.data
