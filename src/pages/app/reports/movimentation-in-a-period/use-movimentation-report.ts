@@ -6,6 +6,7 @@ import { ExitType } from "@/api/pharma/movement/exit/register-medicine-exit";
 import { Movimentation } from "@/api/pharma/reports/movimentation-in-a-period-report";
 import { useAuth } from "@/contexts/authContext";
 import { MovementTypeDirection } from "@/lib/utils/movement-type";
+import { translateMovementTypeLabel } from "@/lib/utils/translations-mappers/entry-type-translation";
 import { BACKGROUND_LANDSCAPE } from "@/lib/reports/bases-64";
 
 pdfMake.vfs = (pdfFonts as any).vfs;
@@ -146,7 +147,7 @@ export function useMovimentationReportPdf() {
             mov.batchCode,
             mov.quantity,
             new Date(mov.movementDate).toLocaleDateString("pt-BR"),
-            mov.movementType,
+            translateMovementTypeLabel(mov.movementType),
             mov.direction === MovementTypeDirection.ENTRY ? "ENTRADA" : "SAÍDA",
             mov.operator,
           ]),

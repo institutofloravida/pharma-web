@@ -37,16 +37,7 @@ export function MedicineEntryTableRow({
       <TableCell className="font-mono text-xs font-medium">
         {dateFormatter.format(new Date(medicineEntry.entryDate))}
       </TableCell>
-      <TableCell>
-        <Button variant={'outline'} size={'xs'}>
-          <PenLine className="h-3 w-3" />
-        </Button>
-      </TableCell>
-      <TableCell>
-        <Button variant={'outline'} size={'xs'}>
-          <Trash className="h-3 w-3" />
-        </Button>
-      </TableCell>
+      
     </TableRow>
   )
 }

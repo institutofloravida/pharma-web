@@ -8,6 +8,7 @@ import {
   fullDateTimeFormatter,
 } from "@/lib/utils/formatter";
 import { MovementTypeDirection } from "@/lib/utils/movement-type";
+import { translateMovementTypeLabel } from "@/lib/utils/translations-mappers/entry-type-translation";
 
 export interface MovimentationTableRowProps {
   movimentation: Movimentation;
@@ -42,7 +43,7 @@ export function MovimentationTableRow({
         {movimentation.quantity}
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
-        <Badge variant={"secondary"}>{movimentation.movementType}</Badge>
+        <Badge variant={"secondary"}>{translateMovementTypeLabel(movimentation.movementType)}</Badge>
       </TableCell>
       <TableCell className="font-mono text-xs font-medium">
         {movimentation.operator}

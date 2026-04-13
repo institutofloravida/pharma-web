@@ -1,10 +1,12 @@
-import { CheckCircle, Search } from "lucide-react";
+import { CheckCircle, Search, XCircle } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialogConfirm } from "@/components/dialog/alert-confirm-content";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { TransferModal } from "./components/transfer-modal";
 import {
@@ -13,6 +15,7 @@ import {
 } from "@/api/pharma/movement/transfer/fetch-transfer";
 import { getTransferStatusTranslation } from "@/lib/utils/translations-mappers/status-transfer-translation";
 import { confirmTransfer } from "@/api/pharma/movement/transfer/confirm-transfer";
+import { cancelTransfer } from "@/api/pharma/movement/transfer/cancel-transfer";
 import { useAuth } from "@/contexts/authContext";
 import { toast } from "@/hooks/use-toast";
 import { handleApiError } from "@/lib/utils/handle-api-error";
@@ -25,6 +28,7 @@ export interface TransferTableRowProps {
 export function TransferTableRow({ transfer }: TransferTableRowProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const { token, institutionId } = useAuth();
   const navigate = useNavigate();
 
@@ -50,6 +54,29 @@ export function TransferTableRow({ transfer }: TransferTableRowProps) {
       });
     } finally {
       setIsConfirming(false);
+    }
+  };
+
+  const handleOnCancel = async (transferId: string) => {
+    try {
+      setIsCancelling(true);
+      await cancelTransfer({ transferId }, token ?? "");
+      queryClient.invalidateQueries({
+        queryKey: ["transfers"],
+      });
+      toast({
+        title: "Transferência recusada com sucesso!",
+        description: "Os medicamentos foram devolvidos ao estoque de origem.",
+      });
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast({
+        title: "Erro ao recusar transferência",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsCancelling(false);
     }
   };
 
@@ -102,23 +129,45 @@ export function TransferTableRow({ transfer }: TransferTableRowProps) {
       <TableCell className="text-right">
         {transfer.status === TransferStatus.PENDING &&
           transfer.institutionDestinationId === institutionId && (
-            <Dialog>
-              <DialogTrigger asChild>
-                {transfer.status === "PENDING" && (
+            <div className="flex items-center justify-end gap-2">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    className="gap-2"
+                    disabled={isCancelling}
+                  >
+                    <XCircle className="h-4 w-4" />
+                    Recusar
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogConfirm
+                  title="Recusar transferência?"
+                  description="Os medicamentos serão devolvidos ao estoque de origem. Esta ação não pode ser desfeita."
+                  isPending={isCancelling}
+                  variant="destructive"
+                  cancelLabel="Cancelar"
+                  confirmLabel="Recusar"
+                  onConfirm={() => handleOnCancel(transfer.transferId)}
+                />
+              </AlertDialog>
+              <Dialog>
+                <DialogTrigger asChild>
                   <Button size="sm" variant="outline" className="gap-2">
                     <CheckCircle className="h-4 w-4" />
                     Confirmar
                   </Button>
-                )}
-              </DialogTrigger>
-              <TransferModal
-                isOpen={true}
-                onConfirm={() => handleOnConfirm(transfer.transferId)}
-                onClose={() => setIsOpen(false)}
-                transferId={transfer.transferId}
-                isConfirming={isConfirming}
-              />
-            </Dialog>
+                </DialogTrigger>
+                <TransferModal
+                  isOpen={true}
+                  onConfirm={() => handleOnConfirm(transfer.transferId)}
+                  onClose={() => setIsOpen(false)}
+                  transferId={transfer.transferId}
+                  isConfirming={isConfirming}
+                />
+              </Dialog>
+            </div>
           )}
       </TableCell>
     </TableRow>

@@ -6,6 +6,7 @@ interface InventoryMedicineDetailsParams {
 
 interface batchStockInventory {
   id: string;
+  batchId: string;
   code: string;
   quantity: number;
   expirationDate: Date;

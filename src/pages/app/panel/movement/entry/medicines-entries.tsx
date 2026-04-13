@@ -72,8 +72,7 @@ export function MedicinesEntries() {
                   <TableHead className="">Operador</TableHead>
                   <TableHead className="w-[64px]">Itens</TableHead>
                   <TableHead>Data</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
+                  
                 </TableRow>
               </TableHeader>
               <TableBody>

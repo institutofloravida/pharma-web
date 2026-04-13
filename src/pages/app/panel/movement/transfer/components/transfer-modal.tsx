@@ -28,21 +28,22 @@ import {
   Loader2,
   Package,
   User,
+  XCircle,
 } from "lucide-react";
 import type { Transfer } from "../types/transfer";
 import { getTransfer } from "@/api/pharma/movement/transfer/get-transfer";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/authContext";
 import { getTransferStatusTranslation } from "@/lib/utils/translations-mappers/status-transfer-translation";
-import { tr } from "date-fns/locale";
-import { on } from "events";
 
 interface TransferModalProps {
   transferId: string;
   isOpen: boolean;
   onClose: () => void;
   onConfirm: (transferId: string) => void;
+  onCancel?: (transferId: string) => void;
   isConfirming?: boolean;
+  isCancelling?: boolean;
 }
 
 export function TransferModal({
@@ -50,7 +51,9 @@ export function TransferModal({
   isOpen,
   onClose,
   onConfirm,
+  onCancel,
   isConfirming = false,
+  isCancelling = false,
 }: TransferModalProps) {
   const { token } = useAuth();
   if (!transferId) return null;
@@ -303,17 +306,37 @@ export function TransferModal({
                 serão adicionados ao estoque de destino.
               </p>
               <div className="flex gap-3">
-                <Button variant="outline" onClick={onClose} disabled={isConfirming}>
-                  Cancelar
+                <Button
+                  variant="outline"
+                  onClick={onClose}
+                  disabled={isConfirming || isCancelling}
+                >
+                  Fechar
                 </Button>
-                <Button onClick={handleConfirm} disabled={isConfirming}>
-                  {isConfirming ? (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                  )}
-                  {isConfirming ? "Confirmando..." : "Confirmar Recebimento"}
-                </Button>
+                {onCancel && transfer?.status === "PENDING" && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => transfer && onCancel(transfer.transferId)}
+                    disabled={isCancelling || isConfirming}
+                  >
+                    {isCancelling ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <XCircle className="mr-2 h-4 w-4" />
+                    )}
+                    {isCancelling ? "Recusando..." : "Recusar Transferência"}
+                  </Button>
+                )}
+                {transfer?.status === "PENDING" && (
+                  <Button onClick={handleConfirm} disabled={isConfirming || isCancelling}>
+                    {isConfirming ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                    )}
+                    {isConfirming ? "Confirmando..." : "Confirmar Recebimento"}
+                  </Button>
+                )}
               </div>
             </div>
           </div>

@@ -50,8 +50,8 @@ export function DispensationsMonthCard() {
                 }
               >
                 {dispenseMetrics.month.percentageComparedToLastMonth > 0
-                  ? `+${dispenseMetrics.month.percentageComparedToLastMonth}`
-                  : dispenseMetrics.month.percentageComparedToLastMonth}
+                  ? `+${parseFloat(dispenseMetrics.month.percentageComparedToLastMonth.toFixed(2))}`
+                  : parseFloat(dispenseMetrics.month.percentageComparedToLastMonth.toFixed(2))}
                 %
               </span>{" "}
               em relação ao mês passado

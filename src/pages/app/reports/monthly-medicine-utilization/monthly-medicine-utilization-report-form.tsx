@@ -45,9 +45,12 @@ export function MonthlyMedicineUtilizationReportForm() {
 
   const generatePdf = useMonthlyMedicineUtilizationReportPdf();
 
+  const currentDate = new Date();
   const form = useForm<MonthlyMedicineUtilizationReportFormSchema>({
     defaultValues: {
       institutionId: institutionId ?? "",
+      year: currentDate.getFullYear(),
+      month: currentDate.getMonth(),
     },
     resolver: zodResolver(monthlymedicineutilizationReportFormSchema),
   });
@@ -124,7 +127,7 @@ export function MonthlyMedicineUtilizationReportForm() {
                 <FormLabel>Ano</FormLabel>
                 <ComboboxUp
                   field={{
-                    value: String(field.value) ?? "",
+                    value: field.value != null ? String(field.value) : "",
                     onChange: field.onChange,
                   }}
                   items={Array.from(
@@ -159,7 +162,7 @@ export function MonthlyMedicineUtilizationReportForm() {
                 <FormLabel>Mês</FormLabel>
                 <SelectMonth
                   onChange={field.onChange}
-                  value={String(field.value)}
+                  value={field.value != null ? String(field.value) : ""}
                 />
                 <FormMessage />
               </FormItem>

@@ -1,11 +1,13 @@
 import { apiPharma } from '@/lib/axios'
 
 export interface EntryDetailsBatch {
+  movimentationId: string
   batchNumber: string
   manufacturer: string
   manufacturingDate?: string
   expirationDate: string
   quantity: number
+  originalQuantity?: number | null
 }
 
 export interface EntryDetailsMedicine {
@@ -21,11 +23,13 @@ export interface EntryDetailsMedicine {
 export interface EntryDetails {
   id: string
   entryDate: string
-  entryType: 'MOVEMENT_TYPE' | 'TRANSFER' | 'INVENTORY'
+  entryType: 'MOVEMENT_TYPE' | 'TRANSFER' | 'INVENTORY' | 'CORRECTION'
   movementType?: string
   nfNumber?: string
   operator: string
   stock: string
+  correctedAt?: string | null
+  correctionOfEntryId?: string | null
   medicines: EntryDetailsMedicine[]
 }
 

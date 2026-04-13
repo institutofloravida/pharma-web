@@ -17,6 +17,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import { inventoryMedicineDetails } from "@/api/pharma/inventory/inventory-medicine-details";
 import { UpdateMinimumLevelDialog } from "./update-minimum-level-dialog";
+import { UpdateBatchDialog } from "./update-batch-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -277,6 +278,7 @@ export function InventoryMedicineDetails() {
                     <TableHead className="text-center">
                       Data Fabricação
                     </TableHead>
+                    <TableHead className="w-10"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -300,6 +302,7 @@ export function InventoryMedicineDetails() {
                         >
                           {new Date(batch.expirationDate).toLocaleDateString(
                             "pt-BR",
+                            { timeZone: "UTC" },
                           )}
                         </span>
 
@@ -325,8 +328,17 @@ export function InventoryMedicineDetails() {
                         {batch.manufacturingDate
                           ? new Date(
                               batch.manufacturingDate,
-                            ).toLocaleDateString("pt-BR")
+                            ).toLocaleDateString("pt-BR", { timeZone: "UTC" })
                           : "-"}
+                      </TableCell>
+                      <TableCell>
+                        <UpdateBatchDialog
+                          medicineStockId={medicine.medicineStockId}
+                          batchId={batch.batchId}
+                          currentCode={batch.code}
+                          currentExpirationDate={batch.expirationDate}
+                          currentManufacturingDate={batch.manufacturingDate}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}

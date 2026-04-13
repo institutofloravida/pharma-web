@@ -51,8 +51,8 @@ export function DispensationsTodayCard() {
                 }
               >
                 {dispenseMetrics.today.percentageAboveAverage > 0
-                  ? `+${dispenseMetrics.today.percentageAboveAverage}`
-                  : dispenseMetrics.today.percentageAboveAverage}
+                  ? `+${parseFloat(dispenseMetrics.today.percentageAboveAverage.toFixed(2))}`
+                  : parseFloat(dispenseMetrics.today.percentageAboveAverage.toFixed(2))}
                 %
               </span>{" "}
               {dispenseMetrics.today.percentageAboveAverage >= 0
