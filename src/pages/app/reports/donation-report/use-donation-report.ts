@@ -16,8 +16,8 @@ export function useDonationReportPdf() {
 
     const data = await getDonationReportReport({ exitId }, token);
     const { exit, movimentation } = data;
-    console.log("data", data);
-    const formattedDate = new Date().toLocaleDateString("pt-BR", {
+    const exitDate = new Date(exit.exitDate);
+    const formattedDate = exitDate.toLocaleDateString("pt-BR", {
       day: "2-digit",
       month: "long",
       year: "numeric",
