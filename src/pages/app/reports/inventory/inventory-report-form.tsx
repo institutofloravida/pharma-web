@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { fetchManufacturers } from "@/api/pharma/auxiliary-records/manufacturer/fetch-manufacturer";
 import { fetchStocks } from "@/api/pharma/auxiliary-records/stock/fetch-stocks";
 import { fetchTherapeuticClasses } from "@/api/pharma/auxiliary-records/therapeutic-class/fetch-therapeutic-class";
 import { getInventoryReport } from "@/api/pharma/reports/inventory-report";
@@ -32,12 +33,14 @@ export const inventoryReportFormSchema = z.object({
   isLowStock: z.coerce.boolean().optional(),
   group: z.coerce.boolean().optional(),
   includeBatches: z.coerce.boolean().optional(),
+  manufacturerId: z.string().optional(),
 });
 type InventoryReportFormSchema = z.infer<typeof inventoryReportFormSchema>;
 
 export function InventoryReportForm() {
   const [queryStock, setQueryStock] = useState("");
   const [queryTherapeuticClass, setqueryTherapeuticClass] = useState("");
+  const [queryManufacturer, setQueryManufacturer] = useState("");
 
   const [filters, setFilters] = useState<InventoryReportFormSchema | null>(
     null,
@@ -56,6 +59,7 @@ export function InventoryReportForm() {
       therapeuticClassesIds: [],
       group: undefined,
       includeBatches: undefined,
+      manufacturerId: "",
     },
   });
 
@@ -80,6 +84,15 @@ export function InventoryReportForm() {
     refetchOnMount: true,
   });
 
+  const { data: manufacturersResult, isFetching: isFetchingManufacturers } =
+    useQuery({
+      queryKey: ["manufacturers", queryManufacturer],
+      queryFn: () =>
+        fetchManufacturers({ page: 1, query: queryManufacturer }, token ?? ""),
+      staleTime: 1000,
+      refetchOnMount: true,
+    });
+
   const { refetch, isFetching } = useQuery({
     queryKey: [
       "inventory-report",
@@ -90,6 +103,7 @@ export function InventoryReportForm() {
       filters?.isLowStock ?? null,
       filters?.group ?? null,
       filters?.includeBatches ?? null,
+      filters?.manufacturerId ?? null,
     ],
     queryFn: ({ queryKey }) => {
       const [
@@ -101,6 +115,7 @@ export function InventoryReportForm() {
         isLow,
         group,
         includeBatches,
+        manufacturerId,
       ] = queryKey;
       const institutionId =
         typeof institutionIdRaw === "string" ? institutionIdRaw : "";
@@ -119,6 +134,7 @@ export function InventoryReportForm() {
             typeof includeBatches === "boolean"
               ? (includeBatches as boolean)
               : undefined,
+          manufacturerId: manufacturerId as string | undefined,
         },
         token ?? "",
       );
@@ -155,10 +171,20 @@ export function InventoryReportForm() {
               return tc?.name ?? id;
             }) ?? [],
           isLowStock: values.isLowStock,
+          manufacturer: values.manufacturerId
+            ? manufacturersResult?.manufacturers.find(
+                (m) => m.id === values.manufacturerId,
+              )?.name
+            : undefined,
         });
       } else if (payload?.stocks) {
         generateGroupedPdf(payload.stocks, {
           includeBatches: !!values.includeBatches,
+          manufacturer: values.manufacturerId
+            ? manufacturersResult?.manufacturers.find(
+                (m) => m.id === values.manufacturerId,
+              )?.name
+            : undefined,
         });
       }
     }, 0);
@@ -203,6 +229,31 @@ export function InventoryReportForm() {
                   onSelect={(id, name) => {
                     form.setValue("stockId", id);
                     setQueryStock(name);
+                  }}
+                  itemKey="id"
+                  itemValue="name"
+                />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="manufacturerId"
+            render={({ field }) => (
+              <FormItem className="col-span-4 grid">
+                <FormLabel>Fabricante</FormLabel>
+                <Combobox
+                  items={manufacturersResult?.manufacturers || []}
+                  field={{ value: field.value ?? "" }}
+                  query={queryManufacturer}
+                  placeholder="Selecione um fabricante"
+                  isFetching={isFetchingManufacturers}
+                  onQueryChange={setQueryManufacturer}
+                  onSelect={(id, name) => {
+                    form.setValue("manufacturerId", id);
+                    setQueryManufacturer(name);
                   }}
                   itemKey="id"
                   itemValue="name"

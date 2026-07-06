@@ -28,6 +28,7 @@ export function useMovimentationReportPdf() {
       quantity?: number;
       movementType?: string;
       exitType?: ExitType;
+      manufacturer?: string;
     },
   ) => {
     const currentDate = new Date();
@@ -85,6 +86,7 @@ export function useMovimentationReportPdf() {
     filtersReport.push(
       formatLabelValue("Tipo de Movimento", filters.movementType),
     );
+    filtersReport.push(formatLabelValue("Fabricante", filters.manufacturer));
 
     filtersReport.push(
       filters.exitType && {
@@ -129,12 +131,13 @@ export function useMovimentationReportPdf() {
     contentArr.push({
       table: {
         headerRows: 1,
-        widths: ["auto", "*", "auto", "auto", "auto", "auto", "auto", "*"],
+        widths: ["auto", "*", "auto", "auto", "auto", "auto", "auto", "auto", "*"],
         body: [
           [
             { text: "Estoque", style: "tableHeader" },
             { text: "Medicamento", style: "tableHeader" },
             { text: "Lote", style: "tableHeader" },
+            { text: "Fabricante", style: "tableHeader" },
             { text: "Quantidade", style: "tableHeader" },
             { text: "Data", style: "tableHeader" },
             { text: "Tipo de Movimentação", style: "tableHeader" },
@@ -145,6 +148,7 @@ export function useMovimentationReportPdf() {
             mov.stock,
             `${mov.medicine} - ${mov.dosage}${mov.unitMeasure} - ${mov.pharmaceuticalForm}`,
             mov.batchCode,
+            mov.manufacturer ?? "",
             mov.quantity,
             new Date(mov.movementDate).toLocaleDateString("pt-BR"),
             translateMovementTypeLabel(mov.movementType),

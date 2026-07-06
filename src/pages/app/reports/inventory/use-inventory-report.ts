@@ -17,6 +17,7 @@ export function useInventoryReportPdf() {
       medicineName?: string
       therapeuticClasses?: string[]
       isLowStock?: boolean
+      manufacturer?: string
     },
   ) => {
     const currentDate = new Date()
@@ -34,6 +35,7 @@ export function useInventoryReportPdf() {
       if (typeof filters.isLowStock === 'boolean') {
         filtros.push(`Apenas baixo estoque: ${filters.isLowStock ? 'Sim' : 'Não'}`)
       }
+      if (filters.manufacturer) filtros.push(`Fabricante: ${filters.manufacturer}`)
     }
 
     const contentArr: any[] = [
@@ -196,13 +198,20 @@ useInventoryReportPdf.grouped = function () {
         }>
       }>
     }>,
-    opts?: { includeBatches?: boolean },
+    opts?: { includeBatches?: boolean; manufacturer?: string },
   ) => {
     const currentDate = new Date()
     const formattedDate = currentDate.toLocaleDateString('pt-BR')
     const formattedTime = currentDate.toLocaleTimeString('pt-BR')
 
     const contentArr: any[] = []
+
+    if (opts?.manufacturer) {
+      contentArr.push({
+        text: [{ text: 'Fabricante: ', bold: true }, { text: opts.manufacturer }],
+        margin: [0, 0, 0, 10],
+      })
+    }
 
     if (!stocks || stocks.length === 0) {
       contentArr.push({

@@ -8,6 +8,7 @@ export interface GetInventoryReportQuery {
   isLowStock?: boolean;
   group?: boolean;
   includeBatches?: boolean;
+  manufacturerId?: string;
 }
 
 export interface InventoryItem {
@@ -84,6 +85,7 @@ export async function getInventoryReport(
     therapeuticClassesIds,
     group,
     includeBatches,
+    manufacturerId,
   }: GetInventoryReportQuery,
   token: string,
 ) {
@@ -103,6 +105,9 @@ export async function getInventoryReport(
   }
   if (typeof isLowStock === "boolean") {
     params.isLowStock = isLowStock;
+  }
+  if (manufacturerId && manufacturerId.trim().length > 0) {
+    params.manufacturerId = manufacturerId;
   }
   if (typeof group === "boolean") {
     params.group = group;

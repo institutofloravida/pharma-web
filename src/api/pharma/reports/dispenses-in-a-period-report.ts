@@ -6,6 +6,7 @@ export interface GetDispensesInAPeriodReportQuery {
   endDate: Date;
   patientId?: string;
   operatorId?: string;
+  manufacturerId?: string;
 }
 
 export interface Dispensation {
@@ -41,6 +42,7 @@ export async function getDispensesInAPeriodReport(
     startDate,
     operatorId,
     patientId,
+    manufacturerId,
   }: GetDispensesInAPeriodReportQuery,
   token: string,
 ) {
@@ -56,6 +58,7 @@ export async function getDispensesInAPeriodReport(
         startDate,
         operatorId,
         patientId,
+        manufacturerId,
       },
     },
   );

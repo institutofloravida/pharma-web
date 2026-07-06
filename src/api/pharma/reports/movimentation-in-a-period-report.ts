@@ -14,6 +14,7 @@ export interface GetMovimentationInAPeriodReportQuery {
   stockId?: string
   medicineStockId?: string
   batchStockId?: string
+  manufacturerId?: string
   quantity?: number
   movementTypeId?: string
   exitType?: ExitType
@@ -23,6 +24,7 @@ export interface Movimentation {
   direction: MovementTypeDirection
   medicine: string
   batchCode: string
+  manufacturer?: string
   complement: string | null | undefined
   dosage: string
   pharmaceuticalForm: string
@@ -49,6 +51,7 @@ export async function getMovimentationInAPeriodReport(
     operatorId,
     direction,
     batchStockId,
+    manufacturerId,
     exitType,
     medicineId,
     medicineStockId,
@@ -71,6 +74,7 @@ export async function getMovimentationInAPeriodReport(
         startDate,
         operatorId,
         batchStockId,
+        manufacturerId,
         exitType,
         direction,
         medicineId,

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { fetchManufacturers } from "@/api/pharma/auxiliary-records/manufacturer/fetch-manufacturer";
 import { fetchOperators } from "@/api/pharma/operators/fetch-operators";
 import { getDispensesInAPeriodReport } from "@/api/pharma/reports/dispenses-in-a-period-report";
 import { fetchUsers } from "@/api/pharma/users/fetch-users";
@@ -31,6 +32,8 @@ export const dispensesReportFormSchema = z.object({
   patientName: z.string().optional(),
   operatorId: z.string().optional(),
   operatorName: z.string().optional(),
+  manufacturerId: z.string().optional(),
+  manufacturerName: z.string().optional(),
   startDate: z.date({
     required_error: "A data início é obrigatória.",
   }),
@@ -42,6 +45,7 @@ type DispensesReportFormSchema = z.infer<typeof dispensesReportFormSchema>;
 
 export function DispensesReportForm() {
   const [queryUsers, setQueryUsers] = useState("");
+  const [queryManufacturer, setQueryManufacturer] = useState("");
   const [filters, setFilters] = useState<DispensesReportFormSchema | null>({
     startDate: new Date(),
     endDate: new Date(),
@@ -68,6 +72,15 @@ export function DispensesReportForm() {
     refetchOnMount: true,
   });
 
+  const { data: manufacturersResult, isFetching: isFetchingManufacturers } =
+    useQuery({
+      queryKey: ["manufacturers", queryManufacturer],
+      queryFn: () =>
+        fetchManufacturers({ page: 1, query: queryManufacturer }, token ?? ""),
+      staleTime: 1000,
+      refetchOnMount: true,
+    });
+
   const { data, refetch, isFetching } = useQuery({
     queryKey: [
       "dispenses-report",
@@ -76,10 +89,18 @@ export function DispensesReportForm() {
       filters?.patientId ?? null,
       filters?.startDate ?? null,
       filters?.endDate ?? null,
+      filters?.manufacturerId ?? null,
     ],
     queryFn: ({ queryKey }) => {
-      const [, institutionIdRaw, operatorId, patientId, startDate, endDate] =
-        queryKey;
+      const [
+        ,
+        institutionIdRaw,
+        operatorId,
+        patientId,
+        startDate,
+        endDate,
+        manufacturerId,
+      ] = queryKey;
       const institutionId =
         typeof institutionIdRaw === "string" ? institutionIdRaw : "";
       return getDispensesInAPeriodReport(
@@ -89,6 +110,7 @@ export function DispensesReportForm() {
           patientId: patientId as string | undefined,
           startDate: (startDate as Date) ?? new Date(),
           endDate: (endDate as Date) ?? new Date(),
+          manufacturerId: manufacturerId as string | undefined,
         },
         token ?? "",
       );
@@ -108,6 +130,7 @@ export function DispensesReportForm() {
           endDate: filters.endDate ?? new Date(),
           patientName: filters.patientName,
           operatorName: filters.operatorName,
+          manufacturerName: filters.manufacturerName,
         });
       }
     }, 0);
@@ -210,6 +233,35 @@ export function DispensesReportForm() {
               />
               <FormDescription>
                 Pesquise por cpf, nome ou data de nascimento{" "}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="manufacturerId"
+          render={({ field }) => (
+            <FormItem className="col-span-3 flex flex-col gap-1">
+              <FormLabel>Fabricante</FormLabel>
+              <ComboboxUp
+                field={field}
+                items={manufacturersResult?.manufacturers ?? []}
+                itemKey="id"
+                onQueryChange={setQueryManufacturer}
+                query={queryManufacturer}
+                isFetching={isFetchingManufacturers}
+                formatItem={(item) => `${item.name}`}
+                getItemText={(item) => `${item.name}`}
+                placeholder="Pesquise por um fabricante"
+                onSelect={(id, item) => {
+                  form.setValue("manufacturerId", id);
+                  form.setValue("manufacturerName", item.name);
+                }}
+              />
+              <FormDescription>
+                Filtra dispensas que tiveram algum lote deste fabricante
               </FormDescription>
               <FormMessage />
             </FormItem>

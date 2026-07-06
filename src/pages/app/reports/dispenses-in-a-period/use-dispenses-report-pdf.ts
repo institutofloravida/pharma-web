@@ -17,6 +17,7 @@ export function useDispensesReportPdf() {
       endDate: Date;
       patientName?: string;
       operatorName?: string;
+      manufacturerName?: string;
     },
   ) => {
     const currentDate = new Date();
@@ -33,6 +34,9 @@ export function useDispensesReportPdf() {
       }
       if (filters.operatorName) {
         filtros.push(`Operador: ${filters.operatorName}`);
+      }
+      if (filters.manufacturerName) {
+        filtros.push(`Fabricante: ${filters.manufacturerName}`);
       }
     }
 

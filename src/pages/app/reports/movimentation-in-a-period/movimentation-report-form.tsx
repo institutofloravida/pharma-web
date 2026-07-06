@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import { fetchManufacturers } from "@/api/pharma/auxiliary-records/manufacturer/fetch-manufacturer";
 import { fetchMovementTypes } from "@/api/pharma/auxiliary-records/movement-type/fetch-movement-types";
 import { fetchStocks } from "@/api/pharma/auxiliary-records/stock/fetch-stocks";
 import { fetchMedicines } from "@/api/pharma/medicines/fetch-medicines";
@@ -48,6 +49,8 @@ export const movimentationReportFormSchema = z.object({
   batchStockName: z.string().optional(),
   movementTypeId: z.string().optional(),
   movementTypeName: z.string().optional(),
+  manufacturerId: z.string().optional(),
+  manufacturerName: z.string().optional(),
   exitType: z.nativeEnum(ExitType).optional(),
   quantity: z.number().optional(),
   operatorId: z.string().optional(),
@@ -71,6 +74,7 @@ export function MovimentationReportForm() {
   const [queryMedicineStock, setQueryMedicineStock] = useState("");
   const [queryBatchesStock, setQueryBatchesStock] = useState("");
   const [queryMovementType, setQueryMovementType] = useState("");
+  const [queryManufacturer, setQueryManufacturer] = useState("");
 
   const [filters, setFilters] = useState<MovimentationReportFormSchema | null>({
     startDate: new Date(),
@@ -169,6 +173,15 @@ export function MovimentationReportForm() {
       refetchOnMount: true,
     });
 
+  const { data: manufacturersResult, isFetching: isFetchingManufacturers } =
+    useQuery({
+      queryKey: ["manufacturers", queryManufacturer],
+      queryFn: () =>
+        fetchManufacturers({ page: 1, query: queryManufacturer }, token ?? ""),
+      staleTime: 1000,
+      refetchOnMount: true,
+    });
+
   const { data: movementTypesResult, isFetching: isFetchingMovementTypes } =
     useQuery({
       queryKey: [
@@ -212,6 +225,7 @@ export function MovimentationReportForm() {
       filters?.movementTypeId ?? null,
       filters?.movementTypeName ?? null,
       filters?.direction ?? null,
+      filters?.manufacturerId ?? null,
     ],
     queryFn: ({ queryKey }) => {
       const [
@@ -235,6 +249,7 @@ export function MovimentationReportForm() {
         movementTypeId,
         _______,
         direction,
+        manufacturerId,
       ] = queryKey;
       const institutionId =
         typeof institutionIdRaw === "string" ? institutionIdRaw : "";
@@ -252,6 +267,7 @@ export function MovimentationReportForm() {
           exitType: exitType as ExitType | undefined,
           movementTypeId: movementTypeId as string | undefined,
           direction: direction as MovementTypeDirection | undefined,
+          manufacturerId: manufacturerId as string | undefined,
         },
         token ?? "",
       );
@@ -282,6 +298,7 @@ export function MovimentationReportForm() {
           batcheStock: values.batchStockName,
           exitType: values.exitType,
           direction: values.direction,
+          manufacturer: values.manufacturerName,
         });
       }
     }, 0);
@@ -578,6 +595,34 @@ export function MovimentationReportForm() {
                               Não existem quantidades válidas para este medicamento
                             </FormDescription>
                           )} */}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="manufacturerId"
+            render={({ field }) => (
+              <FormItem className="col-span-4 grid">
+                <FormLabel>Fabricante</FormLabel>
+                <ComboboxUp
+                  items={manufacturersResult?.manufacturers ?? []}
+                  field={{
+                    value: field.value ?? "",
+                    onChange: field.onChange,
+                  }}
+                  query={queryManufacturer}
+                  placeholder="Selecione um fabricante"
+                  isFetching={isFetchingManufacturers}
+                  onQueryChange={setQueryManufacturer}
+                  onSelect={(id, item) => {
+                    form.setValue("manufacturerId", id);
+                    form.setValue("manufacturerName", item.name);
+                  }}
+                  itemKey="id"
+                  formatItem={(item) => `${item.name}`}
+                  getItemText={(item) => `${item.name}`}
+                />
                 <FormMessage />
               </FormItem>
             )}
