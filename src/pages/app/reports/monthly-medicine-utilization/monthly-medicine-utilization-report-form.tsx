@@ -36,12 +36,7 @@ export function MonthlyMedicineUtilizationReportForm() {
   const { token, institutionId } = useAuth();
   const [queryStock, setQueryStock] = useState("");
   const [queryYear, setQueryYear] = useState("");
-  const [filters, setFilters] =
-    useState<MonthlyMedicineUtilizationReportFormSchema | null>({
-      institutionId: "",
-      year: 0,
-      month: 0,
-    });
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const generatePdf = useMonthlyMedicineUtilizationReportPdf();
 
@@ -62,57 +57,38 @@ export function MonthlyMedicineUtilizationReportForm() {
     refetchOnMount: true,
   });
 
-  const { data, refetch, isFetching } = useQuery({
-    queryKey: [
-      "monthlymedicineutilization-report",
-      institutionId,
-      filters?.stockId ?? null,
-      filters?.stockName ?? null,
-      filters?.year ?? null,
-      filters?.month ?? null,
-    ],
-    queryFn: ({ queryKey }) => {
-      const [, institutionIdRaw, stockId, ____, year, month] = queryKey;
-      const institutionId =
-        typeof institutionIdRaw === "string" ? institutionIdRaw : "";
-      return getMonthlyMedicineUtilization(
-        {
-          institutionId,
-          stockId: stockId as string | undefined,
-          month: Number(month),
-          year: Number(year),
-        },
-        token ?? "",
-      );
-    },
-    enabled: false,
-  });
   const handleClick = async () => {
-    console.log(form.formState.errors);
     const isValid = await form.trigger();
     if (!isValid) return;
 
     const values = form.getValues();
+    setIsGenerating(true);
+    try {
+      const result = await getMonthlyMedicineUtilization(
+        {
+          institutionId: values.institutionId || institutionId || "",
+          stockId: values.stockId,
+          month: Number(values.month),
+          year: Number(values.year),
+        },
+        token ?? "",
+      );
 
-    setFilters(values);
-
-    setTimeout(async () => {
-      const result = await refetch();
-
-      if (result.data?.utilization) {
-        generatePdf(result.data.utilization, {
+      if (result?.utilization) {
+        generatePdf(result.utilization, {
           institutionId: institutionId ?? "",
           stock: values.stockName,
           year: String(values.year),
           month: String(values.month),
         });
       }
-    }, 0);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleClearFilters = () => {
     form.reset();
-    setFilters(null);
   };
 
   return (
@@ -212,8 +188,8 @@ export function MonthlyMedicineUtilizationReportForm() {
               <X className="mr-2 h-4 w-4" />
               Limpar Campos
             </Button>
-            <Button onClick={handleClick} disabled={isFetching} type="button">
-              {isFetching ? "Gerando relatório..." : "Gerar PDF"}{" "}
+            <Button onClick={handleClick} disabled={isGenerating} type="button">
+              {isGenerating ? "Gerando relatório..." : "Gerar PDF"}{" "}
             </Button>
           </div>
         </div>
